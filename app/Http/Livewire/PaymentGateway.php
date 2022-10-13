@@ -21,7 +21,7 @@ class PaymentGateway extends Component
 
     public function render()
     {
-        $data['gatewaysCollection'] = Gateway::paginate(4);
+        $data['gatewaysCollection'] = Gateway::latest()->paginate(4);
         $data['gatewayId'] = $this->gatewayId;
         $data['gatewayName'] = $this->gatewayName;
         $data['gatewayStatus'] = $this->gatewayStatus;

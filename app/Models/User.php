@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Notifications\PasswordResetNotification;
+use App\Notifications\ResetPasswordNotification;
 use App\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -42,7 +44,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    public function gateways()
+    public function usergateway()
     {
         return $this->hasOne(UserGateway::class,'user_id');
 
@@ -64,7 +66,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ];
         }
 
-        return $this->gateways()->updateOrCreate(['user_id' => $this->id],['config_details' => $config_details]);
+        return $this->usergateway()->updateOrCreate(['user_id' => $this->id],['config_details' => $config_details]);
 
     }
 
@@ -120,6 +122,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail($this));
+
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function passwordResetNotification()
+    {
+        $this->notify(new PasswordResetNotification());
 
     }
 

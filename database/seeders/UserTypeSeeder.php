@@ -24,6 +24,7 @@ class UserTypeSeeder extends Seeder
             ['name' => "Merchant", "created_at" =>now(), "updated_at" => now() ],
         ]);
         //
+        /** @var User $admin */
         $admin = User::create([
             "type" => 1,
             "first_name" => "David",
@@ -31,8 +32,18 @@ class UserTypeSeeder extends Seeder
             "email" => "dogunejimite@saanapay.ng",
             "password" => bcrypt('1234')
         ]);
+        /** @var User $company */
+        $company = User::create([
+            "type" => 1,
+            "first_name" => "Saanapay",
+            "last_name" => "",
+            "email" => "business@saanapay.ng",
+            "password" => bcrypt('1234')
+        ]);
+        $company->addWallet();
 
         event(new Registered($admin));
+        event(new Registered($company));
 
 
     }

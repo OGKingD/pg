@@ -57,4 +57,6 @@ Route::middleware(['auth'])->group(function () {
 Route::get('test', function () {
     return view('test');
 });
+Route::get('payment/process/{id}',[\App\Http\Controllers\PaymentController::class, "paymentPage"]);
+Route::get('payment/receipt/{id}',[\App\Http\Controllers\PaymentController::class,'receipt'])->name('receipt');
 

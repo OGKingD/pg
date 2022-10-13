@@ -15,4 +15,21 @@ class Invoice extends Model
         return $this->belongsTo(User::class);
 
     }
+
+    public function rrr()
+    {
+        return $this->hasOne(RRR::class,'invoice_no','invoice_no');
+    }
+
+    public function transaction()
+    {
+        return $this->hasOne(Transaction::class,'invoice_no','invoice_no');
+
+    }
+
+    public function gateways()
+    {
+        return $this->user->usergateway;
+
+    }
 }

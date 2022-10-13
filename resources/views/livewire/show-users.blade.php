@@ -30,11 +30,11 @@
                             aria-labelledby="dropdownUserOptions">
                             <li>
                                 <a class="dropdown-item border-radius-md text-info" href="javascript:"
-                                   onclick="openEditPaymentGatewayModal({{$val->Gateways}},'{{$val->id}}')">
+                                   onclick="openEditPaymentGatewayModal({{$val->usergateway}},'{{$val->id}}')">
                                     Edit {{$val->first_name}} Gateway(s)
                                 </a>
+                                <hr class="dropdown-divider">
                             </li>
-                            <hr class="dropdown-divider">
 
                             <li>
                                 <a class="dropdown-item border-radius-md" href="javascript:;">See Details</a></li>
@@ -237,13 +237,9 @@
             }
 
 
-            function gatewaysUpdated() {
-                salert("Merchant Gateway Updated", "Success", 'success');
-                toggleModal('#modal-edit-user-gateway');
-            }
-
             window.addEventListener('merchantGatewayUpdated', event => {
-                gatewaysUpdated();
+                toggleModal('#modal-edit-user-gateway');
+                return salert("Merchant Gateway Updated", "Success", 'success');
             });
 
         </script>

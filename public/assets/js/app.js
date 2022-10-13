@@ -5,6 +5,34 @@ function salert(title, text, icon) {
         icon: icon,
     });
 }
+function copyTextToClipboard(elementId) {
+
+    var textArea = document.createElement("textarea");
+    document.body.appendChild(textArea);
+    console.log(document.getElementById(elementId));
+    textArea.value = document.getElementById(elementId).value ? document.getElementById(elementId).value : document.getElementById(elementId).innerText;
+
+    textArea.focus();
+    textArea.select();
+
+
+    try {
+        var successful = document.execCommand('copy');
+        var msg = successful ? 'successful' : 'unsuccessful';
+        Swal.fire({
+            title: 'Details Copied',
+        });
+    } catch (err) {
+        console.log(err);
+
+        throw new Error("Oops, unable to copy RRR");
+
+    }
+
+    document.body.removeChild(textArea);
+
+
+}
 
 function toggleModal(modalId) {
     $(modalId).modal('toggle');

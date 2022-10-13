@@ -36,7 +36,7 @@ class ShowUsers extends Component
             $this->dispatchBrowserEvent('gatewaysFetched');
         }
 
-        $builder = User::with('gateways')->where('type','=', 5);
+        $builder = User::with('usergateway')->where('type','=', 5);
         $users_tpl = !$this->searchUsers ? $builder->Paginate(10) : $builder->where('email', 'like', "{$this->searchUsers}%")->paginate(10);
 
         $this->users = collect($users_tpl->items());
@@ -85,6 +85,7 @@ class ShowUsers extends Component
         $merchantGatewayUpdated = UserGateway::where('user_id',$this->selectedUser)->first()->update([
             'config_details' => $config_details
         ]);
+        logger($merchantGatewayUpdated);
 
         if ($merchantGatewayUpdated) {
             $this->dispatchBrowserEvent('merchantGatewayUpdated');

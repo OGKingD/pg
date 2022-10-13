@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" sizes="76x76" href="{{asset('assets/img/saanapay.png')}}">
     <link rel="icon" type="image/png" href="{{asset('assets/img/saanapay.png')}}">
     <title>
-        Argon Design System Pro by Creative Tim
+        {{  $title ?? config('app.name', 'Laravel') }}
     </title>
     <!-- Extra details for Live View on GitHub Pages -->
     <!-- Canonical SEO -->
@@ -59,7 +59,7 @@
 <body class="presentation-page">
 
 <!-- Navbar -->
-<nav id="navbar-main" class="navbar navbar-main navbar-expand-lg  navbar-dark position-sticky top-0  py-2" style="background-color: #2f58e3">
+<nav id="navbar-main" class="navbar navbar-main navbar-expand-lg  navbar-dark position-sticky top-0  py-2" style="background: rgb(255,255,255);background: linear-gradient(152deg, rgba(255,255,255,1) 36%, rgba(44,202,227,1) 43%, rgba(19,60,139,1) 99%);">
     <div class="container">
         <a class=" min-vw-60" href="/">
             <img src="{{asset('assets/img/saanapay.png')}}" style="width: 55%" alt="">
@@ -127,15 +127,15 @@
                             <p class="lead">Start the Development with this<br/> <b>Badass Bootstrap 4 Design
                                     System.</b></p>
                             <div class="btn-wrapper mt-5">
-                                <a href="https://www.creative-tim.com/product/argon-design-system-pro"
-                                   class="btn btn-primary btn-icon mb-3 mb-sm-0">
-                                    <span class="btn-inner--icon"><i class="fas fa-shopping-cart"></i></span>
-                                    <span class="btn-inner--text">Purchase</span>
+                                <a href="{{route('login')}}"
+                                   class="btn btn-icon mb-3 mb-sm-0 text-white" style="background-color: #2ccae3">
+                                    <span class="btn-inner--icon"><i class="fas fa-sign-in-alt"></i></span>
+                                    <span >Login</span>
                                 </a>
-                                <a href="https://www.creative-tim.com/builder/argon"
+                                <a href="{{route('register')}}"
                                    class="btn btn-outline-primary btn-icon mb-3 mb-sm-0" target="_blank">
-                                    <span class="btn-inner--icon"><i class="fas fa-shopping-cart"></i></span>
-                                    <span class="btn-inner--text">Try Online Builder</span>
+                                    <span class="btn-inner--icon"><i class="fas fa-door-open"></i></span>
+                                    <span class="btn-inner--text">Register</span>
                                 </a>
                             </div>
 
@@ -719,7 +719,14 @@
         url: ' http://demos.creative-tim.com/blk-design-system-pro/index.html'
     });
 </script>
+<script src="{{asset('assets/js/core/popper.min.js')}}"></script>
+<script src="{{asset('assets/js/core/bootstrap.min.js')}}"></script>
+<script src="{{asset('assets/js/core/axios.js')}}"></script>
+<script src="{{asset('assets/js/plugins/perfect-scrollbar.min.js')}}"></script>
+<script src="{{asset('assets/js/plugins/smooth-scrollbar.min.js')}}"></script>
 
+<script src="{{asset('assets/js/plugins/dragula/dragula.min.js')}}"></script>
+<script src="{{asset('assets/js/plugins/jkanban/jkanban.js')}}"></script>
 </body>
 
 </html>

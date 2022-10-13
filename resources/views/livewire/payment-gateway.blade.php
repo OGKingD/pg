@@ -8,7 +8,7 @@
                  aria-hidden="true" style="display: none;">
                 <div class="modal-dialog modal-dialog-centered modal-md" role="document">
                     <div class="modal-content">
-                        <form role="form" action="{{route('paymentgateway.add')}}" method="post" wire:submit.prevent="addPaymentGateway">
+                        <form role="form" id="addPaymentGatewayForm" action="{{route('paymentgateway.add')}}" method="post" wire:submit.prevent="addPaymentGateway">
                             @csrf
 
                             <div class="modal-header ">
@@ -171,7 +171,7 @@
          aria-hidden="true" style="display: none;">
         <div class="modal-dialog modal-dialog-centered modal-md" role="document">
             <div class="modal-content">
-                <form role="form" wire:submit.prevent="updatePaymentGateway">
+                <form role="form" wire:submit.prevent="updatePaymentGateway" id="editPaymentGatewayForm">
 
                     @csrf
 
@@ -262,6 +262,7 @@
             window.addEventListener('gatewayCreated', event => {
                 Swal.close();
                 toggleModal('#modal-new-gateway');
+                document.getElementById('addPaymentGatewayForm').reset();
                 salert("Payment Gateway Created", "Success","success");
 
             });

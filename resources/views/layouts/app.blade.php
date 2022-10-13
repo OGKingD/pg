@@ -53,7 +53,7 @@
 @endif
 @if(session()->has('success'))
     <script>
-        salert("Success!", "{{session('status')}}!", "success");
+        salert("Success!", "{{session('success')}}!", "success");
     </script>
 @endif
 

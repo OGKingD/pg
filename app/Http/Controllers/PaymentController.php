@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gateway;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -17,6 +18,41 @@ class PaymentController extends Controller
         $data['title'] = "Payment Gateways";
 
         return view('admin.gateways.index', $data);
+    }
+
+    public function paymentPage($id)
+    {
+        list($data, $invoice) = $this->checkifInvoiceExist($id);
+
+        $data['title']  = "Payment Page";
+
+        //only show payment page when invoice is pending
+        if ($invoice->status !== "pending"){
+            //redirect to payment page;
+            return redirect()->route('receipt',['id' => $id])->with('status','Invoice Paid!');
+        }
+
+
+        return view('payment_page',$data);
+
+    }
+
+    public function receipt($id)
+    {
+        list($data, $invoice) = $this->checkifInvoiceExist($id);
+
+        $data['title']  = "Payment Receipt";
+
+        if ($invoice->status === 'pending'){
+            abort(403);
+        }
+        $data['invoice'] = $invoice;
+
+
+        return view('payment_receipt',$data);
+
+
+
     }
 
     /**
@@ -84,4 +120,22 @@ class PaymentController extends Controller
     {
         //
     }
+
+    /**
+     * @param $id
+     * @return array
+     */
+    public function checkifInvoiceExist($id): array
+    {
+        //check if Invoice exists;
+        $invoice = Invoice::where('invoice_no', $id)->first();
+        $data['invoice'] = $invoice;
+
+        if (!$invoice) {
+            abort(404);
+        }
+        return array($data, $invoice);
+    }
+
+
 }
