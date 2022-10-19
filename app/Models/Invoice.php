@@ -27,9 +27,9 @@ class Invoice extends Model
 
     }
 
-    public function gateways()
+    public function gateway()
     {
-        return $this->user->usergateway;
+        return $this->transaction->gateway();
 
     }
 }

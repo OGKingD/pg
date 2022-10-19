@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,7 +16,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware(['terminate'])->group(function () {
+    Route::middleware(['api'])->get('/welcome', function (Request $request) {
+        $inspirationalText = inspirationalText();
+        return [ "message" => "Hello 👋  {$request->user()->first_name} : {$inspirationalText['quote']} -- {$inspirationalText['author']}", 'success' => true,];
+    });
+    Route::post('webhook/flutterwave',[WebhookController::class,'flutterwave']);
+//Payment Request Routes!
+    Route::prefix('payments')->group(function () {
+        Route::post('create',[PaymentController::class,"createPaymentRequest"]);
+        Route::get('validate', [PaymentController::class, 'details']);
+    });
 });
-Route::post('webhook/flutterwave',[\App\Http\Controllers\WebhookController::class,'flutterwave']);

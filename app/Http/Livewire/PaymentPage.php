@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use Exception;
 use App\Lib\Services\{Flutterwave, Providus, Remita};
 use App\Models\DynamicAccount;
 use App\Models\Gateway;
@@ -27,6 +28,7 @@ class PaymentPage extends Component
     public $virtualAccDetails;
     public $cardDetails;
     public $gatewayId;
+    public $merchantRedirectUrl;
 
     public $cc_Number;
     public $cc_Expiration;
@@ -39,8 +41,8 @@ class PaymentPage extends Component
     public $transaction;
 
     protected $listeners = ['generateRRR', 'processCardTransaction',
-        'cardAuthorizationWithPin', 'cardAuthorizationWithOtp', 'generateVirtualAccountNumber',
-        'payWith',];
+        'cardAuthorizationWithPin', 'cardAuthorizationWithOtp','cardAuthorizationWithAvs',
+        'generateVirtualAccountNumber', 'payWith',];
 
     /**
      * @throws \JsonException
@@ -94,6 +96,97 @@ class PaymentPage extends Component
 
     }
 
+    public function setActiveTab($tab): void
+    {
+        $this->activeTab = $tab;
+        $this->calcInvoiceToal();
+
+    }
+
+    public function calcInvoiceToal()
+    {
+
+        if (is_null($this->merchantGateways)) {
+
+            $this->dispatchBrowserEvent('calcInvoiceTotal');
+
+            $mGateways = $this->invoice->user->usergateway;
+            $merchantGateways = $mGateways ? $mGateways->config_details : null;
+
+            $freshArr = [];
+            if ($merchantGateways) {
+                array_walk($merchantGateways, static function ($item, $key) use (&$freshArr) {
+                    $item['gateway_id'] = $key;
+                    $freshArr[str_replace(' ', '', strtolower($item['name']))] = $item;
+                });
+            }
+
+            $this->merchantGateways = $freshArr;
+
+
+            $this->dispatchBrowserEvent('calcInvoiceTotalDone');
+
+        }
+
+        $this->invoiceTotal = $this->invoice->amount;
+
+        if ($this->merchantGateways) {
+            $mgwayActiveTab = $this->merchantGateways[$this->activeTab];
+            $charge_factor = $mgwayActiveTab['charge_factor'];
+            $this->gatewayId = $mgwayActiveTab['gateway_id'];
+
+            if ($mgwayActiveTab['status']) {
+                $this->invoiceCharge = $charge_factor ? ($mgwayActiveTab['charge'] / 100) * $this->invoice->amount : $mgwayActiveTab['charge'];
+                $this->invoiceTotal = $this->invoiceCharge + $this->invoice->amount;
+            }
+        }
+
+
+    }
+
+    /**
+     * @param $channel
+     * @throws \JsonException
+     */
+    public function logPaymentRequest($channel): void
+    {
+        $paymentRequest = (new PaymentRequest)->firstOrCreate(
+            [
+                "invoice_no" => $this->invoice->invoice_no,
+            ]
+        );
+        $response = [
+            "channel" => $channel,
+            "date" => Carbon::now()->toDayDateTimeString(),
+        ];
+        //Get the payload;
+        $payload = $paymentRequest->details;
+        $payload[] = $response;
+
+
+        $paymentRequest->update([
+            "details" => $payload,
+        ]);
+    }
+
+    /**
+     * @param Gateway $gateway
+     * @return float|int
+     */
+    public function setPaymentGatewayCharges($gateway)
+    {
+        $paymentGateway = isset($this->invoice->user->Gateways->config_details) ? $this->invoice->user->Gateways->config_details[$gateway->id] : null;
+        $amount = $this->invoice->amount;
+
+        if ($paymentGateway) {
+            //amount = gateway charge + fee;
+            //check if charge_factor is set / disable : disabled = flatrate , enabled = percentage;
+            $charge = $paymentGateway['charge_factor'] ? ($paymentGateway['charge_factor'] / 100) * $this->invoice->amount : $paymentGateway['charge_factor'];
+            $amount = $charge + $this->invoice->amount;
+        }
+        return $amount;
+    }
+
     /**
      * @throws \JsonException
      */
@@ -143,48 +236,10 @@ class PaymentPage extends Component
 
     }
 
-    public function setActiveTab($tab): void
-    {
-        $this->activeTab = $tab;
-        $this->calcInvoiceToal();
-
-    }
-
-    /**
-     * @param $channel
-     * @throws \JsonException
-     */
-    public function logPaymentRequest($channel): void
-    {
-        $paymentRequest = (new PaymentRequest)->firstOrCreate(
-            [
-                "invoice_no" => $this->invoice->invoice_no,
-            ]
-        );
-        $response = [
-            "channel" => $channel,
-            "date" => Carbon::now()->toDayDateTimeString(),
-        ];
-        //Get the payload;
-        if (is_null($paymentRequest->details)) {
-            // first time call; insert new response;
-            $payload = [$response];
-        } else {
-            $payload = json_decode($paymentRequest->details, true, 512, JSON_THROW_ON_ERROR);
-            //add response to existing response;
-            $payload[] = $response;
-        }
-
-        $paymentRequest->update([
-            "details" => $payload,
-        ]);
-    }
-
-
     /**
      * @throws \JsonException
      */
-    public function processCardTransaction()
+    public function processCardTransaction(): void
     {
         $this->setActiveTab('card');
         //do validation;
@@ -203,7 +258,7 @@ class PaymentPage extends Component
             "currency" => "NGN",
             "amount" => $this->invoiceTotal,
             "email" => $this->invoice->customer_email,
-            "redirect_url" => config('app.url') . "/payment/receipt/{$this->invoice->invoice_no}?payment_type=" . $this->activeTab,
+            "redirect_url" => config('app.url') . "/payment/card/validate/{$this->invoice->invoice_no}",
             "tx_ref" => ""
         ]);
 
@@ -215,22 +270,22 @@ class PaymentPage extends Component
             "amount" => ['required'],
         ]);
 
-        $details = [];
 
         if ($validator->fails()) {
 
             $details = ['status' => false, 'errors' => $validator->messages()];
+            $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
+            return;
 
-        } else {
-            //call Flutterwave to charge Card;
+        }
+
+        //call Flutterwave to charge Card;
+        try {
             [$flwave, $response] = $this->flwChargeCard();
+
             $trnxId = $flwave->getTxRef();
-            //Update Transaction;
-            if (isset($this->transaction)) {
-                $this->transaction->update([
-                    "flutterwave_ref" => $trnxId
-                ]);
-            } else {
+
+            if (!isset($this->transaction)) {
                 //create transaction;
                 $orderedUuid = Str::orderedUuid();
                 $this->user->transaction()->create(
@@ -249,9 +304,25 @@ class PaymentPage extends Component
                     ]
                 );
             }
+
+            //Update Transaction;
+            if (isset($this->transaction)) {
+                $this->transaction->update(
+                    [
+                        "flutterwave_ref" => $trnxId,
+                        'gateway_id' => $card->id,
+                        'amount' => $this->invoiceTotal - $this->invoiceCharge,
+                        'fee' => $this->invoiceCharge,
+                        'total' => $this->invoiceTotal,
+                    ]
+                );
+            }
             //check for the authorization
+            $details = ['status' => false, 'errors' => "Cannot Authorize Card!"];
+
             if (isset($response['meta']['authorization'])) {
                 $details = ['status' => true,];
+                $this->logPaymentRequest("card");
 
                 $this->cardDetails['authorization']['mode'] = $response['meta']['authorization']['mode'];
 
@@ -272,8 +343,10 @@ class PaymentPage extends Component
                     $details['url'] = $response['meta']['authorization']['redirect'];
                 }
             }
-
+        } catch (Exception $e) {
+            $details = ['status' => false, 'errors' => $e->getMessage()];
         }
+
         $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
 
 
@@ -297,8 +370,8 @@ class PaymentPage extends Component
         //add pin to cardDetails
         $this->cardDetails['authorization']['pin'] = $this->cc_Pin;
         //charge card finally
-        [$flwave, $response] = $this->flwChargeCard();
-
+        $response = $this->flwChargeCard()[1];
+        info($response);
         //handle failed
 
         //handle success pin validation
@@ -332,49 +405,30 @@ class PaymentPage extends Component
 
     public function cardAuthorizationWithOtp()
     {
-        /**
-         * @var User $user
-         * @var User $company
-         * @var Wallet $wallet
-         * @var Transaction $transaction
-         **/
-        $company = User::firstWhere('email', 'business@saanapay.ng');
-        $user = $this->user;
-        $wallet = $user->wallet;
-        $transaction = $this->transaction;
 
-        $flwave = new Flutterwave(config('flutterwave.secret_key'));
-        $response = $flwave->validateTransaction($this->cc_Otp, $this->cardDetails['flw_ref'], 'card');
-        info("Response for " . $this->cardDetails['flw_ref'], $response);
+        try {
+            $flwave = new Flutterwave(config('flutterwave.secret_key'));
+            $response = $flwave->validateTransaction($this->cc_Otp, $this->cardDetails['flw_ref'], 'card');
+            $this->verifyFlwaveResponse($response);
+        } catch (Exception $e) {
 
-        $details = ['status' => true, 'flag' => 'processing'];
-        if (isset($response['data'])) {
-            if (strtoupper($response['data']['status']) === "SUCCESSFUL") {
-
-                $details = ['status' => true, 'flag' => "payment_completed"];
-
-                //Payment Successful;
-                $payment_provider_message = $response['data']['flw_ref'] . " " . $response['data']['processor_response'];
-                $params = array_merge($response['data']['customer'], [
-                    "narration" => $response['data']['narration'],
-                    "tx_ref" => $response['data']['tx_ref'],
-                    "ip" => $response['data']['ip'],
-                    "payment_type" => $response['data']['payment_type']
-                ]);
-
-                $transaction->handleSuccessfulPayment($transaction, $this->gatewayId, $payment_provider_message, $params, $wallet, $user, $company);
-
-
-            }
-            if (strtoupper($response['data']['status']) === "FAILED") {
-                //Payment UNSuccessful;
-                $details = ['status' => false, 'flag' => "payment_failed"];
-            }
+            $details = ['status' => false, 'errors' => $e->getMessage()];
+            $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
 
         }
 
+    }
+    public function cardAuthorizationWithAvs()
+    {
+        try {
+            $flwave = new Flutterwave(config('flutterwave.secret_key'));
+            $response = $flwave->cardCharge($this->cardDetails);
+            $this->verifyFlwaveResponse($response);
+        } catch (Exception $e) {
 
-        $this->dispatchBrowserEvent('paymentCompleted', $details);
+            $details = ['status' => false, 'errors' => $e->getMessage()];
+            $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
+        }
     }
 
     public function payWith($processor)
@@ -414,49 +468,10 @@ class PaymentPage extends Component
 
     }
 
-    public function calcInvoiceToal()
-    {
-
-        if (is_null($this->merchantGateways)) {
-
-            $this->dispatchBrowserEvent('calcInvoiceTotal');
-
-            $mGateways = $this->invoice->gateways();
-            $merchantGateways = $mGateways ? $mGateways->config_details : null;
-
-            $freshArr = [];
-            if ($merchantGateways) {
-                array_walk($merchantGateways, static function ($item, $key) use (&$freshArr) {
-                    $item['gateway_id'] = $key;
-                    $freshArr[str_replace(' ', '', strtolower($item['name']))] = $item;
-                });
-            }
-
-            $this->merchantGateways = $freshArr;
-
-
-            $this->dispatchBrowserEvent('calcInvoiceTotalDone');
-
-        }
-
-        $this->invoiceTotal = $this->invoice->amount;
-
-        $mgwayActiveTab = $this->merchantGateways[$this->activeTab];
-        $charge_factor = $mgwayActiveTab['charge_factor'];
-        $this->gatewayId = $mgwayActiveTab['gateway_id'];
-
-        if ($mgwayActiveTab['status']) {
-            $this->invoiceCharge = $charge_factor ? ($mgwayActiveTab['charge'] / 100) * $this->invoice->amount : $mgwayActiveTab['charge'];
-            $this->invoiceTotal = $this->invoiceCharge + $this->invoice->amount;
-        }
-
-
-    }
-
-
     public function render()
     {
         $this->setActiveTab($this->activeTab);
+        //setMerchant RedirectURL;
         $data['availableGateways'] = Gateway::all()->mapWithKeys(function ($item) {
             return [str_replace(' ', '', strtolower($item->name)) => $item->id];
         });
@@ -464,20 +479,53 @@ class PaymentPage extends Component
     }
 
     /**
-     * @param Gateway $gateway
-     * @return float|int|mixed
+     * @param $response
+     * @param Transaction $transaction
+     * @param $wallet
+     * @param User $user
+     * @param User $company
      */
-    public function setPaymentGatewayCharges($gateway): mixed
+    public function verifyFlwaveResponse($response): void
     {
-        $paymentGateway = isset($this->invoice->user->Gateways->config_details) ? $this->invoice->user->Gateways->config_details[$gateway->id] : null;
-        $amount = $this->invoice->amount;
+        /**
+         * @var User $user
+         * @var User $company
+         * @var Wallet $wallet
+         * @var Transaction $transaction
+         **/
+        $company = User::firstWhere('email', config('app.company_email'));
+        $user = $this->user;
+        $wallet = $user->wallet;
+        $transaction = $this->transaction;
+        info("Response for " . $this->cardDetails['flw_ref'], $response);
 
-        if ($paymentGateway) {
-            //amount = gateway charge + fee;
-            //check if charge_factor is set / disable : disabled = flatrate , enabled = percentage;
-            $charge = $paymentGateway['charge_factor'] ? ($paymentGateway['charge_factor'] / 100) * $this->invoice->amount : $paymentGateway['charge_factor'];
-            $amount = $charge + $this->invoice->amount;
+        $details = ['status' => true, 'flag' => 'processing'];
+        if (isset($response['data'])) {
+            if (strtoupper($response['data']['status']) === "SUCCESSFUL") {
+
+                $details = ['status' => true, 'flag' => "payment_completed"];
+
+                //Payment Successful;
+                $payment_provider_message = $response['data']['flw_ref'] . " " . $response['data']['processor_response'];
+                $params = array_merge($response['data']['customer'], [
+                    "narration" => $response['data']['narration'],
+                    "tx_ref" => $response['data']['tx_ref'],
+                    "ip" => $response['data']['ip'],
+                    "payment_type" => $response['data']['payment_type']
+                ]);
+
+                $transaction->handleSuccessfulPayment($transaction, $this->gatewayId, $payment_provider_message, $params, $wallet, $user, $company);
+
+
+            }
+            if (strtoupper($response['data']['status']) === "FAILED") {
+                //Payment UNSuccessful;
+                $details = ['status' => false, 'flag' => "payment_failed"];
+            }
+
         }
-        return $amount;
+
+
+        $this->dispatchBrowserEvent('paymentCompleted', $details);
     }
 }

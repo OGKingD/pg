@@ -3,6 +3,8 @@
 namespace App\Http;
 
 use App\Http\Middleware\Admin;
+use App\Http\Middleware\EnforceJsonContentType;
+use App\Http\Middleware\TerminatingMiddleware;
 use App\Http\Middleware\TwoFactorAuth;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -23,6 +25,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        EnforceJsonContentType::class,
     ];
 
     /**
@@ -45,6 +48,7 @@ class Kernel extends HttpKernel
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            'auth:sanctum',
         ],
     ];
 
@@ -67,5 +71,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         '2fa' => TwoFactorAuth::class,
         'admin' => Admin::class,
+        'enforceJson' => EnforceJsonContentType::class,
+        'terminate' => TerminatingMiddleware::class,
     ];
 }

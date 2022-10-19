@@ -16,7 +16,7 @@
         </thead>
         <tbody>
         {{-- Nothing in the world is as soft and yielding as water. --}}
-        @foreach($users as $k=>$val)
+        @forelse($users as $k=>$val)
 
             <tr>
                 <td>{{++$k}}.</td>
@@ -24,7 +24,7 @@
                     <div class="dropstart">
                         <a href="javascript:;" class="text-success" id="dropdownUserOptions" data-bs-toggle="dropdown"
                            aria-expanded="false">
-                            <i class="fas fa-ellipsis-v " aria-hidden="true"> </i>
+                            <i class="fas fa-ellipsis-v fa-2x" aria-hidden="true"> </i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-start px-2 py-3 bg-light-vertical"
                             aria-labelledby="dropdownUserOptions">
@@ -81,7 +81,25 @@
                 <td>{{date("Y/m/d h:i:A", strtotime($val->created_at))}}</td>
                 <td>{{date("Y/m/d h:i:A", strtotime($val->updated_at))}}</td>
             </tr>
-        @endforeach
+            @empty
+            <tr>
+              <td>
+                  <div class="col-lg-10 col-sm-8 mt-lg-0 mt-4 mx-auto">
+                      <div class="justify-content-start card card-plain">
+                          <div class="card-header pb-0 text-start">
+                              <h2 class="font-weight-bolder">😢 There are no registered Users Yet!</h2>
+                              <p class="mb-0 text-center">Once Users Sign Up they'll appear here.</p>
+                          </div>
+
+                      </div>
+
+                  </div>
+
+              </td>
+            </tr>
+
+
+        @endforelse
         {{ $usersCollection->links() }}
 
         </tbody>
@@ -149,7 +167,7 @@
                                                 <div class="form-check form-switch">
                                                     <input class="form-check-input" type="checkbox" id="status"
                                                            name="status+{{$key}}"
-                                                           checked="checked"> Active
+                                                           @if($gway['status'] === 1) checked @endif> Active
 
                                                 </div>
                                             </div>
@@ -239,7 +257,7 @@
 
             window.addEventListener('merchantGatewayUpdated', event => {
                 toggleModal('#modal-edit-user-gateway');
-                return salert("Merchant Gateway Updated", "Success", 'success');
+                salert("Merchant Gateway Updated", "Success", 'success');
             });
 
         </script>

@@ -9,6 +9,7 @@ class Transaction extends Model
     use HasFactory;
 
     protected $guarded = [];
+    protected $casts =  ['details' => 'json'];
 
     public function user()
     {
@@ -20,6 +21,12 @@ class Transaction extends Model
         return $this->belongsTo(Invoice::class,'invoice_no','invoice_no');
 
     }
+
+    public function gateway()
+    {
+        return $this->belongsTo(Gateway::class);
+
+    }
     /**
      * @param Transaction $transaction
      * @param mixed $gateway_id
@@ -29,10 +36,11 @@ class Transaction extends Model
      * @param User $user
      * @param User $company
      */
-    public function handleSuccessfulPayment(Transaction $transaction, mixed $gateway_id, $payment_provider_message, array $details, mixed $wallet, mixed $user, User $company): void
+    public function handleSuccessfulPayment(Transaction $transaction,  $gateway_id, $payment_provider_message, array $details, Wallet $wallet, User $user, User $company): bool
     {
         /** @var Invoice $invoice */
         $invoice = $transaction->invoice;
+        $details = array_merge($transaction->details,$details);
 
         $transaction->update([
             "status" => "successful",
@@ -74,7 +82,28 @@ class Transaction extends Model
                 "flag" => "credit",
             ]);
 
+            return true;
+
         }
+        return false;
     }
 
+    /**
+     * @param Transaction $transaction
+     * @param $gateway_id
+     * @param $payment_provider_message
+     * @param array $details
+     */
+    public function handleFailedPayment(Transaction $transaction, $gateway_id, $payment_provider_message, array $details): bool
+    {
+        $transaction->update([
+            "status" => "failed",
+            "gateway_id" => $gateway_id,
+            "payment_provider_message" => $payment_provider_message,
+            "details" => $details
+        ]);
+
+        return true;
+
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Invoice;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -22,23 +23,49 @@ class InvoicePage extends Component
 
     public function render()
     {
-        $invoices = \App\Models\Invoice::paginate(5);
+        $invoices = Invoice::paginate(5);
         $this->invoices = $invoices->items();
         return view('livewire.invoice-page');
     }
 
     public function addInvoice()
     {
-        $user = $this->getUser();
-        $payload = json_decode($this->invoiceDetails, true, 512, JSON_THROW_ON_ERROR);
-        $invoiceAdded = $user->invoice()->create([
-            'invoice_no' => 'INV'.Str::random(17),
-            'quantity' => $payload['quantity'],
-            'customer_email' => $payload['email'],
-            'due_date' => $payload['due_date'],
-            'amount' => $payload['amount'],
-            'name' => $payload['item_name'],
-        ]);
+
+        $invoiceAdded = "";
+        DB::transaction(function () use (&$invoiceAdded) {
+            $user = $this->getUser();
+            $payload = json_decode($this->invoiceDetails, true, 512, JSON_THROW_ON_ERROR);
+            $request_id = Str::random(17);
+            $trn_details = [];
+            $amount = $payload['amount'];
+            $redirect_url = $payload['redirect_url'] ?? null;
+
+
+            /** @var Invoice $invoiceAdded */
+            $invoiceAdded = $user->invoice()->create([
+                'invoice_no' => 'INV'. $request_id,
+                'quantity' => $payload['quantity'],
+                'customer_email' => $payload['email'],
+                'due_date' => $payload['due_date'],
+                'amount' => $amount,
+                'name' => $payload['item_name'],
+            ]);
+            //check if merchantRedirectURL is set and add it ;
+            if (isset($redirect_url)) {
+                $trn_details['redirect_url'] = $redirect_url;
+            }
+            //Add Transaction;
+            $invoiceAdded->transaction()->create([
+                "transaction_ref" => $request_id,
+                "user_id" => $invoiceAdded->user_id,
+                "merchant_transaction_ref" => $request_id,
+                "status" => "pending",
+                "amount" => $amount,
+                'details' => $trn_details,
+                "flag" => "debit"
+            ]);
+        });
+
         if ($invoiceAdded){
             $this->dispatchBrowserEvent('invoiceAdded');
         }

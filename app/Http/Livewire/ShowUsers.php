@@ -85,7 +85,6 @@ class ShowUsers extends Component
         $merchantGatewayUpdated = UserGateway::where('user_id',$this->selectedUser)->first()->update([
             'config_details' => $config_details
         ]);
-        logger($merchantGatewayUpdated);
 
         if ($merchantGatewayUpdated) {
             $this->dispatchBrowserEvent('merchantGatewayUpdated');

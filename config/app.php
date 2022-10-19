@@ -14,6 +14,8 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    'company_email' => env("COMPANY_EMAIL_ADDRESS","'business@saanapay.ng'"),
+    'support_email' => env('SUPPORT_EMAIL_ADDRESS', 'support@saanapay.ng'),
 
     /*
     |--------------------------------------------------------------------------

@@ -4,6 +4,7 @@ use App\Models\Settings;
 use App\Models\User;
 
 use Illuminate\Support\Facades\Mail;
+use JetBrains\PhpStorm\ArrayShape;
 
 
 function send_email($to, $name, $subject, $message, $extras=[], $type=null) {
@@ -28,7 +29,10 @@ function send_email($to, $name, $subject, $message, $extras=[], $type=null) {
 }
 
 
-function inspirationalText()
+/**
+ * @return array ["quote" => "string", "author" => "string"]
+ */
+#[ArrayShape(["quote" => "string", "author" => "string"])] function inspirationalText()
 {
     $text = \Illuminate\Foundation\Inspiring::quote();
     $array = explode('-',$text);
@@ -57,4 +61,33 @@ if (! function_exists('boomtime'))
 
         return $timemsg;
     }
+}
+
+
+function encrypt3des($data,$secret){
+
+    $key = md5(mb_convert_encoding($secret, 'UTF-16LE', 'UTF-8'), true);
+    $key .= substr($key, 0, 8);
+    $encData = openssl_encrypt($data, 'DES-EDE3-CBC', $key, OPENSSL_RAW_DATA, openssl_random_pseudo_bytes(8));
+    return base64_encode($encData);
+
+}
+
+
+/**
+ * @return User
+ */
+function company()
+{
+    return User::firstWhere('email', config('app.company_email'));
+
+}
+
+function errorResponseJson($message,$payload): array
+{
+    return [
+        "message" => "$message",
+        "errors" => $payload
+    ];
+
 }
