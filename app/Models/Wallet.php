@@ -71,7 +71,7 @@ class Wallet extends Model
         return DB::transaction(function() use($amount, $callback, &$before, &$after){
             /** @var Connection $connection */
             /** @var Wallet $wallet */
-            $wallet = $this->fresh()->where('id' ,$this->id)->lockForUpdate()->first();
+            $wallet = $this->fresh()->where('user_id' ,$this->user_id)->lockForUpdate()->first();
 
             $result = is_callable($callback) ? $callback() : null;
             $before = $wallet->balance;

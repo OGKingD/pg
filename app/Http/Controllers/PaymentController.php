@@ -75,11 +75,11 @@ class PaymentController extends Controller
 
         if (isset($invoice)) {
             $data['invoice'] = $invoice;
-            if (isset($invoice->transaction->details["redirect_url"])) {
+            /** @var Transaction $transaction */
+            $transaction = $invoice->transaction;
+            if (isset($transaction->details["redirect_url"])) {
 
-                /** @var Transaction $transaction */
-                $transaction = $invoice->transaction->only(["merchant_transaction_ref", "invoice_no", "amount", "fee", "total", "description", "status", "flag", "currency"]);
-                $data['merchant_site'] = $invoice->transaction->details["redirect_url"] . "?" . http_build_query($transaction);
+                $data['merchant_site'] = $transaction->merchantRedirectUrl();
 
             }
         }
@@ -111,8 +111,8 @@ class PaymentController extends Controller
         $request_id = $request->request_id;
 
         //check if invoice Exists;
-        $invoice = $this->checkIfInvoiceExist("INV".$request_id);
-        if ($invoice){
+        $transaction = Transaction::select('merchant_transaction_ref')->firstWhere('merchant_transaction_ref',$request_id);
+        if ($transaction){
             $error = [
                 "request_id" => ["Payment Request already Exists, Please Use a Unique Request ID!"],
             ];

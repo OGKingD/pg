@@ -100,6 +100,7 @@ class Handler extends ExceptionHandler
             //report internal error to Admin;
             logger()->error("Error in file: {$e->getFile()} ", ['cause'=>$e->getMessage(), 'trace'=>$e->getTraceAsString()]);
         }
+        logger()->error("Error in file: {$e->getFile()} ", ['cause'=>$e->getMessage(), 'trace'=>$e->getTraceAsString()]);
 
         return $this->shouldReturnJson($request, $e)
             ? response()->json([

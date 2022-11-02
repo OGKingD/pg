@@ -324,7 +324,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-xl-4 col-lg-5 col-md-7 mx-auto">
+                                        <div class="col-xl-5 col-lg-5 col-md-7 mx-auto">
                                             <div class="card py-lg-3">
                                                 <div class="card-body text-center">
 
@@ -351,7 +351,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-xl-4 col-lg-5 col-md-7 mx-auto">
+                                        <div class="col-xl-5 col-lg-5 col-md-7 mx-auto">
                                             <div class="card py-lg-3">
                                                 <div class="card-body text-center">
 
@@ -665,11 +665,21 @@
                 let pin = document.getElementById('pin');
                 let otp = document.getElementById('otp');
                 if ( pin !== null){
+                    //pin length validation;
+                    if (pin.value.length < 4){
+                        salert("Validation Failed!","Please enter a 4-digit PIN!","error");
+                        return ;
+                    }
                     authorizeWith('Pin')
                     return;
                 }
 
                 if ( otp !== null){
+                    //otp length validation;
+                    if (otp.value.length < 4){
+                        salert("Validation Failed!","Please enter a valid OTP!","error");
+                        return;
+                    }
                     authorizeWith('Otp')
                     return ;
                 }
@@ -752,9 +762,21 @@
                 });
 
                 if (type.toUpperCase() === "PIN") {
+                    let pin = document.getElementById('pin');
+                    //pin length validation;
+                    if (pin.value.length < 4){
+                        salert("Validation Failed!","Please enter a 4-digit PIN!","error");
+                        return ;
+                    }
                     Livewire.emit('cardAuthorizationWithPin');
                 }
                 if (type.toUpperCase() === "OTP") {
+                    let otp = document.getElementById('otp');
+                    //otp length validation;
+                    if (otp.value.length < 4){
+                        salert("Validation Failed!","Please enter a valid OTP!","error");
+                        return;
+                    }
                     Livewire.emit('cardAuthorizationWithOtp');
                 }
                 if (type.toUpperCase() === "AVS") {
@@ -776,9 +798,17 @@
 
                 if (response.flag === "payment_completed") {
                     salert('Payment Completed!', "Success!", 'success');
+                    console.log("here")
+                    @if (isset($invoice->transaction->details["redirect_url"]))
+                        sprocessing("Redirecting ! Please wait!");
+                        //redirect to Merchant Page;
+                        location.assign("{{$invoice->transaction->merchantRedirectUrl()}}");
+                    @else
+                        //redirect to Receipt Page;
+                        location.assign("{{route('receipt',$invoice->invoice_no)}}");
+                    @endif
 
-                    //redirect to Receipt Page;
-                    location.assign("{{route('receipt',$invoice->invoice_no)}}");
+
                 }
 
                 if (response.flag === "processing") {

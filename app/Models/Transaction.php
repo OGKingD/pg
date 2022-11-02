@@ -110,4 +110,12 @@ class Transaction extends Model
         return true;
 
     }
+
+    public function merchantRedirectUrl()
+    {
+        $transaction = $this->only(["merchant_transaction_ref", "invoice_no", "amount", "fee", "total", "description", "status", "flag", "currency"]);
+        return $this->details["redirect_url"] . "?" . http_build_query($transaction);
+
+
+    }
 }

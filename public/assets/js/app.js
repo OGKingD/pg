@@ -5,6 +5,17 @@ function salert(title, text, icon) {
         icon: icon,
     });
 }
+
+function sprocessing(title,allowEscapeKey=false, showConfirmButton=false, allowOutsideClick= false ) {
+    Swal.fire({
+        title: title,
+        html: '  <span class="spinner-border spinner-border-lg text-primary"></span>\n',
+        allowEscapeKey: allowEscapeKey,
+        showConfirmButton: showConfirmButton,
+        allowOutsideClick: allowOutsideClick,
+        allowEnterKey: false,
+    });
+}
 function copyTextToClipboard(elementId) {
 
     var textArea = document.createElement("textarea");

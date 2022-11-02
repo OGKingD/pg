@@ -328,9 +328,11 @@ Total:
                                 <ul class="list-group">
                                     <li class="list-group-item border-0 d-flex p-3 mb-2 bg-gray-100 border-radius-lg">
                                         <div class="d-flex flex-column">
-                                            <h6 class="mb-2 text-sm">David</h6>
-                                            <span class="mb-2 text-xs">Company Name: <span class="text-dark font-weight-bold ms-2">David Ogunejimite</span></span>
-                                            <span class="mb-2 text-xs">Email Address: <span class="text-dark ms-2 font-weight-bold">david@saanapy.ng</span></span>
+                                            <h6 class="mb-3 text-sm">{{ucfirst(explode('@',$invoice->customer_email)[0])}}</h6>
+                                            <span class="mb-2 text-xs">Company Name: <span
+                                                    class="text-dark font-weight-bold ms-2">{{$invoice->user->first_name }} {{$invoice->user->last_name }}</span></span>
+                                            <span class="mb-2 text-xs">Email Address: <span
+                                                    class="text-dark ms-2 font-weight-bold">{{$invoice->customer_email}}</span></span>
 
                                         </div>
                                     </li>
@@ -342,8 +344,8 @@ Total:
                 </div>
             </div>
             {{--                    //redirect button for merchat if redirect URL is present--}}
-            @if(isset($merchant_site))
-                @if(in_array($invoice->status,["SUCCESSFUL","FAILED"]))
+        @if(isset($merchant_site))
+            @if(in_array(strtoupper($invoice->status),["SUCCESSFUL","FAILED"]))
                     <div class="justify-content-center">
                         <hr>
                         <a href="{{$merchant_site}}" class="text-center text-white btn bg-gradient-faded-secondary mb-0">
