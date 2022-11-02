@@ -333,7 +333,7 @@
                                                         <label for="pin">PIN</label>
                                                         <input class="form-control" placeholder="****" id="pin"
                                                                type="password"
-                                                               pattern="[0-9]*" minlength="4" name="pin" wire:model.lazy="cc_Pin"></div>
+                                                               pattern="[0-9]*" minlength="4" maxlength="4"  name="pin" wire:model.lazy="cc_Pin"></div>
                                                     <div class="text-center">
                                                         <button type="button" class="btn btn-lg bg-gradient-dark mt-3 mb-0"
                                                                 onclick="authorizeWith('Pin')">Process

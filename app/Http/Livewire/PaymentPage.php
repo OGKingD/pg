@@ -367,36 +367,32 @@ class PaymentPage extends Component
 
     public function cardAuthorizationWithPin()
     {
-        //add pin to cardDetails
-        $this->cardDetails['authorization']['pin'] = $this->cc_Pin;
-        //charge card finally
-        $response = $this->flwChargeCard()[1];
-        info($response);
-        //handle failed
 
-        //handle success pin validation
-
-        $data = $response['data'];
-        $this->transaction->update([
-            'flutterwave_ref' => $data['id'],
-        ]);
-        $this->cardDetails['flw_ref'] = $data['flw_ref'];
-        $details = [];
-
-        //just in case check what type of Authorization is needed;
-        if (isset($response['meta'])) {
-            if ($response['meta']['authorization']['mode'] === 'redirect') {
-                $details['flag'] = "redirect_required";
-                $details = ["status" => true, "flag" => "redirect_required", "url" => $response['meta']['authorization']['redirect']];
+        try {//add pin to cardDetails
+            $this->cardDetails['authorization']['pin'] = $this->cc_Pin;//charge card finally
+            $response = $this->flwChargeCard()[1];
+            info($response);//handle failed
+            //handle success pin validation
+            $data = $response['data'];
+            $this->transaction->update([
+                'flutterwave_ref' => $data['id'],
+            ]);
+            $this->cardDetails['flw_ref'] = $data['flw_ref'];
+            $details = [];//just in case check what type of Authorization is needed;
+            if (isset($response['meta'])) {
+                if ($response['meta']['authorization']['mode'] === 'redirect') {
+                    $details['flag'] = "redirect_required";
+                    $details = ["status" => true, "flag" => "redirect_required", "url" => $response['meta']['authorization']['redirect']];
+                }
+            }//when OTP is required;
+            if (isset($data['auth_mode']) && $data['auth_mode'] === "otp") {
+                $this->isOtpRequired = true;
+                $this->isPinRequired = false;
+                $this->hideCardFields = true;
+                $details = ['status' => true, 'flag' => "otp_required"];
             }
-        }
-
-        //when OTP is required;
-        if (isset($data['auth_mode']) && $data['auth_mode'] === "otp") {
-            $this->isOtpRequired = true;
-            $this->isPinRequired = false;
-            $this->hideCardFields = true;
-            $details = ['status' => true, 'flag' => "otp_required"];
+        } catch (Exception $e) {
+            $details = ['status' => false, 'errors' => $e->getMessage()];
         }
 
         $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
@@ -433,34 +429,36 @@ class PaymentPage extends Component
 
     public function payWith($processor)
     {
-        $this->setActiveTab(strtolower($processor));
-        $flwave = new Flutterwave(config('flutterwave.secret_key'));
-        $tx_ref = $flwave->getTxRef();
 
 
-        $gateway = Gateway::where('name', $processor)->first();
-        $amount = $this->setPaymentGatewayCharges($gateway);
-
-        $payload = [
-            "amount" => $amount,
-            "currency" => "NGN",
-            "email" => $this->invoice->customer_email,
-            "fullname" => $this->invoice->name,
-            "tx_ref" => $tx_ref
-        ];
-        $response = $flwave->{"charge" . $processor}($payload);
-        $details = [];
-        if ($response) {
-            $details['message'] = response(['message']);
-            $details['flag'] = "payment_failed";
-            $details['status'] = isset($response['data']['meta']['authorization']['redirect']);
-            if ($details['status']) {
-                $details['flag'] = "redirect_required";
-                $details['url'] = $response['data']['meta']['authorization']['redirect'];
+        try {
+            $this->setActiveTab(strtolower($processor));
+            $flwave = new Flutterwave(config('flutterwave.secret_key'));
+            $tx_ref = $flwave->getTxRef();
+            $gateway = Gateway::where('name', $processor)->first();
+            $amount = $this->setPaymentGatewayCharges($gateway);
+            $payload = [
+                "amount" => $amount,
+                "currency" => "NGN",
+                "email" => $this->invoice->customer_email,
+                "fullname" => $this->invoice->name,
+                "tx_ref" => $tx_ref
+            ];
+            $response = $flwave->{"charge" . $processor}($payload);
+            $details = [];
+            if ($response) {
+                $details['message'] = response(['message']);
+                $details['flag'] = "payment_failed";
+                $details['status'] = isset($response['data']['meta']['authorization']['redirect']);
+                if ($details['status']) {
+                    $details['flag'] = "redirect_required";
+                    $details['url'] = $response['data']['meta']['authorization']['redirect'];
+                }
             }
+            logger("Payment for charge$processor Response is : ", $response);
+        } catch (Exception $e) {
+            $details = ['status' => false, 'errors' => $e->getMessage()];
         }
-
-        logger("Payment for charge$processor Response is : ", $response);
 
 
         $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
