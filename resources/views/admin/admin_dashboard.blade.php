@@ -4,161 +4,231 @@
 @section('content')
     <div>
         <div class="row mt-4">
-            <div class="col-xl-7">
-                <div class="card">
-                    <div class="card-header d-flex pb-0 p-3">
-                        <h6 class="my-auto">Cameras</h6>
-                        <div class="nav-wrapper position-relative ms-auto w-50">
-                            <ul class="nav nav-pills nav-fill p-1" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab"
-                                       href="smart-home.html#cam1" role="tab" aria-controls="cam1" aria-selected="true">
-                                        Kitchen
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="smart-home.html#cam2"
-                                       role="tab" aria-controls="cam2" aria-selected="false">
-                                        Living
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" href="smart-home.html#cam3"
-                                       role="tab" aria-controls="cam3" aria-selected="false">
-                                        Attic
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="dropdown pt-2">
-                            <a href="javascript:;" class="text-secondary ps-4" id="dropdownCam"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end me-sm-n4 px-2 py-3"
-                                aria-labelledby="dropdownCam">
-                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Pause</a></li>
-                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Stop</a></li>
-                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Schedule</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item border-radius-md text-danger" href="javascript:;">Remove</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card-body p-3 mt-2">
-                        <div class="tab-content" id="v-pills-tabContent">
-                            <div class="tab-pane fade show position-relative active height-400 border-radius-lg"
-                                 id="cam1" role="tabpanel" aria-labelledby="cam1"
-                                 style="background-image: url('../../assets/img/bg-smart-home-1.jpg'); background-size:cover;">
-                                <div class="position-absolute d-flex top-0 w-100">
-                                    <p class="text-white p-3 mb-0">17.05.2021 4:34PM</p>
-                                    <div class="ms-auto p-3">
-<span class="badge badge-secondary">
-<i class="fas fa-dot-circle text-danger"></i>
-Recording</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade position-relative height-400 border-radius-lg" id="cam2"
-                                 role="tabpanel" aria-labelledby="cam2"
-                                 style="background-image: url('../../assets/img/bg-smart-home-2.jpg'); background-size:cover;">
-                                <div class="position-absolute d-flex top-0 w-100">
-                                    <p class="text-white p-3 mb-0">17.05.2021 4:35PM</p>
-                                    <div class="ms-auto p-3">
-<span class="badge badge-secondary">
-<i class="fas fa-dot-circle text-danger"></i>
-Recording</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade position-relative height-400 border-radius-lg" id="cam3"
-                                 role="tabpanel" aria-labelledby="cam3"
-                                 style="background-image: url('../../assets/img/home-decor-3.jpg'); background-size:cover;">
-                                <div class="position-absolute d-flex top-0 w-100">
-                                    <p class="text-white p-3 mb-0">17.05.2021 4:57PM</p>
-                                    <div class="ms-auto p-3">
-<span class="badge badge-secondary">
-<i class="fas fa-dot-circle text-danger"></i>
-Recording</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-5 ms-auto mt-xl-0 mt-4">
-                <div class="row">
+            <div class="col-xl-7 ">
+                <div class="row mb-4">
                     <div class="col-12">
                         <div class="card bg-gradient-primary">
                             <div class="card-body p-3">
                                 <div class="row">
                                     <div class="col-8 my-auto">
                                         <div class="numbers">
-                                            <p class="text-white text-sm mb-0 text-capitalize font-weight-bold opacity-7">
-                                                Wheather today</p>
-                                            <h5 class="text-white font-weight-bolder mb-0">
-                                                San Francisco - 29°C
+                                            <h5 class="text-white font-weight-bolder text-capitalize font-weight-bold  mb-0">
+                                                {{$greeting}} - °
                                             </h5>
                                         </div>
                                     </div>
                                     <div class="col-4 text-end">
-                                        <img class="w-50" src="../../assets/img/small-logos/icon-sun-cloud.png"
+                                        <img class="w-50" src="{{asset("assets/img/logos/icon-sun-cloud.png")}}"
                                              alt="image sun">
-                                        <h5 class="mb-0 text-white text-end me-1">Cloudy</h5>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <h1 class="text-gradient text-primary"><span id="status1" countto="21">21</span> <span
-                                        class="text-lg ms-n2">°C</span></h1>
-                                <h6 class="mb-0 font-weight-bolder">Living Room</h6>
-                                <p class="opacity-8 mb-0 text-sm">Temperature</p>
-                            </div>
+                <div class="card">
+                    <div class="card-header pb-0 p-3">
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0">Transaction Breakdown</h6>
+                            <button type="button"
+                                    class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                    title="See the transactions with a bird's eye view">
+                                <i class="fas fa-info"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="col-md-6 mt-md-0 mt-4">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <h1 class="text-gradient text-primary"><span id="status2" countto="44">44</span> <span
-                                        class="text-lg ms-n1">%</span></h1>
-                                <h6 class="mb-0 font-weight-bolder">Outside</h6>
-                                <p class="opacity-8 mb-0 text-sm">Humidity</p>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-5 text-center">
+                                <div class="chart">
+                                    <canvas id="chart-consumption" class="chart-canvas" height="197"></canvas>
+                                </div>
+                                <h4 class="font-weight-bold mt-n8">
+                                    <span>{{$transactions_count}}</span>
+                                    <span class="d-block text-body text-sm">TRANSACTIONS</span>
+                                </h4>
+                            </div>
+                            <div class="col-7">
+                                <div class="table-responsive">
+                                    <table class="table align-items-center mb-0">
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-0">
+                                                    <span class="badge bg-success me-3"> </span>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">Successful </h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-xs font-weight-bold"> {{number_format((($successful_transactions_count/$transactions_count) * 100) ,1)}}% ({{$successful_transactions_count}})</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-0">
+                                                    <span class="badge bg-warning me-3"> </span>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">Pending</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-xs font-weight-bold"> {{number_format((($pending_transactions_count/$transactions_count) * 100) ,1)}}% ({{$pending_transactions_count}})</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-0">
+                                                    <span class="badge bg-danger me-3"> </span>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">Failed</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-xs font-weight-bold"> {{number_format((($failed_transactions_count/$transactions_count) * 100) ,1)}}% ({{$failed_transactions_count}})</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-0">
+                                                    <span class="badge bg-gradient-success me-3"> </span>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">Successful Amount</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-xs font-weight-bold"> &#{{nairaSymbol()}} {{number_format($successful_transactions ,1)}} </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-0">
+                                                    <span class="badge bg-gradient-warning me-3"> </span>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">Pending Amount</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-xs font-weight-bold"> &#{{nairaSymbol()}} {{number_format($pending_transactions ,1)}} </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-0">
+                                                    <span class="badge bg-gradient-danger me-3"> </span>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">Failed Amount</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-xs font-weight-bold"> &#{{nairaSymbol()}} {{number_format($failed_transactions ,1)}} </span>
+                                            </td>
+                                        </tr>
+
+                                        </tbody>
+                                        <tfoot>
+
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-0">
+                                                    <span class="badge bg-gradient-faded-info-vertical me-3"> </span>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">Expected Revenue </h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-xs font-weight-bold"> <b>&#{{nairaSymbol()}} {{number_format($transactions_expected_revenue ,1)}}</b> </span>
+                                            </td>
+                                        </tr>
+
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <h1 class="text-gradient text-primary"><span id="status3" countto="87">87</span> <span
-                                        class="text-lg ms-n2">m³</span></h1>
-                                <h6 class="mb-0 font-weight-bolder">Water</h6>
-                                <p class="opacity-8 mb-0 text-sm">Consumption</p>
-                            </div>
+            </div>
+
+            <div class="col-xl-5 ms-auto mt-xl-0 mt-4">
+                <div class="card">
+                    <div class="card-header pb-0 p-3">
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0">Gateways Breakdown</h6>
+                            <button type="button"
+                                    class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                    title="See the gateways used to process transactions with a bird's eye view">
+                                <i class="fas fa-info"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="col-md-6 mt-md-0 mt-4">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <h1 class="text-gradient text-primary"><span id="status4" countto="417">417</span> <span
-                                        class="text-lg ms-n2">GB</span></h1>
-                                <h6 class="mb-0 font-weight-bolder">Internet</h6>
-                                <p class="opacity-8 mb-0 text-sm">All devices</p>
+                    <div class="card-body p-0">
+                        <div class="row ">
+                            <div class="col-md-6 mb-md-2">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h1 class="text-gradient text-primary"><span id="status3" countto="{{$card_transactions_count}}">{{$card_transactions_count}}</span> <span
+                                                class="text-lg ms-n2">°</span></h1>
+                                        <h6 class="mb-0 font-weight-bolder">Card</h6>
+
+                                    </div>
+                                </div>
                             </div>
+                            <div class="col-md-6 mb-md-2 ">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$bank_transfer_transactions_count}}">{{$bank_transfer_transactions_count}}</span> <span
+                                                class="text-lg ms-n2">°</span></h1>
+                                        <h6 class="mb-0 font-weight-bolder">Bank Transfer</h6>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-md-2 ">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$remita_transactions_count}}">{{$remita_transactions_count}}</span> <span
+                                                class="text-lg ms-n2">°</span></h1>
+                                        <h6 class="mb-0 font-weight-bolder">Remita</h6>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-md-2 ">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$google_pay_transactions_count}}">{{$google_pay_transactions_count}}</span> <span
+                                                class="text-lg ms-n2">°</span></h1>
+                                        <h6 class="mb-0 font-weight-bolder">GooglePay</h6>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-md-2 ">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$apple_pay_transactions_count}}">{{$apple_pay_transactions_count}}</span> <span
+                                                class="text-lg ms-n2">°</span></h1>
+                                        <h6 class="mb-0 font-weight-bolder">Applepay</h6>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
         <div class="row mt-4">
@@ -177,59 +247,56 @@ Recording</span>
                     </div>
                     <div class="card-body p-3">
                         <ul class="list-group">
-                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
-                                <div class="d-flex">
-                                    <div class="d-flex align-items-center">
-                                        <button
-                                            class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center">
-                                            <i class="fas fa-arrow-down" aria-hidden="true"></i></button>
-                                        <div class="d-flex flex-column">
-                                            <h6 class="mb-1 text-dark text-sm">Netflix</h6>
-                                            <span class="text-xs">27 March 2020, at 12:30 PM</span>
+
+                            @forelse($latest_transactions as $trnx)
+                                <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radiu s-lg">
+                                    <div class="d-flex">
+                                        <div class="d-flex align-items-center">
+                                            <button
+                                                class="btn btn-icon-only btn-rounded @if($trnx->flag === "debit") btn-outline-danger @else btn-outline-success @endif mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center">
+                                                @if($trnx->flag === "debit")
+                                                    <i class="fas fa-arrow-down" aria-hidden="true"></i>
+                                                @else
+                                                    <i class="fas fa-arrow-up" aria-hidden="true"></i>
+                                                @endif
+
+                                            </button>
+                                            <div class="d-flex flex-column">
+                                                <h6 class="mb-1 text-dark text-sm">{{$trnx->merchant_transaction_ref}}</h6>
+                                                <span class="text-xs">{{\Illuminate\Support\Carbon::parse($trnx->updated_at)->toDayDateTimeString()}}</span>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="d-flex align-items-center @if($trnx->flag === "debit") text-danger @else text-success @endif text-gradient text-sm font-weight-bold ms-auto">
+                                            @if($trnx->flag === "debit")
+                                                -
+                                            @else
+                                                +
+                                            @endif
+                                                &#{{nairaSymbol()}} {{ number_format($trnx->total)}}
                                         </div>
                                     </div>
-                                    <div
-                                        class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
-                                        - $ 2,500
-                                    </div>
-                                </div>
-                                <hr class="horizontal dark mt-3 mb-2">
-                            </li>
-                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
-                                <div class="d-flex">
-                                    <div class="d-flex align-items-center">
-                                        <button
-                                            class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center">
-                                            <i class="fas fa-arrow-up" aria-hidden="true"></i></button>
-                                        <div class="d-flex flex-column">
-                                            <h6 class="mb-1 text-dark text-sm">Apple</h6>
-                                            <span class="text-xs">23 March 2020, at 04:30 AM</span>
+                                    <hr class="horizontal dark mt-3 mb-2">
+                                </li>
+
+                            @empty
+                                <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                    <div class="d-flex">
+                                        <div class="d-flex align-items-center">
+                                            <button
+                                                class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center">
+                                                😢
+                                            </button>
+                                            <div class="d-flex flex-column">
+                                                <h2 class="font-weight-bolder"> There are no transactions Yet!</h2>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div
-                                        class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
-                                        + $ 2,000
-                                    </div>
-                                </div>
-                                <hr class="horizontal dark mt-3 mb-2">
-                            </li>
-                            <li class="list-group-item border-0 justify-content-between ps-0 mb-2 border-radius-lg">
-                                <div class="d-flex">
-                                    <div class="d-flex align-items-center">
-                                        <button
-                                            class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center">
-                                            <i class="fas fa-arrow-up" aria-hidden="true"></i></button>
-                                        <div class="d-flex flex-column">
-                                            <h6 class="mb-1 text-dark text-sm">Partner #22213</h6>
-                                            <span class="text-xs">19 March 2020, at 02:50 AM</span>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
-                                        + $ 1,400
-                                    </div>
-                                </div>
-                            </li>
+                                    <hr class="horizontal dark mt-3 mb-2">
+                                </li>
+
+
+                            @endforelse
                         </ul>
                     </div>
                 </div>
@@ -239,7 +306,7 @@ Recording</span>
                     <div class="card-header pb-0 p-3">
                         <div class="row">
                             <div class="col-md-6">
-                                <h6 class="mb-0">Revenue</h6>
+                                <h6 class="mb-0">Revenue Breakdown </h6>
                             </div>
                             <div class="col-md-6 d-flex justify-content-end align-items-center">
                                 <i class="far fa-calendar-alt me-2" aria-hidden="true"></i>
@@ -253,16 +320,15 @@ Recording</span>
                                 <div class="d-flex">
                                     <div class="d-flex align-items-center">
                                         <button
-                                            class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center">
+                                            class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
                                             <i class="fas fa-arrow-up" aria-hidden="true"></i></button>
                                         <div class="d-flex flex-column">
-                                            <h6 class="mb-1 text-dark text-sm">via PayPal</h6>
-                                            <span class="text-xs">07 June 2021, at 09:00 AM</span>
+                                            <h6 class="mb-1 text-dark text-sm">Successful via Card</h6>
                                         </div>
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
-                                        + $ 4,999
+                                        + &#{{nairaSymbol()}} {{ number_format($successful_card_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -271,36 +337,243 @@ Recording</span>
                                 <div class="d-flex">
                                     <div class="d-flex align-items-center">
                                         <button
-                                            class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center">
-                                            <i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+                                            class="btn btn-icon-only btn-rounded btn-outline-warning mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
                                         <div class="d-flex flex-column">
-                                            <h6 class="mb-1 text-dark text-sm">Partner #90211</h6>
-                                            <span class="text-xs">07 June 2021, at 05:50 AM</span>
+                                            <h6 class="mb-1 text-dark text-sm">Pending via Card</h6>
                                         </div>
                                     </div>
                                     <div
-                                        class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
-                                        + $ 700
+                                        class="d-flex align-items-center text-warning text-gradient text-sm font-weight-bold ms-auto">
+                                        + &#{{nairaSymbol()}} {{ number_format($pending_card_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
                             </li>
-                            <li class="list-group-item border-0 justify-content-between ps-0 mb-2 border-radius-lg">
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
                                 <div class="d-flex">
                                     <div class="d-flex align-items-center">
                                         <button
-                                            class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 p-3 btn-sm d-flex align-items-center justify-content-center">
+                                            class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
                                             <i class="fas fa-arrow-down" aria-hidden="true"></i></button>
                                         <div class="d-flex flex-column">
-                                            <h6 class="mb-1 text-dark text-sm">Services</h6>
-                                            <span class="text-xs">07 June 2021, at 07:10 PM</span>
+                                            <h6 class="mb-1 text-dark text-sm">Failed via Card</h6>
                                         </div>
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
-                                        - $ 1,800
+                                        - &#{{nairaSymbol()}} {{ number_format($failed_card_transactions_total)}}
                                     </div>
                                 </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Successful via Bank Transfer</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
+                                        + &#{{nairaSymbol()}} {{ number_format($successful_bank_transfer_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-warning mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Pending via Bank Transfer</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-warning text-gradient text-sm font-weight-bold ms-auto">
+                                        + &#{{nairaSymbol()}} {{ number_format($pending_bank_transfer_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-down" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Failed via Bank Transfer</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
+                                        - &#{{nairaSymbol()}} {{ number_format($failed_bank_transfer_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Successful via Remita</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
+                                        + &#{{nairaSymbol()}} {{ number_format($successful_remita_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-warning mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Pending via Remita</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-warning text-gradient text-sm font-weight-bold ms-auto">
+                                        + &#{{nairaSymbol()}} {{ number_format($pending_remita_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-down" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Failed via Remita</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
+                                        - &#{{nairaSymbol()}} {{ number_format($failed_remita_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Successful via GooglePay</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
+                                        + &#{{nairaSymbol()}} {{ number_format($successful_google_pay_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-warning mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Pending via GooglePay</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-warning text-gradient text-sm font-weight-bold ms-auto">
+                                        + &#{{nairaSymbol()}} {{ number_format($pending_google_pay_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-down" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Failed via GooglePay</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
+                                        - &#{{nairaSymbol()}} {{ number_format($failed_google_pay_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Successful via ApplePay</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
+                                        + &#{{nairaSymbol()}} {{ number_format($successful_apple_pay_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-warning mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Pending via ApplePay</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-warning text-gradient text-sm font-weight-bold ms-auto">
+                                        + &#{{nairaSymbol()}} {{ number_format($pending_apple_pay_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
+                            </li>
+                            <li class="list-group-item border-0 justify-content-between ps-0 pb-0 border-radius-lg">
+                                <div class="d-flex">
+                                    <div class="d-flex align-items-center">
+                                        <button
+                                            class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 p-2 btn-sm d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-arrow-down" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">Failed via ApplePay</h6>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
+                                        - &#{{nairaSymbol()}} {{ number_format($failed_apple_pay_transactions_total)}}
+                                    </div>
+                                </div>
+                                <hr class="horizontal dark mt-3 mb-2">
                             </li>
                         </ul>
                     </div>
@@ -313,140 +586,16 @@ Recording</span>
                 <div class="card">
                     <div class="card-header pb-0 p-3">
                         <div class="d-flex align-items-center">
-                            <h6 class="mb-0">Consumption by room</h6>
+                            <h6 class="mb-0">Users Breakdown</h6>
                             <button type="button"
                                     class="btn btn-icon-only btn-rounded btn-outline-secondary mb-0 ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto"
                                     data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                    title="See the consumption per room">
+                                    title="See the users ">
                                 <i class="fas fa-info"></i>
                             </button>
                         </div>
                     </div>
                     <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-5 text-center">
-                                <div class="chart">
-                                    <canvas id="chart-consumption" class="chart-canvas" height="197"></canvas>
-                                </div>
-                                <h4 class="font-weight-bold mt-n8">
-                                    <span>471.3</span>
-                                    <span class="d-block text-body text-sm">WATTS</span>
-                                </h4>
-                            </div>
-                            <div class="col-7">
-                                <div class="table-responsive">
-                                    <table class="table align-items-center mb-0">
-                                        <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-0">
-                                                    <span class="badge bg-gradient-primary me-3"> </span>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Living Room</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> 15% </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-0">
-                                                    <span class="badge bg-gradient-secondary me-3"> </span>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Kitchen</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> 20% </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-0">
-                                                    <span class="badge bg-gradient-info me-3"> </span>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Attic</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> 13% </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-0">
-                                                    <span class="badge bg-gradient-success me-3"> </span>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Garage</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> 32% </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-0">
-                                                    <span class="badge bg-gradient-warning me-3"> </span>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Basement</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> 20% </span>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 mt-lg-0 mt-4">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="card h-100">
-                            <div class="card-body p-3">
-                                <h6>Consumption per day</h6>
-                                <div class="chart pt-3">
-                                    <canvas id="chart-cons-week" class="chart-canvas" height="170"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-sm-0 mt-4">
-                        <div class="card h-100">
-                            <div class="card-body text-center p-3">
-                                <h6 class="text-start">Device limit</h6>
-                                <round-slider value="21" valueLabel="Temperature"></round-slider>
-                                <h4 class="font-weight-bold mt-n7"><span class="text-dark" id="value">21</span><span
-                                        class="text-body">°C</span></h4>
-                                <p class="ps-1 mt-5 mb-0"><span class="text-xs">16°C</span><span class="px-3">Temperature</span><span
-                                        class="text-xs">38°C</span></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <hr class="horizontal dark my-5">
-        <div class="row mt-4">
-            <div class="col-lg-5 mb-lg-0 mb-4">
-                <div class="card z-index-2">
-                    <div class="card-body p-3">
-                        <div class="bg-gradient-dark border-radius-lg py-3 pe-1 mb-3">
-                            <div class="chart">
-                                <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
-                            </div>
-                        </div>
                         <h6 class="ms-2 mt-4 mb-0"> Active Users </h6>
                         <p class="text-sm ms-2"> (<span class="font-weight-bolder">+23%</span>) than last week </p>
                         <div class="container border-radius-lg">
@@ -474,12 +623,12 @@ Recording</span>
                                                 </g>
                                             </svg>
                                         </div>
-                                        <p class="text-xs mt-1 mb-0 font-weight-bold">Users</p>
+                                        <p class="text-xs mt-1 mb-0 font-weight-bold">Total Merchants</p>
                                     </div>
-                                    <h4 class="font-weight-bolder">36K</h4>
+                                    <h4 class="font-weight-bolder">{{number_format($total_merchants)}}</h4>
                                     <div class="progress w-75">
-                                        <div class="progress-bar bg-dark w-60" role="progressbar" aria-valuenow="60"
-                                             aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-dark w-100" role="progressbar" aria-valuenow="{{$total_merchants}}"
+                                             aria-valuemin="0" aria-valuemax="{{$total_merchants}}"></div>
                                     </div>
                                 </div>
                                 <div class="col-3 py-3 ps-0">
@@ -510,11 +659,11 @@ Recording</span>
                                                 </g>
                                             </svg>
                                         </div>
-                                        <p class="text-xs mt-1 mb-0 font-weight-bold">Clicks</p>
+                                        <p class="text-xs mt-1 mb-0 font-weight-bold">Api Merchants</p>
                                     </div>
-                                    <h4 class="font-weight-bolder">2m</h4>
+                                    <h4 class="font-weight-bolder">{{number_format($total_api_merchants)}}</h4>
                                     <div class="progress w-75">
-                                        <div class="progress-bar bg-dark w-90" role="progressbar" aria-valuenow="90"
+                                        <div class="progress-bar bg-dark w-{{number_format(($total_api_merchants/$total_merchants) * 100,)}}" role="progressbar" aria-valuenow="{{$total_api_merchants}}"
                                              aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
@@ -541,11 +690,11 @@ Recording</span>
                                                 </g>
                                             </svg>
                                         </div>
-                                        <p class="text-xs mt-1 mb-0 font-weight-bold">Sales</p>
+                                        <p class="text-xs mt-1 mb-0 font-weight-bold">Active Merchants</p>
                                     </div>
-                                    <h4 class="font-weight-bolder">435$</h4>
+                                    <h4 class="font-weight-bolder">{{$total_active_merchants}}</h4>
                                     <div class="progress w-75">
-                                        <div class="progress-bar bg-dark w-30" role="progressbar" aria-valuenow="30"
+                                        <div class="progress-bar bg-dark w-{{number_format(($total_active_merchants/$total_merchants) * 100,)}}" role="progressbar" aria-valuenow="30"
                                              aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
@@ -574,38 +723,101 @@ Recording</span>
                                                 </g>
                                             </svg>
                                         </div>
-                                        <p class="text-xs mt-1 mb-0 font-weight-bold">Items</p>
+                                        <p class="text-xs mt-1 mb-0 font-weight-bold">Inactive Merchants</p>
                                     </div>
-                                    <h4 class="font-weight-bolder">43</h4>
+                                    <h4 class="font-weight-bolder">{{number_format($total_inactive_merchants)}}</h4>
                                     <div class="progress w-75">
-                                        <div class="progress-bar bg-dark w-50" role="progressbar" aria-valuenow="50"
+                                        <div class="progress-bar bg-dark w-{{number_format(($total_inactive_merchants/$total_merchants) * 100,)}}" role="progressbar" aria-valuenow="50"
                                              aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
-            <div class="col-lg-7">
-                <div class="card z-index-2">
-                    <div class="card-header pb-0">
-                        <h6>Sales overview</h6>
-                        <p class="text-sm">
-                            <i class="fa fa-arrow-up text-success"></i>
-                            <span class="font-weight-bold">4% more</span> in 2021
-                        </p>
-                    </div>
+            <div class="col-lg-6 mt-lg-0 mt-4">
+                <div class="card h-100">
                     <div class="card-body p-3">
-                        <div class="chart">
-                            <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+                        <h6>Consumption per day</h6>
+                        <div class="chart pt-3">
+                            <canvas id="chart-cons-week" class="chart-canvas" height="170"></canvas>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
+        <hr class="horizontal dark my-5">
     </div>
 @endsection
 
 
+@section('scripts')
+    <script>
+        // Chart Doughnut Consumption by room
+        var ctx1 = document.getElementById("chart-consumption").getContext("2d");
 
+        var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
+
+        gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
+        gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+        gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
+
+        new Chart(ctx1, {
+            type: "doughnut",
+            data: {
+                labels: ["Successful", "Pending", "Failed"],
+                datasets: [{
+                    label: "Consumption",
+                    weight: 9,
+                    cutout: 90,
+                    tension: 0.9,
+                    pointRadius: 2,
+                    borderWidth: 2,
+                    backgroundColor: ['#98ec2d', '#ffb500', '#f60303'],
+                    data: [{{$successful_transactions_count}}, {{$pending_transactions_count}}, {{$failed_transactions_count}}],
+                    fill: false
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                        },
+                        ticks: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                        },
+                        ticks: {
+                            display: false,
+                        }
+                    },
+                },
+            },
+        });
+    </script>
+@endsection

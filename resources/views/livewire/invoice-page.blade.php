@@ -51,7 +51,7 @@
                         <br>
                         <span class="text-xs">{{$invoice->name}}</span>
                         <hr class="horizontal dark my-3">
-                        <h5 class="mb-0">&#8358;{{number_format($invoice->amount,2)}}</h5>
+                        <h5 class="mb-0">&#{{nairaSymbol()}}{{number_format($invoice->amount,2)}}</h5>
                         <span class="text-xs">Due Date: {{\Carbon\Carbon::parse()->diffInDays($invoice->due_date)}} day(s)</span>
 
                     </div>

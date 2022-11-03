@@ -91,3 +91,9 @@ function errorResponseJson($message,$payload): array
     ];
 
 }
+
+function nairaSymbol()
+{
+    return '8358;';
+
+}

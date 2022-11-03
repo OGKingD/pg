@@ -6,25 +6,6 @@
         </a>
     </div>
     <hr class="horizontal dark mt-0">
-    <div class="sidenav-footer mx-3 mt-3 pt-3">
-        <div class="card card-background shadow-none card-background-mask-secondary" id="sidenavCard">
-            <div class="full-background" style="background-image: url('{{asset('assets/img/curved-images/white-curved.jpg')}}')"></div>
-            <div class="card-body text-start p-3 w-100">
-                <div class="row">
-                    <div class="col-3">
-                        <div class="icon icon-shape icon-sm bg-white shadow text-center mb-3 d-flex align-items-center justify-content-center border-radius-md">
-                            <i class="ni ni-diamond text-dark text-gradient text-lg top-0" aria-hidden="true" id="sidenavCardIcon"></i>
-                        </div>
-                    </div>
-
-                    <div class="col-8 docs-info">
-                        <span class="text-white up mb-0">Hello {{auth()->user()->last_name }}! Welcome.</span>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
     <hr class="horizontal dark mt-0">
 
     <div class="collapse navbar-collapse  w-auto h-auto" id="sidenav-collapse-main">
@@ -65,15 +46,6 @@
                 </a>
             </li>
 
-
-            <li class="nav-item mt-3">
-                <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6">PAGES</h6>
-            </li>
-
-            <li class="nav-item">
-                <hr class="horizontal dark" />
-                <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6">DOCS</h6>
-            </li>
 
             <li class="nav-item">
                 <hr class="horizontal dark mt-0">
