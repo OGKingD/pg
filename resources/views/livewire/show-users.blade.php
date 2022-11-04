@@ -1,6 +1,6 @@
 <div>
 
-    <table class="container table table-flush" id="datatable-buttons">
+    <table class="container table table-flush" id="datatable-basic">
         <thead>
         <tr>
             <th>{{__('S/N')}}</th>
@@ -261,6 +261,18 @@
             });
 
         </script>
+        @if(count($users))
+            <script>
+                $('#datatable-basic').DataTable({
+                    paging: false,
+                    ordering: true,
+                    info: false,
+                    fixedHeight: true,
+                    searchable: true,
+
+                });
+            </script>
+        @endif
     @endsection
 
 </div>

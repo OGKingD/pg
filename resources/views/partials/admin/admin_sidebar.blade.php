@@ -45,6 +45,14 @@
                     <span class="nav-link-text ms-1">Merchants</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link @if(request()->path() === "transactions") active @endif" href="{{route('transactions')}}" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <i class="fas fa-receipt @if(request()->path() === "transactions") text-white @else text-dark @endif"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Transactions</span>
+                </a>
+            </li>
 
 
             <li class="nav-item">

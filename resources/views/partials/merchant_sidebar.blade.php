@@ -7,25 +7,6 @@
     </div>
 
     <hr class="horizontal dark mt-0">
-    <div class="sidenav-footer mx-3 mt-3 pt-3">
-        <div class="card card-background shadow-none card-background-mask-secondary" id="sidenavCard">
-            <div class="full-background" style="background-image: url('{{asset('assets/img/curved-images/white-curved.jpg')}}')"></div>
-            <div class="card-body text-start p-3 w-100">
-                <div class="row">
-                    <div class="col-3">
-                        <div class="icon icon-shape icon-sm bg-white shadow text-center mb-3 d-flex align-items-center justify-content-center border-radius-md">
-                            <i class="ni ni-diamond text-dark text-gradient text-lg top-0" aria-hidden="true" id="sidenavCardIcon"></i>
-                        </div>
-                    </div>
-
-                    <div class="col-8 docs-info">
-                        <span class="text-white up mb-0">Hello {{auth()->user()->first_name }}! Welcome.</span>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
     <hr class="horizontal dark mt-0">
 
 
@@ -46,16 +27,12 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link @if(request()->path() === "transactions") active @endif" href="#" >
+                <a class="nav-link @if(request()->path() === "transactions") active @endif" href="{{route('transactions')}}" >
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                        <i class="fas fa-file-invoice-dollar @if(request()->path() === "transactions") text-white @else text-dark @endif"></i>
+                        <i class="fas fa-receipt @if(request()->path() === "transactions") text-white @else text-dark @endif"></i>
                     </div>
                     <span class="nav-link-text ms-1">Transactions</span>
                 </a>
-            </li>
-
-            <li class="nav-item mt-3">
-                <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder opacity-6">PAGES</h6>
             </li>
 
             <li class="nav-item">
@@ -70,35 +47,15 @@
                     <span class="nav-link-text ms-1">Invoice</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link @if(request()->path() === "transactions/request_money") active @endif" href="#" >
-                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
-                        <i class="fas fa-file-invoice-dollar @if(request()->path() === "transactions") text-white @else text-dark @endif"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Request Money</span>
-                </a>
-            </li>
+            {{--            <li class="nav-item">--}}
+{{--                <a class="nav-link @if(request()->path() === "transactions/request_money") active @endif" href="#" >--}}
+{{--                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">--}}
+{{--                        <i class="fas fa-file-invoice-dollar @if(request()->path() === "transactions") text-white @else text-dark @endif"></i>--}}
+{{--                    </div>--}}
+{{--                    <span class="nav-link-text ms-1">Request Money</span>--}}
+{{--                </a>--}}
+{{--            </li>--}}
 
-            <li class="nav-item">
-                <a class="nav-link" href="https://github.com/creativetimofficial/ct-soft-ui-dashboard-pro/blob/main/CHANGELOG.md" target="_blank">
-                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                        <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                            <title>credit-card</title>
-                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                <g transform="translate(-2169.000000, -745.000000)" fill="#FFFFFF" fill-rule="nonzero">
-                                    <g transform="translate(1716.000000, 291.000000)">
-                                        <g transform="translate(453.000000, 454.000000)">
-                                            <path class="color-background" d="M43,10.7482083 L43,3.58333333 C43,1.60354167 41.3964583,0 39.4166667,0 L3.58333333,0 C1.60354167,0 0,1.60354167 0,3.58333333 L0,10.7482083 L43,10.7482083 Z" opacity="0.593633743"></path>
-                                            <path class="color-background" d="M0,16.125 L0,32.25 C0,34.2297917 1.60354167,35.8333333 3.58333333,35.8333333 L39.4166667,35.8333333 C41.3964583,35.8333333 43,34.2297917 43,32.25 L43,16.125 L0,16.125 Z M19.7083333,26.875 L7.16666667,26.875 L7.16666667,23.2916667 L19.7083333,23.2916667 L19.7083333,26.875 Z M35.8333333,26.875 L28.6666667,26.875 L28.6666667,23.2916667 L35.8333333,23.2916667 L35.8333333,26.875 Z"></path>
-                                        </g>
-                                    </g>
-                                </g>
-                            </g>
-                        </svg>
-                    </div>
-                    <span class="nav-link-text ms-1">Changelog</span>
-                </a>
-            </li>
             <li class="nav-item">
                 <hr class="horizontal dark mt-0">
 

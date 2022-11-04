@@ -11,37 +11,12 @@
     </title>
     <!-- Extra details for Live View on GitHub Pages -->
     <!-- Canonical SEO -->
-    <link rel="canonical" href="https://www.creative-tim.com/product/argon-design-system-pro"/>
+    <link rel="canonical" href="https://www.saanapay.ng"/>
     <!--  Social tags      -->
     <meta name="keywords"
-          content="argon design system pro, design system, login, form, table, tables, calendar, card, cards, navbar, modal, icons, icons, map, chat, carousel, menu, datepicker, gallery, slider, date, sidebar, social, dropdown, search, tab, nav, footer, date picker, forms, tabs, time, button, select, input, timeline, cart, car, fullcalendar, about us, invoice, account, chat, log in, blog, profile, portfolio, landing page, ecommerce, shop, landing, register, app, contact, one page, sign up, signup, store, bootstrap 4, bootstrap4">
-    <meta name="description"
-          content="Start your development with a Premium Argon Design System for Bootstrap 4. It combines colors that are easy on the eye, spacious cards, beautiful typography, and graphics. It is a beautiful cross-platform UI kit featuring over 1100 components, 43 sections and 17 example pages.">
-    <!-- Schema.org markup for Google+ -->
-    <meta itemprop="name" content="Argon Design System Pro by Creative Tim">
-    <meta itemprop="description"
-          content="Start your development with a Premium Argon Design System for Bootstrap 4. It combines colors that are easy on the eye, spacious cards, beautiful typography, and graphics. It is a beautiful cross-platform UI kit featuring over 1100 components, 43 sections and 17 example pages.">
-    <meta itemprop="image"
-          content="https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-design-system-pro/opt_adsp_thumbnail.jpg">
-    <!-- Twitter Card data -->
-    <meta name="twitter:card" content="product">
-    <meta name="twitter:site" content="@creativetim">
-    <meta name="twitter:title" content="Argon Design System Pro by Creative Tim">
-    <meta name="twitter:description"
-          content="Start your development with a Premium Argon Design System for Bootstrap 4. It combines colors that are easy on the eye, spacious cards, beautiful typography, and graphics. It is a beautiful cross-platform UI kit featuring over 1100 components, 43 sections and 17 example pages.">
-    <meta name="twitter:creator" content="@creativetim">
-    <meta name="twitter:image"
-          content="https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-design-system-pro/opt_adsp_thumbnail.jpg">
-    <!-- Open Graph data -->
-    <meta property="fb:app_id" content="655968634437471">
-    <meta property="og:title" content="Argon Design System Pro by Creative Tim"/>
-    <meta property="og:type" content="article"/>
-    <meta property="og:url" content="https://demos.creative-tim.com/argon-design-system-pro/index.html"/>
-    <meta property="og:image"
-          content="https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-design-system-pro/opt_adsp_thumbnail.jpg"/>
-    <meta property="og:description"
-          content="Start your development with a Premium Argon Design System for Bootstrap 4. It combines colors that are easy on the eye, spacious cards, beautiful typography, and graphics. It is a beautiful cross-platform UI kit featuring over 1100 components, 43 sections and 17 example pages."/>
-    <meta property="og:site_name" content="Saanapay"/>
+          content="payment, gateway, simple">
+    <meta name="description" content="Saanapay.">
+
     <!--  -->
     <!--     Fonts and icons     -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
@@ -124,8 +99,7 @@
                         <div class="col-lg-4 ml-5">
                             <img src="{{asset('assets/img/saanapay.png')}}" style="width: 200px;" class="img-fluid" alt="">
                             <span class="badge badge-danger">PRO</span>
-                            <p class="lead">Start the Development with this<br/> <b>Badass Bootstrap 4 Design
-                                    System.</b></p>
+                            <p class="lead">Get Started<br/> <b>Payments Made Easy.</b></p>
                             <div class="btn-wrapper mt-5">
                                 <a href="{{route('login')}}"
                                    class="btn btn-icon mb-3 mb-sm-0 text-white" style="background-color: #2ccae3">
