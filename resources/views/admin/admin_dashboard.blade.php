@@ -18,8 +18,14 @@
                                         </div>
                                     </div>
                                     <div class="col-4 text-end">
-                                        <img class="w-50" src="{{asset("assets/img/logos/icon-sun-cloud.png")}}"
-                                             alt="image sun">
+                                        @if(strtoupper($time_of_day) === "NIGHT")
+                                            <img class="w-50" src="{{asset("assets/img/logos/cloudy-night.png")}}"
+                                                 alt="image Night">
+                                        @else
+                                            <img class="w-50" src="{{asset("assets/img/logos/icon-sun-cloud.png")}}"
+                                                 alt="image sun">
+                                        @endif
+
                                     </div>
                                 </div>
                             </div>
@@ -58,7 +64,7 @@
                                                 <div class="d-flex px-2 py-0">
                                                     <span class="badge bg-success me-3"> </span>
                                                     <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Successful </h6>
+                                                        <h6 class="mb-0 text-sm">Successful Transactions </h6>
                                                     </div>
                                                 </div>
                                             </td>
@@ -71,7 +77,7 @@
                                                 <div class="d-flex px-2 py-0">
                                                     <span class="badge bg-warning me-3"> </span>
                                                     <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Pending</h6>
+                                                        <h6 class="mb-0 text-sm">Pending Transactions</h6>
                                                     </div>
                                                 </div>
                                             </td>
@@ -84,7 +90,7 @@
                                                 <div class="d-flex px-2 py-0">
                                                     <span class="badge bg-danger me-3"> </span>
                                                     <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Failed</h6>
+                                                        <h6 class="mb-0 text-sm">Failed Transactions</h6>
                                                     </div>
                                                 </div>
                                             </td>
@@ -145,7 +151,20 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> <b>&#{{nairaSymbol()}} {{number_format($transactions_expected_revenue ,1)}}</b> </span>
+                                                <span class="text-xs font-weight-bold"> <b>&#{{nairaSymbol()}} {{number_format($total_fees_charge ,1)}}</b> </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-0">
+                                                    <span class="badge bg-gradient-faded-info-vertical me-3"> </span>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">Revenue </h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-xs font-weight-bold"> <b>&#{{nairaSymbol()}} {{number_format($total_successful_fees_charge,1 )}}</b> </span>
                                             </td>
                                         </tr>
 
@@ -171,7 +190,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="card-body p-0 mb-4">
                         <div class="row ">
                             <div class="col-md-6 mb-md-2">
                                 <div class="card">
@@ -306,7 +325,7 @@
                     <div class="card-header pb-0 p-3">
                         <div class="row">
                             <div class="col-md-6">
-                                <h6 class="mb-0">Revenue Breakdown </h6>
+                                <h6 class="mb-0">Breakdown via Gateways </h6>
                             </div>
                             <div class="col-md-6 d-flex justify-content-end align-items-center">
                                 <i class="far fa-calendar-alt me-2" aria-hidden="true"></i>
@@ -814,6 +833,77 @@
                         },
                         ticks: {
                             display: false,
+                        }
+                    },
+                },
+            },
+        });
+
+
+
+        // Chart Consumption by day
+        var ctx = document.getElementById("chart-cons-week").getContext("2d");
+
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                datasets: [{
+                    label: "Watts",
+                    tension: 0.4,
+                    borderWidth: 0,
+                    borderRadius: 4,
+                    borderSkipped: false,
+                    backgroundColor: "#3A416F",
+                    data: [150, 230, 380, 220, 420, 200, 70],
+                    maxBarThickness: 6
+                }, ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            font: {
+                                size: 12,
+                                family: "Open Sans",
+                                style: 'normal',
+                            },
+                            display: true,
+                            padding: 10,
+                            color: '#9ca2b7'
+                        },
+                    },
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            padding: 10,
+                            color: '#9ca2b7'
                         }
                     },
                 },
