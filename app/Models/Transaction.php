@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
 
@@ -10,16 +11,111 @@ class Transaction extends Model
     use HasFactory;
 
     protected $guarded = [];
-    protected $casts =  ['details' => 'json'];
+    protected $casts = ['details' => 'json'];
+
+    public static function generateCsvReport(array $payload, array $csvHeaders)
+    {
+        $file = fopen(storage_path("logs/{$payload['filename']}"), "wb");
+        /** @var Builder $query */
+        $query = self::reportQuery($payload);
+        $query->chunk(3000, function ($results) use ($file, $csvHeaders) {
+            //Define Headers;
+            fputcsv($file, $csvHeaders);
+            foreach ($results as $result) {
+                //Define Content;
+                $contents = [
+                    $result->merchant_transaction_ref,
+                    $result->gateway->name ?? "N/A",
+                    number_format($result->amount, 2),
+                    number_format($result->fee, 2),
+                    number_format($result->total, 2),
+                    $result->description,
+                    $result->status,
+                    $result->flag,
+                    $result->created_at,
+                ];
+                fputcsv($file, $contents);
+            }
+        });
+        fclose($file);
+
+    }
+
+    /**
+     * @param $query
+     */
+    public static function reportQuery($query): Builder
+    {
+        $queryArray = [];
+        $columns_to_select = [
+            "transaction_ref",
+            'merchant_transaction_ref',
+            'gateway_id',
+            'amount',
+            'fee',
+            'total',
+            'description',
+            'status',
+            'flag',
+            'created_at'];
+
+        if (isset($query['transaction_ref'])) {
+            $queryArray[] = ['transaction_ref', '=', (string)($query['transaction_ref'])];
+        }
+        if (isset($query['merchant_transaction_ref'])) {
+            $queryArray[] = ['merchant_transaction_ref', '=', (string)($query['merchant_transaction_ref'])];
+        }
+        if (isset($query['gateway_id'])) {
+            $queryArray[] = ['gateway_id', '=', (int)($query['gateway_id'])];
+        }
+        if (isset($query['amount'])) {
+            $queryArray[] = ['amount', '=', ($query['amount'])];
+        }
+        if (isset($query['total'])) {
+            $queryArray[] = ['total', '=', (string)($query['total'])];
+        }
+        if (isset($query['description'])) {
+            $queryArray[] = ['description', 'like', "%" . $query['transaction_ref'] . "%"];
+        }
+        if (isset($query['status'])) {
+            $queryArray[] = ['status', '=', (string)($query['status'])];
+        }
+        if (isset($query['flag'])) {
+            $queryArray[] = ['flag', '=', (string)($query['flag'])];
+        }
+        if (isset($query['user_id'])) {
+            $queryArray[] = ['user_id', '=', (string)($query['user_id'])];
+        }
+        if (isset($query['transaction_ref'])) {
+            $queryArray[] = ['transaction_ref', '=', (string)($query['transaction_ref'])];
+        }
+
+        $builder = self::with(['invoice', 'gateway', 'user'])->select($columns_to_select)->where($queryArray);
+
+        info("Transaction Report Query parameters is :", $queryArray);
+
+        if ((array_key_exists('created_at', $query) && !empty($query['created_at'])) && (array_key_exists('end_date', $query) && !empty($query['end_date']))) {
+            return $builder->whereBetween("created_at", [$query['created_at'], $query['end_date'] . " 23:59:59.999",]);
+        }
+        if (array_key_exists('created_at', $query) && !empty($query['created_at'])) {
+            return $builder->whereDate('created_at', $query['created_at']);
+        }
+        if (array_key_exists('end_date', $query) && !empty($query['end_date'])) {
+            return $builder->whereDate('created_at', $query['end_date']);
+        }
+        return $builder;
+
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
 
     }
+
     public function invoice()
     {
-        return $this->belongsTo(Invoice::class,'invoice_no','invoice_no');
+        return $this->belongsTo(Invoice::class, 'invoice_no', 'invoice_no');
 
     }
 
@@ -28,6 +124,7 @@ class Transaction extends Model
         return $this->belongsTo(Gateway::class);
 
     }
+
     /**
      * @param Transaction $transaction
      * @param mixed $gateway_id
@@ -37,7 +134,7 @@ class Transaction extends Model
      * @param User $user
      * @param User $company
      */
-    public function handleSuccessfulPayment(Transaction $transaction,  $gateway_id, $payment_provider_message, array $details, Wallet $wallet, User $user, User $company): bool
+    public function handleSuccessfulPayment(Transaction $transaction, $gateway_id, $payment_provider_message, array $details, Wallet $wallet, User $user, User $company): bool
     {
         $status = false;
 
@@ -87,7 +184,7 @@ class Transaction extends Model
 
             });
         } catch (\Throwable $e) {
-            info("Error Happened while handling successful payment: ", ['cause'=>$e->getMessage(), 'trace'=>$e->getTraceAsString()]);
+            info("Error Happened while handling successful payment: ", ['cause' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
         }
         return $status;
     }

@@ -3,10 +3,11 @@
 
         <div>
             <div class="page-header   position-relative m-3 border-radius-xl">
-                <img src="{{asset('assets/img/shapes/waves-white.svg')}}" alt="pattern-lines" class="position-absolute opacity-6 start-0 top-0 w-100">
+                <img src="{{asset('assets/img/shapes/waves-white.svg')}}" alt="pattern-lines"
+                     class="position-absolute opacity-6 start-0 top-0 w-100">
 
             </div>
-            <form role="form" action="#" wire:submit.prevent="searchTransactions" >
+            <form role="form" action="#" wire:submit.prevent="searchTransactions">
                 @csrf
 
                 <div class="pb-lg-3 pb-3 pt-2 postion-relative z-index-2">
@@ -19,8 +20,11 @@
                             <div class="row">
                                 <div class="">
                                     <div class="input-group mb-3">
-                                        <span class="input-group-text"><i class="fas fa-envelope-open"> &nbsp; </i></span>
-                                        <input type="text"  name="email" class="form-control" wire:model="emailtoSearch"  wire:keydown.debounce.450ms="searchForUser()"  placeholder="Email" aria-label="Email" >
+                                        <span class="input-group-text"><i
+                                                class="fas fa-envelope-open"> &nbsp; </i></span>
+                                        <input type="text" name="email" class="form-control" wire:model="emailtoSearch"
+                                               wire:keydown.debounce.450ms="searchForUser()" placeholder="Email"
+                                               aria-label="Email">
                                     </div>
                                 </div>
 
@@ -31,7 +35,8 @@
                                         <div>
                                             <ul class="list-group">
                                                 @foreach($emails as $email)
-                                                    <li class="list-group-item" wire:keydown="retrieveUserFromSearch('{{$email->email}}')">{{$email->email}}</li>
+                                                    <li class="list-group-item"
+                                                        wire:keydown="retrieveUserFromSearch('{{$email->email}}')">{{$email->email}}</li>
                                                 @endforeach
                                             </ul>
                                         </div>
@@ -43,8 +48,8 @@
 
                         </div>
                         <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-success mx-3"> Search </button>
-                            <button type="submit" class="btn btn-danger mx-3"> Reset </button>
+                            <button type="submit" class="btn btn-success mx-3"> Search</button>
+                            <button type="submit" class="btn btn-danger mx-3"> Reset</button>
                         </div>
 
                     </div>
@@ -56,13 +61,29 @@
 
     </div>
     <div class="d-block">
-        <button class="btn btn-icon btn-outline-dark ms-2 export" data-type="csv" type="button">
+        <button class="btn btn-icon btn-outline-dark ms-2 export" data-type="csv" type="button"
+                onclick="generateCsvReport()">
             <span class="btn-inner--icon"><i class="ni ni-archive-2"></i></span>
             <span class="btn-inner--text">Export CSV</span>
         </button>
     </div>
     <div class="row min-vh-90">
+        @if(isset($reportExists))
 
+            <a href="#">
+                <div class="alert alert-info alert-dismissible fade show" role="alert" style="font-size: 25px"
+                     onclick=" downloadReport('reportGeneratedAlert','{{$filename}}')" id="reportGeneratedAlert">
+                        <span class="alert-text">
+                            <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
+                            <strong>Info! </strong>Report Generated! click me to download
+                        </span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+            </a>
+        @endif
         <div class="card table-responsive">
             <div class="dataTable-wrapper dataTable-loading sortable  fixed-columns">
                 <div class="dataTable-container">
@@ -73,31 +94,40 @@
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter">#</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" data-sortable="">
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Transaction Ref</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" data-sortable="">
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Merchant Transaction Ref</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" data-sortable="">
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Gateway</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" data-sortable="">
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Amount</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" data-sortable="">
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Fee</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" data-sortable="">
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Total</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" data-sortable="">
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Status</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" data-sortable="">
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Flag</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" data-sortable="">
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Date</a>
                             </th>
 
@@ -161,6 +191,34 @@
                 });
             </script>
         @endif
+
+        <script>
+            function downloadReport(element, filename) {
+                var alertNode = document.querySelector('#' + element);
+                console.log(alertNode);
+                alertNode.style.display = "none";
+                Livewire.emit("downloadReport", filename, null)
+            }
+
+            function generateCsvReport() {
+                const urlSearchParams = new URLSearchParams(window.location.search);
+                const params = Object.fromEntries(urlSearchParams.entries());
+                sprocessing("Generating Report");
+                Livewire.emit("exportCsv", params)
+            }
+
+            addEventListener("generatingReport", event => {
+                let response = event.detail;
+
+                if (response.status !== true) {
+                    salert("Generating Report", "Cannot Generate Report! No data Available", "warning")
+                }
+                if (response.status === true) {
+                    salert("Generating Report", "You'll be notified once Report is Generated", "info")
+                }
+
+            });
+        </script>
     @endsection
 
 
