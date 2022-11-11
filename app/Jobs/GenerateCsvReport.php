@@ -51,8 +51,14 @@ class GenerateCsvReport implements ShouldQueue
         if (!$this->user->isAdmin()) {
             $this->payload['user_id'] = $this->user->id;
         }
+        //check if group_by is set and call summary report;
+        if (isset($this->payload['group_by'])) {
+            $transaction::summaryReport($this->payload);
+        }
 
-        $transaction::generateCsvReport($this->payload, $this->csvHeaders);
+        if (!isset($this->payload['group_by'])) {
+            $transaction::generateCsvReport($this->payload, $this->csvHeaders);
+        }
         //send Mail insert to Notification DB;
 
     }

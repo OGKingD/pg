@@ -41,6 +41,76 @@ class Transaction extends Model
 
     }
 
+    public static function summaryReport(array $payload)
+    {
+        $file = fopen(storage_path("logs/{$payload['filename']}"), "wb");
+        $query = self::reportQuery($payload);
+
+        $query->chunk(3000, function ($results) use ($file) {
+            //Define Headers;
+            $csvHeaders = [];
+            //group by user_id, status, flag,gateway_id
+            $headers = $results[0]->original;
+            foreach ($headers as $key => $head) {
+                $title = strtoupper($key);
+                if ($title === "ID") {
+                    continue;
+                }
+                if ($title === "GATEWAY_ID") {
+                    $csvHeaders[] = "CHANNEL";
+                    continue;
+                }
+                if ($title === "USER_ID") {
+                    $csvHeaders[] = "MERCHANT";
+                    continue;
+                }
+
+                $csvHeaders[] = $title;
+            }
+
+            fputcsv($file, $csvHeaders);
+            foreach ($results as $result) {
+                $contents = [];
+
+                $data = $result->original;
+
+                //Define Content;
+                foreach ($data as $key => $datum) {
+
+                    if ($key === "id") {
+                        continue;
+                    }
+                    if ($key === "gateway_id") {
+                        $contents[] = $result->gateway->name ?? "N/A";
+                        continue;
+                    }
+                    if ($key === "user_id") {
+                        $contents[] = "{$result->user->first_name} {$result->user->last_name}";
+                        continue;
+                    }
+                    if ($key === "amount") {
+                        $contents[] = number_format($result->amount, 2);
+                        continue;
+                    }
+                    if ($key === "fee") {
+                        $contents[] = number_format($result->fee, 2);
+                        continue;
+                    }
+                    if ($key === "total") {
+                        $contents[] = number_format($result->total, 2);
+                        continue;
+                    }
+
+                    $contents[] = $datum;
+                }
+
+                fputcsv($file, $contents);
+            }
+        });
+        fclose($file);
+
+    }
+
     /**
      * @param $query
      */
@@ -90,10 +160,67 @@ class Transaction extends Model
             $queryArray[] = ['transaction_ref', '=', (string)($query['transaction_ref'])];
         }
 
+
+        //check if group_by is used;
+        if (isset($query['group_by'])) {
+            /** @var Builder $grp_by_query */
+            //determine the relationships to load;
+            $relation = [];
+            $grp_by = $query['group_by'];
+
+            unset($query['filename'], $query['group_by']);
+            $builder = "";
+            $exclude_from_columns_to_select = ['end_date'];
+            $columns_to_select = array_diff(array_keys($query), $exclude_from_columns_to_select);
+            if ($grp_by === "gateway_id") {
+                $relation[] = "gateway";
+                $columns_to_select[] = "gateway_id";
+            }
+            if ($grp_by === "user_id") {
+                $relation[] = "user";
+                $columns_to_select[] = "user_id";
+            }
+            //user didn't select any search criteria;
+            if (empty($columns_to_select)){
+                $columns_to_select[] = "user_id";
+            }
+            if (!in_array($grp_by, ['user_id', 'gateway_id'])) {
+                $columns_to_select[] = $grp_by;
+            }
+
+            if (count($relation)) {
+                $builder = self::with($relation)->select($columns_to_select);
+            }
+
+            if (empty($relation)) {
+                $builder = self::select($columns_to_select);
+            }
+
+            $builder
+                ->selectRaw("@rn:=@rn+1  AS id")
+                ->selectRaw("COUNT(id) as transaction_count")
+                ->selectRaw("SUM(amount) as amount")
+                ->selectRaw("SUM(fee) as fee")
+                ->selectRaw("SUM(total) as total")->where($queryArray);
+
+            $grp_by_query = self::queryWithDateRange($query, $builder);
+
+            $grp_by_query->groupBy($columns_to_select)->orderBy('id');
+
+
+            return $grp_by_query;
+        }
+
         $builder = self::with(['invoice', 'gateway', 'user'])->select($columns_to_select)->where($queryArray);
 
         info("Transaction Report Query parameters is :", $queryArray);
 
+        return self::queryWithDateRange($query, $builder);
+
+    }
+
+    public static function queryWithDateRange($query, $builder)
+    {
         if ((array_key_exists('created_at', $query) && !empty($query['created_at'])) && (array_key_exists('end_date', $query) && !empty($query['end_date']))) {
             return $builder->whereBetween("created_at", [$query['created_at'], $query['end_date'] . " 23:59:59.999",]);
         }

@@ -54,6 +54,13 @@ function toggleModal(modalId) {
     $(modalId).modal('toggle');
 }
 
+function setUserField(id,email) {
+    document.getElementById('userId').value = id;
+    document.getElementById('customer_email').value = email;
+    let emailDiv = document.getElementById('emailListing');
+    emailDiv ? emailDiv.style.display = "none" :"";
+}
+
 function triggerConfigurationOptions() {
     fixedPlugin.classList.contains("show") ? fixedPlugin.classList.remove("show") : fixedPlugin.classList.add("show");
 }

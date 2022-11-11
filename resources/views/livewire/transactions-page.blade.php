@@ -7,55 +7,426 @@
                      class="position-absolute opacity-6 start-0 top-0 w-100">
 
             </div>
-            <form role="form" action="#" wire:submit.prevent="searchTransactions">
-                @csrf
+            <!-- Nav pills -->
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="pill" href="#home">Filter Transactions</a>
+                </li>
 
-                <div class="pb-lg-3 pb-3 pt-2 postion-relative z-index-2">
-                    <h3 class="text">Search</h3>
+                @if($isAdmin)
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="pill" href="#menu1">Summary Report </a>
+                    </li>
+                @endif
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label>Email</label>
+            </ul>
 
-                            <div class="row">
-                                <div class="">
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text"><i
-                                                class="fas fa-envelope-open"> &nbsp; </i></span>
-                                        <input type="text" name="email" class="form-control" wire:model="emailtoSearch"
-                                               wire:keydown.debounce.450ms="searchForUser()" placeholder="Email"
-                                               aria-label="Email">
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane container active" id="home">
+                    <form role="form" action="#"  onsubmit="event.preventDefault(); searchTransactions(this); ">
+                        @csrf
+                        <fieldset class="py-md-4">
+                            <div class="row" id="rawFilter">
+
+                                <div class="col-lg-3 col-md-4 non_essential_summary_filter">
+                                    <div class="form-group">
+                                        <label for="transaction_ref" class="col-form-label text-md-right">
+                                            {{__("Transaction Number")}}
+                                        </label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-mobile-alt" style="font-size: 15px;"></i>
+                                                </span>
+                                            <input id="transaction_ref" type="tel" placeholder="Transaction Ref"
+                                                   class="form-control @error('transaction_ref') is-invalid @enderror"
+                                                   name="transaction_ref"
+                                                   value="{{ old('transaction_ref') }}" autocomplete="tel"
+                                            >
+
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="">
+                                <div class="col-lg-3 col-md-4 non_essential_summary_filter">
+                                    <div class="form-group">
+                                        <label for="payment_provider_id" class="col-form-label text-md-right">
+                                            {{__("Merchant Ref")}}
+                                        </label>
+                                        <div class="input-group input-group-merge input-group-alternative mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-mobile-alt" style="font-size: 15px;"></i>
+                                                </span>
+                                            <input id="payment_provider_id" type="tel" placeholder="Payment Ref"
+                                                   class="form-control @error('payment_provider_id') is-invalid @enderror"
+                                                   name="merchant_transaction_ref" value="{{$merchant_transaction_ref}}"
+                                            >
 
-                                    @if(!empty($emails))
-
-                                        <div>
-                                            <ul class="list-group">
-                                                @foreach($emails as $email)
-                                                    <li class="list-group-item"
-                                                        wire:keydown="retrieveUserFromSearch('{{$email->email}}')">{{$email->email}}</li>
-                                                @endforeach
-                                            </ul>
                                         </div>
-                                    @endif
+                                    </div>
+                                </div>
 
+                                <div class="col-lg-3 col-md-4">
+                                    <div class="form-group">
+                                        <label for="status" class=" col-form-label text-md-right">
+                                            {{ __('Payment Status') }}
+                                        </label>
+
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa fa-university py-1" style="font-size: 18px;"></i>
+                                                </span>
+                                            </div>
+
+
+                                            <select id="status" title="Choose a Status"
+                                                    data-style="btn border"
+                                                    class="selectpicker form-control" name="status">
+
+                                                <option value="">Choose Status</option>
+
+                                                <option @if($payment_status === "pending" ) selected
+                                                        @endif value="pending">PENDING
+                                                </option>
+                                                <option @if($payment_status === "failed" ) selected
+                                                        @endif value="failed">FAILED
+                                                </option>
+                                                <option @if($payment_status === "successful" ) selected
+                                                        @endif value="successful">SUCCESSFUL
+                                                </option>
+                                            </select>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-4">
+                                    <div class="form-group">
+                                        <label for="flag"
+                                               class=" col-form-label text-md-right">{{ __('Payment Flag') }}</label>
+
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa fa-flag py-1" style="font-size: 18px;"></i>
+                                                </span>
+                                            </div>
+                                            <select id="flag" title="Credit / Debit"
+                                                    data-style="btn border" class="selectpicker form-control " name="flag">
+                                                <option value="">Choose Type</option>
+
+                                                <option @if($payment_flag === "credit" ) selected @endif value="credit">
+                                                    CREDIT
+                                                </option>
+                                                <option @if($payment_flag === "debit" ) selected @endif value="debit">
+                                                    DEBIT
+                                                </option>
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-4">
+                                    <div class="form-group">
+                                        <label for="flag"
+                                               class=" col-form-label text-md-right">{{ __('Payment Channel') }}</label>
+
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa fa-flag py-1" style="font-size: 18px;"></i>
+                                                </span>
+                                            </div>
+                                            <select id="flag"
+                                                    data-style="btn border" class=" form-control " name="gateway_id">
+                                                <option value="">Choose Type</option>
+
+                                                <option @if($payment_channel === 1 ) selected @endif value="1">
+                                                    Card
+                                                </option>
+                                                <option @if($payment_channel === 2 ) selected @endif value="2">
+                                                    Bank Transfer
+                                                </option>
+                                                <option @if($payment_channel === "3" ) selected @endif value="3">
+                                                    Remita
+                                                </option>
+                                                <option @if($payment_channel === "4" ) selected @endif value="4">
+                                                    GooglePay
+                                                </option>
+                                                <option @if($payment_channel === "5" ) selected @endif value="5">
+                                                    ApplePay
+                                                </option>
+
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-3 col-md-4 ">
+                                    <div class="form-group">
+                                        <label for="customer_email" class="col-form-label text-md-right">
+                                            {{__("Merchant Email")}}
+                                        </label>
+                                        <livewire:email-search />
+                                    </div>
 
                                 </div>
+
+                                <div class="col-lg-3 col-md-4">
+                                    <div class="form-group">
+                                        <label for="created_at" class="col-form-label text-md-right">
+                                            {{__("Start Date")}}
+                                        </label>
+                                        <div class="input-group input-group-merge input-group-alternative mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-calendar-alt" style="font-size: 15px;"></i>
+                                                </span>
+                                            <input id="created_at" type="date" placeholder="yyyy-mm-dd"
+                                                   class="datechk form-control @error('created_at') is-invalid @enderror"
+                                                   name="created_at" value="{{$payment_created_at}}"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-4">
+                                    <div class="form-group">
+                                        <label for="created_at" class="col-form-label text-md-right">
+                                            {{__("End Date")}}
+                                        </label>
+                                        <div class="input-group input-group-merge input-group-alternative mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-calendar-alt" style="font-size: 15px;"></i>
+                                            </span>
+                                            <input id="created_at" type="date" placeholder="yyyy-mm-dd"
+                                                   class="datechk form-control @error('created_at') is-invalid @enderror"
+                                                   name="end_date" value="{{$payment_end_date}}"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
 
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-success mx-3"> Search</button>
-                            <button type="submit" class="btn btn-danger mx-3"> Reset</button>
-                        </div>
 
-                    </div>
+                            <div class="col text-right">
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-success mx-3"> Search</button>
+                                    <button type="submit" class="btn btn-danger mx-3"> Reset</button>
+                                </div>
+                            </div>
+                        </fieldset>
+
+
+
+                    </form>
                 </div>
 
-            </form>
+                <div class="tab-pane container fade" id="menu1">
+                    <form role="form" action="#"  onsubmit="event.preventDefault(); searchTransactions(this); ">
+                        @csrf
+                        <fieldset class="py-md-4">
+                            <div class="row" id="rawFilter">
+
+
+                                <div class="col-lg-4 col-md-4">
+                                    <div class="form-group">
+                                        <label for="status" class=" col-form-label text-md-right">
+                                            {{ __('Payment Status') }}
+                                        </label>
+
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa fa-university py-1" style="font-size: 18px;"></i>
+                                                </span>
+                                            </div>
+
+
+
+                                            <select id="status" title="Choose a Status"
+                                                    data-style="btn border"
+                                                    class="selectpicker form-control" name="status">
+
+                                                <option value="">Choose Status</option>
+
+                                                <option @if($payment_status === "pending" ) selected
+                                                        @endif value="pending">PENDING
+                                                </option>
+                                                <option @if($payment_status === "failed" ) selected
+                                                        @endif value="failed">FAILED
+                                                </option>
+                                                <option @if($payment_status === "successful" ) selected
+                                                        @endif value="successful">SUCCESSFUL
+                                                </option>
+                                            </select>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4">
+                                    <div class="form-group">
+                                        <label for="flag"
+                                               class=" col-form-label text-md-right">{{ __('Payment Flag') }}</label>
+
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa fa-flag py-1" style="font-size: 18px;"></i>
+                                                </span>
+                                            </div>
+                                            <select id="flag" title="Credit / Debit"
+                                                    data-style="btn border" class="selectpicker form-control " name="flag">
+                                                <option value="">Choose Type</option>
+
+                                                <option @if($payment_flag === "credit" ) selected @endif value="credit">
+                                                    CREDIT
+                                                </option>
+                                                <option @if($payment_flag === "debit" ) selected @endif value="debit">
+                                                    DEBIT
+                                                </option>
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4">
+                                    <div class="form-group">
+                                        <label for="flag"
+                                               class=" col-form-label text-md-right">{{ __('Payment Channel') }}</label>
+
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa fa-flag py-1" style="font-size: 18px;"></i>
+                                                </span>
+                                            </div>
+                                            <select id="flag"
+                                                    data-style="btn border" class=" form-control " name="gateway_id">
+                                                <option value="">Choose Type</option>
+
+                                                <option @if($payment_channel === 1 ) selected @endif value="1">
+                                                    Card
+                                                </option>
+                                                <option @if($payment_channel === 2 ) selected @endif value="2">
+                                                    Bank Transfer
+                                                </option>
+                                                <option @if($payment_channel === "3" ) selected @endif value="3">
+                                                    Remita
+                                                </option>
+                                                <option @if($payment_channel === "4" ) selected @endif value="4">
+                                                    GooglePay
+                                                </option>
+                                                <option @if($payment_channel === "5" ) selected @endif value="5">
+                                                    ApplePay
+                                                </option>
+
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4">
+                                    <div class="form-group">
+                                        <label for="group_by"
+                                               class=" col-form-label text-md-right">{{ __('Group By') }}</label>
+
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa fa-flag py-1" style="font-size: 18px;"></i>
+                                                </span>
+                                            </div>
+                                            <select id="group_by" title="Group By"
+                                                    data-style="btn border" class="form-control " name="group_by">
+                                                <option value="">Choose Type</option>
+
+                                                <option @if($payment_flag === "user_id" ) selected @endif value="user_id">
+                                                    Merchant
+                                                </option>
+                                                <option @if($payment_flag === "gateway_id" ) selected @endif value="gateway_id">
+                                                    Payment Channel
+                                                </option>
+                                                <option @if($payment_flag === "status" ) selected @endif value="status">
+                                                    Status
+                                                </option>
+                                                <option @if($payment_flag === "flag" ) selected @endif value="flag">
+                                                    Flag (Credit/Debit)
+                                                </option>
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-4 col-md-4">
+                                    <div class="form-group">
+                                        <label for="created_at" class="col-form-label text-md-right">
+                                            {{__("Start Date")}}
+                                        </label>
+                                        <div class="input-group input-group-merge input-group-alternative mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-calendar-alt" style="font-size: 15px;"></i>
+                                                </span>
+                                            <input id="created_at" type="date" placeholder="yyyy-mm-dd"
+                                                   class="datechk form-control @error('created_at') is-invalid @enderror"
+                                                   name="created_at" value="{{$payment_created_at}}"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4">
+                                    <div class="form-group">
+                                        <label for="created_at" class="col-form-label text-md-right">
+                                            {{__("End Date")}}
+                                        </label>
+                                        <div class="input-group input-group-merge input-group-alternative mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-calendar-alt" style="font-size: 15px;"></i>
+                                            </span>
+                                            <input id="created_at" type="date" placeholder="yyyy-mm-dd"
+                                                   class="datechk form-control @error('created_at') is-invalid @enderror"
+                                                   name="end_date" value="{{$payment_end_date}}"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="col text-right">
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-success mx-3"> Search</button>
+                                    <button type="submit" class="btn btn-danger mx-3"> Reset</button>
+                                </div>
+                            </div>
+                        </fieldset>
+
+
+
+                    </form>
+                </div>
+
+            </div>
 
         </div>
 
@@ -67,23 +438,22 @@
             <span class="btn-inner--text">Export CSV</span>
         </button>
     </div>
-    <div class="row min-vh-90">
-        @if(isset($reportExists))
-
-            <a href="#">
-                <div class="alert alert-info alert-dismissible fade show" role="alert" style="font-size: 25px"
-                     onclick=" downloadReport('reportGeneratedAlert','{{$filename}}')" id="reportGeneratedAlert">
+    @if(isset($reportExists))
+        <a href="#">
+            <div class="alert alert-info alert-dismissible fade show" role="alert" style="font-size: 25px"
+                 onclick=" downloadReport('reportGeneratedAlert')" id="reportGeneratedAlert">
                         <span class="alert-text">
                             <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
                             <strong>Info! </strong>Report Generated! click me to download
                         </span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
 
-            </a>
-        @endif
+        </a>
+    @endif
+    <div class="row min-vh-90">
         <div class="card table-responsive">
             <div class="dataTable-wrapper dataTable-loading sortable  fixed-columns">
                 <div class="dataTable-container">
@@ -152,12 +522,10 @@
                         @empty
 
                             <tr>
-                                <td colspan="4" rowspan="5" class="text-sm font-weight-normal">
-                                    <div class="justify-content-start card card-plain">
-                                        <div class="card-header pb-0 text-start">
-                                            <h2 class="font-weight-bolder">😢 There are no Transactions Yet!</h2>
-                                            <p class="mb-0 text-center">Once Users start transacting they'll appear
-                                                here.</p>
+                                <td colspan="10"  class="text-sm font-weight-normal">
+                                    <div class="justify-content-center card card-plain">
+                                        <div class="card-header text-center pb-0 text-start">
+                                            <h2 class="font-weight-bolder">😢 No transaction Found!</h2>
                                         </div>
 
                                     </div>
@@ -178,6 +546,12 @@
 
 
     @section('scripts')
+        <style>
+            .nav.nav-pills .nav-link.active {
+                background-color: #2ccae3;
+                color: white;
+            }
+        </style>
 
         @if(count($transactions))
             <script>
@@ -193,18 +567,37 @@
         @endif
 
         <script>
+            function searchTransactions(element) {
+                event.preventDefault();
+                const formData = new FormData(element);
+                let formValues = {};
+                formData.forEach(function (value, key) {
+                    formValues[key] = value;
+                });
+                //bind value;
+            @this.searchParameters
+                = JSON.stringify(formValues);
+
+            sprocessing("Please Wait!");
+
+            Livewire.emit("searchTransactions");
+            }
+
+            addEventListener("searchComplete",function () {
+                Swal.close();
+            })
+
             function downloadReport(element, filename) {
                 var alertNode = document.querySelector('#' + element);
                 console.log(alertNode);
                 alertNode.style.display = "none";
-                Livewire.emit("downloadReport", filename, null)
+                location.assign("{{$reportDownloadLink}}")
             }
 
             function generateCsvReport() {
-                const urlSearchParams = new URLSearchParams(window.location.search);
-                const params = Object.fromEntries(urlSearchParams.entries());
+
                 sprocessing("Generating Report");
-                Livewire.emit("exportCsv", params)
+                Livewire.emit("exportCsv", @this.searchQuery);
             }
 
             addEventListener("generatingReport", event => {
