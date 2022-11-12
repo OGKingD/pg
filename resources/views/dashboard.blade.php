@@ -68,7 +68,7 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> {{number_format((($successful_transactions_count/$transactions_count) * 100) ,1)}}% ({{$successful_transactions_count}})</span>
+                                                <span class="text-xs font-weight-bold"> {{$transactions_count ?? number_format((($successful_transactions_count/$transactions_count) * 100) ,1)}}% ({{$successful_transactions_count}})</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -81,7 +81,7 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> {{number_format((($pending_transactions_count/$transactions_count) * 100) ,1)}}% ({{$pending_transactions_count}})</span>
+                                                <span class="text-xs font-weight-bold"> {{$transactions_count ?? number_format((($pending_transactions_count/$transactions_count) * 100) ,1)}}% ({{$pending_transactions_count}})</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -94,7 +94,7 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> {{number_format((($failed_transactions_count/$transactions_count) * 100) ,1)}}% ({{$failed_transactions_count}})</span>
+                                                <span class="text-xs font-weight-bold"> {{$transactions_count ?? number_format((($failed_transactions_count/$transactions_count) * 100) ,1)}}% ({{$failed_transactions_count}})</span>
                                             </td>
                                         </tr>
                                         <tr>

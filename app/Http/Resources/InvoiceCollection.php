@@ -46,11 +46,6 @@ class InvoiceCollection extends JsonResource
     {
         $url = config("app.url") . "/payment/process/$this->invoice_no";
 
-        $redirect_url = $request->input("redirect_url");
-        if ($redirect_url) {
-            $queryString = http_build_query(["redirect_url" => $redirect_url]);
-            $url = config("app.url") . "/payment/process/$this->invoice_no?$queryString";
-        }
         return [
 
             "invoice_no" => $this->invoice_no,

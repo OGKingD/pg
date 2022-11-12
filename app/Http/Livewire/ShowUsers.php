@@ -30,7 +30,6 @@ class ShowUsers extends Component
 
     public function render()
     {
-        dd($this->searchUsers);
         if ((isset($this->gateways) && is_array($this->gateways))) {
             $selUser = User::whereId($this->selectedUser)->first();
             $this->selectedUserName = $selUser->first_name. " ". $selUser->last_name;

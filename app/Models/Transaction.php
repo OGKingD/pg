@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
+use function Symfony\Component\Translation\t;
 
 class Transaction extends Model
 {
@@ -337,7 +338,9 @@ class Transaction extends Model
 
     public function merchantRedirectUrl()
     {
-        $transaction = $this->only(["merchant_transaction_ref", "invoice_no", "amount", "fee", "total", "description", "status", "flag", "currency"]);
+        $transaction = self::with('gateway')->select(["merchant_transaction_ref", "invoice_no", "gateway_id","amount", "fee", "total", "description", "status", "flag", "currency","updated_at"])->first()->toArray();
+        $transaction["channel"] = $transaction['gateway']['name'];
+        unset($transaction['gateway_id'],$transaction['gateway']);
         return $this->details["redirect_url"] . "?" . http_build_query($transaction);
 
 
