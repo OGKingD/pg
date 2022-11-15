@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Invoice;
 use App\Models\User;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -21,11 +22,16 @@ class InvoicePage extends Component
 
     protected $listeners = ['addInvoice','updateInvoice'];
 
+    public $searchQuery;
+
+    public $perPage;
+
     public function render()
     {
-        $invoices = Invoice::paginate(5);
-        $this->invoices = $invoices->items();
-        return view('livewire.invoice-page');
+
+        $data['invoicesCollection'] = $this->getInvoices();
+
+        return view('livewire.invoice-page', $data);
     }
 
     public function addInvoice()
@@ -109,6 +115,32 @@ class InvoicePage extends Component
         if ($invoiceAdded){
             $this->dispatchBrowserEvent('invoiceUpdated');
         }
+
+    }
+
+    public function getInvoices()
+    {
+        $user = $this->getUser();
+        $userId = $user->id;
+        $isAdmin = $user->type < 5;
+
+        /** @var Builder $builder */
+
+        if (!$isAdmin) {
+            //add user_id;
+            $this->searchQuery['user_id'] = $userId;
+            $builder = Invoice::reportQuery($this->searchQuery);
+
+        }
+        if ($isAdmin) {
+            $builder = Invoice::reportQuery($this->searchQuery);
+        }
+
+        $invoiceCollection = $builder->paginate($this->perPage);
+
+        $this->invoices = $invoiceCollection->items();
+
+        return $invoiceCollection;
 
     }
 

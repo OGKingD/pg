@@ -5,7 +5,7 @@
             <div class="col-md-2 mt-md-0 mb-4">
                 <div class="card">
                     <div class=" dropdown">
-                        <a href="javascript:;" class="text-secondary ps-4" id="dropdownCam"
+                        <a href="javascript:" class="text-secondary ps-4" id="dropdownCam"
                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
                         </a>
@@ -14,19 +14,19 @@
 
                             @if($invoice->status === "pending")
                                 <li>
-                                    <a class="dropdown-item border-radius-md" href="javascript:;"
+                                    <a class="dropdown-item border-radius-md" href="javascript:"
                                        wire:click="openEditInvoiceModal({{$invoice}})">Edit</a>
                                 </li>
                                 <li class="d-none" id="invoiceLink"> {{config('app.url')}}/payment/process/{{$invoice->invoice_no}} </li>
                                 <li>
-                                    <a class="dropdown-item border-radius-md" href="javascript:;" onclick="copyTextToClipboard('invoiceLink')">Copy Link </a>
+                                    <a class="dropdown-item border-radius-md" href="javascript:" onclick="copyTextToClipboard('invoiceLink')">Copy Link </a>
                                 </li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li>
                                     <a class="dropdown-item border-radius-md text-danger"
-                                       href="javascript:;">Remove</a>
+                                       href="javascript:">Remove</a>
                                 </li>
                             @endif
 
@@ -92,7 +92,7 @@
         @endforelse
 
         <div class="col-md-2 mt-md-0 mb-4  ">
-            <a role="button" href="javascript:;" data-bs-toggle="modal" data-bs-target="#modal-new-invoice">
+            <a role="button" href="javascript:" data-bs-toggle="modal" data-bs-target="#modal-new-invoice">
                 <div class="card h-100  bg-info">
                     <div class="card-body d-flex flex-column justify-content-center text-center">
                         <i class="fa fa-plus text-white mb-3" aria-hidden="true"></i>
@@ -102,6 +102,9 @@
             </a>
         </div>
     </div>
+
+    {{ $invoicesCollection->links() }}
+
 
 
     {{--    Modal for Invoice comes here--}}
@@ -349,11 +352,11 @@
             toggleModal('#modal-edit-invoice');
         }
 
-        window.addEventListener('invoiceAdded', event => {
+        window.addEventListener('invoiceAdded', () => {
             invoiceAdded();
         });
 
-        window.addEventListener('openEditInvoiceModal', event => {
+        window.addEventListener('openEditInvoiceModal', () => {
             //trigger Modal;
             openEditInvoiceModal();
         })
@@ -385,7 +388,7 @@
             });
         }
 
-        window.addEventListener('invoiceUpdated', event => {
+        window.addEventListener('invoiceUpdated', () => {
             invoiceUpdated();
         });
     </script>

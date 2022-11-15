@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
-use function Symfony\Component\Translation\t;
 
 class Transaction extends Model
 {
@@ -35,76 +34,6 @@ class Transaction extends Model
                     $result->flag,
                     $result->created_at,
                 ];
-                fputcsv($file, $contents);
-            }
-        });
-        fclose($file);
-
-    }
-
-    public static function summaryReport(array $payload)
-    {
-        $file = fopen(storage_path("logs/{$payload['filename']}"), "wb");
-        $query = self::reportQuery($payload);
-
-        $query->chunk(3000, function ($results) use ($file) {
-            //Define Headers;
-            $csvHeaders = [];
-            //group by user_id, status, flag,gateway_id
-            $headers = $results[0]->original;
-            foreach ($headers as $key => $head) {
-                $title = strtoupper($key);
-                if ($title === "ID") {
-                    continue;
-                }
-                if ($title === "GATEWAY_ID") {
-                    $csvHeaders[] = "CHANNEL";
-                    continue;
-                }
-                if ($title === "USER_ID") {
-                    $csvHeaders[] = "MERCHANT";
-                    continue;
-                }
-
-                $csvHeaders[] = $title;
-            }
-
-            fputcsv($file, $csvHeaders);
-            foreach ($results as $result) {
-                $contents = [];
-
-                $data = $result->original;
-
-                //Define Content;
-                foreach ($data as $key => $datum) {
-
-                    if ($key === "id") {
-                        continue;
-                    }
-                    if ($key === "gateway_id") {
-                        $contents[] = $result->gateway->name ?? "N/A";
-                        continue;
-                    }
-                    if ($key === "user_id") {
-                        $contents[] = "{$result->user->first_name} {$result->user->last_name}";
-                        continue;
-                    }
-                    if ($key === "amount") {
-                        $contents[] = number_format($result->amount, 2);
-                        continue;
-                    }
-                    if ($key === "fee") {
-                        $contents[] = number_format($result->fee, 2);
-                        continue;
-                    }
-                    if ($key === "total") {
-                        $contents[] = number_format($result->total, 2);
-                        continue;
-                    }
-
-                    $contents[] = $datum;
-                }
-
                 fputcsv($file, $contents);
             }
         });
@@ -182,7 +111,7 @@ class Transaction extends Model
                 $columns_to_select[] = "user_id";
             }
             //user didn't select any search criteria;
-            if (empty($columns_to_select)){
+            if (empty($columns_to_select)) {
                 $columns_to_select[] = "user_id";
             }
             if (!in_array($grp_by, ['user_id', 'gateway_id'])) {
@@ -204,7 +133,7 @@ class Transaction extends Model
                 ->selectRaw("SUM(fee) as fee")
                 ->selectRaw("SUM(total) as total")->where($queryArray);
 
-            $grp_by_query = self::queryWithDateRange($query, $builder);
+            $grp_by_query = queryWithDateRange($query, $builder);
 
             $grp_by_query->groupBy($columns_to_select)->orderBy('id');
 
@@ -216,22 +145,77 @@ class Transaction extends Model
 
         info("Transaction Report Query parameters is :", $queryArray);
 
-        return self::queryWithDateRange($query, $builder);
+        return queryWithDateRange($query, $builder);
 
     }
 
-    public static function queryWithDateRange($query, $builder)
+    public static function summaryReport(array $payload)
     {
-        if ((array_key_exists('created_at', $query) && !empty($query['created_at'])) && (array_key_exists('end_date', $query) && !empty($query['end_date']))) {
-            return $builder->whereBetween("created_at", [$query['created_at'], $query['end_date'] . " 23:59:59.999",]);
-        }
-        if (array_key_exists('created_at', $query) && !empty($query['created_at'])) {
-            return $builder->whereDate('created_at', $query['created_at']);
-        }
-        if (array_key_exists('end_date', $query) && !empty($query['end_date'])) {
-            return $builder->whereDate('created_at', $query['end_date']);
-        }
-        return $builder;
+        $file = fopen(storage_path("logs/{$payload['filename']}"), "wb");
+        $query = self::reportQuery($payload);
+
+        $query->chunk(3000, function ($results) use ($file) {
+            //Define Headers;
+            $csvHeaders = [];
+            //group by user_id, status, flag,gateway_id
+            $headers = $results[0]->original;
+            foreach ($headers as $key => $head) {
+                $title = strtoupper($key);
+                if ($title === "ID") {
+                    continue;
+                }
+                if ($title === "GATEWAY_ID") {
+                    $csvHeaders[] = "CHANNEL";
+                    continue;
+                }
+                if ($title === "USER_ID") {
+                    $csvHeaders[] = "MERCHANT";
+                    continue;
+                }
+
+                $csvHeaders[] = $title;
+            }
+
+            fputcsv($file, $csvHeaders);
+            foreach ($results as $result) {
+                $contents = [];
+
+                $data = $result->original;
+
+                //Define Content;
+                foreach ($data as $key => $datum) {
+
+                    if ($key === "id") {
+                        continue;
+                    }
+                    if ($key === "gateway_id") {
+                        $contents[] = $result->gateway->name ?? "N/A";
+                        continue;
+                    }
+                    if ($key === "user_id") {
+                        $contents[] = "{$result->user->first_name} {$result->user->last_name}";
+                        continue;
+                    }
+                    if ($key === "amount") {
+                        $contents[] = number_format($result->amount, 2);
+                        continue;
+                    }
+                    if ($key === "fee") {
+                        $contents[] = number_format($result->fee, 2);
+                        continue;
+                    }
+                    if ($key === "total") {
+                        $contents[] = number_format($result->total, 2);
+                        continue;
+                    }
+
+                    $contents[] = $datum;
+                }
+
+                fputcsv($file, $contents);
+            }
+        });
+        fclose($file);
 
     }
 
@@ -338,9 +322,9 @@ class Transaction extends Model
 
     public function merchantRedirectUrl()
     {
-        $transaction = self::with('gateway')->select(["merchant_transaction_ref", "invoice_no", "gateway_id","amount", "fee", "total", "description", "status", "flag", "currency","updated_at"])->first()->toArray();
+        $transaction = self::with('gateway')->select(["merchant_transaction_ref", "invoice_no", "gateway_id", "amount", "fee", "total", "description", "status", "flag", "currency", "updated_at"])->first()->toArray();
         $transaction["channel"] = $transaction['gateway']['name'];
-        unset($transaction['gateway_id'],$transaction['gateway']);
+        unset($transaction['gateway_id'], $transaction['gateway']);
         return $this->details["redirect_url"] . "?" . http_build_query($transaction);
 
 

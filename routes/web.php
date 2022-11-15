@@ -36,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('dashboard', [\App\Http\Controllers\UserController::class, 'dashboard'])->name('user.dashboard');
         Route::get('invoice',[\App\Http\Controllers\InvoiceController::class,'index'])->name('invoice.listing');
         Route::get('transactions',\App\Http\Livewire\TransactionsPage::class)->name('transactions');
+        Route::get('payment_links', \App\Http\Livewire\PaymentLinks::class)->name('payment_links');
         Route::get('download/{filename}/{path}',[\App\Http\Controllers\DownloadsController::class, 'download'])->name("download_report");
 
 
