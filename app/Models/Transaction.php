@@ -322,8 +322,8 @@ class Transaction extends Model
 
     public function merchantRedirectUrl()
     {
-        $transaction = self::with('gateway')->select(["merchant_transaction_ref", "invoice_no", "gateway_id", "amount", "fee", "total", "description", "status", "flag", "currency", "updated_at"])->first()->toArray();
-        $transaction["channel"] = $transaction['gateway']['name'];
+        $transaction = self::with('gateway')->select(["merchant_transaction_ref", "invoice_no", "gateway_id", "amount", "fee", "total", "description", "status", "flag", "currency", "updated_at"])->firstWhere('id', $this->id)->toArray();
+        $transaction["channel"] = $transaction['gateway']['name'] ?? "N/A";
         unset($transaction['gateway_id'], $transaction['gateway']);
         return $this->details["redirect_url"] . "?" . http_build_query($transaction);
 

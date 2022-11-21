@@ -16,6 +16,32 @@ function sprocessing(title,allowEscapeKey=false, showConfirmButton=false, allowO
         allowEnterKey: false,
     });
 }
+
+function stimer(title,timer = 2000) {
+    let e;
+    Swal.fire({
+        title: title,
+        html: "I will redirect in <b></b> milliseconds.",
+        timer: timer,
+        timerProgressBar: !0,
+        didOpen: () => {
+            Swal.showLoading(), e = setInterval(() => {
+                const e = Swal.getHtmlContainer();
+                if (e) {
+                    const t = e.querySelector("b");
+                    t && (t.textContent = Swal.getTimerLeft())
+                }
+            }, 100)
+        },
+        willClose: () => {
+            clearInterval(e)
+        }
+    }).then(e => {
+        Swal.dismiss();
+        Swal.DismissReason.timer;
+    })
+
+}
 function copyTextToClipboard(elementId) {
 
     var textArea = document.createElement("textarea");

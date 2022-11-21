@@ -798,15 +798,9 @@
 
                 if (response.flag === "payment_completed") {
                     salert('Payment Completed!', "Success!", 'success');
-                    console.log("here")
-                    @if (isset($invoice->transaction->details["redirect_url"]))
-                        sprocessing("Redirecting ! Please wait!");
-                        //redirect to Merchant Page;
-                        location.assign("{{$invoice->transaction->merchantRedirectUrl()}}");
-                    @else
-                        //redirect to Receipt Page;
-                        location.assign("{{route('receipt',$invoice->invoice_no)}}");
-                    @endif
+
+                    sprocessing("Redirecting ! Please wait!");
+                    location.assign("{{route('receipt',$invoice->invoice_no)}}");
 
 
                 }

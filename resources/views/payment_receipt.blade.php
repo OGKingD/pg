@@ -343,19 +343,7 @@ Total:
 
                 </div>
             </div>
-            {{--                    //redirect button for merchat if redirect URL is present--}}
-        @if(isset($merchant_site))
-            @if(in_array(strtoupper($invoice->status),["SUCCESSFUL","FAILED"]))
-                    <div class="justify-content-center">
-                        <hr>
-                        <a href="{{$merchant_site}}" class="text-center text-white btn bg-gradient-faded-secondary mb-0">
-                            <i class="fa fa-backward text-white"> </i>
-                             Redirect to Merchant Site
-                        </a>
 
-                    </div>
-                @endif
-            @endif
         </div>
     </div>
 
@@ -363,6 +351,23 @@ Total:
     @include('partials.admin.admin_footer')
 </div>
 @include('partials.scripts')
+<script>
+    @if(strtoupper($invoice->status) === "SUCCESSFUL")
+
+    setTimeout(() =>{
+
+        stimer("Redirecting ! Please wait!",900);
+        //redirect to Merchant Page;
+        location.assign("{{$invoice->transaction->merchantRedirectUrl()}}");
+    },2000)
+
+    @endif
+    @if (isset($invoice->transaction->details["redirect_url"]))
+
+
+
+    @endif
+</script>
 </body>
 </html>
 

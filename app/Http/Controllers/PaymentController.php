@@ -75,13 +75,6 @@ class PaymentController extends Controller
 
         if (isset($invoice)) {
             $data['invoice'] = $invoice;
-            /** @var Transaction $transaction */
-            $transaction = $invoice->transaction;
-            if (isset($transaction->details["redirect_url"])) {
-
-                $data['merchant_site'] = $transaction->merchantRedirectUrl();
-
-            }
         }
 
 

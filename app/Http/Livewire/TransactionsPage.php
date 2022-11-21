@@ -79,7 +79,7 @@ class TransactionsPage extends Component
             $layout = 'layouts.admin.admin_dashboardapp';
         }
 
-        $data['transactionsCollection'] = $builder->paginate($perPage);
+        $data['transactionsCollection'] = $builder->latest()->paginate($perPage);
         $this->dispatchBrowserEvent("searchComplete");
 
         $this->transactions = $data['transactionsCollection']->items();
