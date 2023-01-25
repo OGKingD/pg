@@ -46,6 +46,9 @@ class PaymentController extends Controller
             return redirect()->route('receipt', ['id' => $id])->with('status', 'Invoice Paid!');
         }
 
+        //declare other variables for the payment page;
+        $data['activeTab'] = "card";
+        $data['merchantGateways'] = $this->getMerchantGatewayDetails($invoice);
 
         return view('payment_page', $data);
 
@@ -64,6 +67,32 @@ class PaymentController extends Controller
             abort(404);
         }
         return $invoice;
+    }
+
+
+    /**
+     * @param $invoice
+     * @return array
+     */
+    public function getMerchantGatewayDetails($invoice): array
+    {
+        $mGateways = $invoice->user->usergateway;
+        $merchantGateways = $mGateways ? $mGateways->config_details : null;
+
+        $freshArr = [];
+
+        if ($merchantGateways) {
+            array_walk($merchantGateways, static function ($item, $key) use (&$freshArr, $invoice) {
+                $item['gateway_id'] = $key;
+                $item["invoiceCharge"] = $item['charge_factor'] ?  ($item['charge'] / 100) * $invoice->amount : $item['charge'];
+                $item["invoiceTotal"] = $invoice->amount + $item['invoiceCharge'];
+                $freshArr[str_replace(' ', '', strtolower($item['name']))] = $item;
+
+            });
+
+        }
+
+        return $freshArr;
     }
 
     public function receipt($id)

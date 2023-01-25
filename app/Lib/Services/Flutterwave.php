@@ -13,6 +13,9 @@ use Laravel\Flutterwave\Rave;
 class Flutterwave extends Rave
 {
 
+    /**
+     * @throws \Exception
+     */
     public function cardCharge($array)
     {
         $this->setType('card');

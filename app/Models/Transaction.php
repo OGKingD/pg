@@ -10,7 +10,7 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $guarded = ['id'];
     protected $casts = ['details' => 'json'];
 
     public static function generateCsvReport(array $payload, array $csvHeaders)

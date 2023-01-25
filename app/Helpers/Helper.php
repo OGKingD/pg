@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Mail;
 
 function send_email($to, $name, $subject, $message, $extras = [], $type = null)
 {
-    $from = env('MAIL_FROM_ADDRESS');
+    $from = config('mail.from.address');
     $template = 'emails/errormail';
 
     if ($type === "info") {

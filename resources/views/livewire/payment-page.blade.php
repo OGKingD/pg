@@ -86,7 +86,7 @@
                             </span>
                         <br>
                         <span class="text-success  text-bold">
-                                NGN {{number_format($invoiceTotal)}}
+                                NGN {{number_format($merchantGateways[$activeTab]['invoiceTotal'])}}
                     </span>
                     </li>
                 </ul>
@@ -107,11 +107,6 @@
 
                                         @if(!$hideCardFields)
                                             <div id="mandatoryFields">
-                                                <div class=" col-md-10 mb-3 field-container">
-                                                    <label for="fullname">Name</label>
-                                                    <input class="form-control" id="fullname" maxlength="20" name="fullname"
-                                                           type="text">
-                                                </div>
 
                                                 <div class="col-md-10 mb-3 field-container">
                                                     <label for="card_number">Card Number</label>
@@ -311,7 +306,7 @@
 
                                         <div class="col-12 text-center">
                                             <button class="btn btn-success btn-lg btn-block"
-                                                    type="submit">Pay {{number_format($invoiceTotal)}} NGN
+                                                    type="submit">Pay {{number_format($merchantGateways[$activeTab]['invoiceTotal'])}} NGN
                                             </button>
                                         </div>
                                     @endif
@@ -797,10 +792,11 @@
                 let response = event.detail;
 
                 if (response.flag === "payment_completed") {
-                    salert('Payment Completed!', "Success!", 'success');
-
-                    sprocessing("Redirecting ! Please wait!");
-                    location.assign("{{route('receipt',$invoice->invoice_no)}}");
+                    stimer('Payment Completed! Redirecting',5000);
+                    setTimeout(function () {
+                        sprocessing("Redirecting ! Please wait!");
+                        location.assign("{{route('receipt',$invoice->invoice_no)}}")
+                    },5000)
 
 
                 }
@@ -814,21 +810,6 @@
                 }
 
 
-            });
-
-            addEventListener('calcInvoiceTotal', event => {
-                Swal.fire({
-                    title: ' Please Wait !',
-                    html: '  <span class="spinner-border spinner-border-lg text-primary"></span>\n',
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    allowEnterKey: false,
-                });
-            });
-
-            addEventListener('calcInvoiceTotalDone', event => {
-                Swal.close();
             });
 
 

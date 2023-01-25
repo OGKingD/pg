@@ -44,6 +44,13 @@ class PaymentPage extends Component
         'cardAuthorizationWithPin', 'cardAuthorizationWithOtp','cardAuthorizationWithAvs',
         'generateVirtualAccountNumber', 'payWith',];
 
+    public function render()
+    {
+        $this->setActiveTab($this->activeTab);
+
+        return view('livewire.payment-page');
+    }
+
     /**
      * @throws \JsonException
      * @var float|int|mixed
@@ -51,9 +58,6 @@ class PaymentPage extends Component
 
     public function generateRRR(Remita $remitaService)
     {
-
-
-        $this->setActiveTab('remita');
 
         //get the INvoice NO;
         $rrr = $this->invoice->rrr;
@@ -69,9 +73,7 @@ class PaymentPage extends Component
 
         } else {
             //Get Merchant Charge;
-            /** @var Gateway $gateway */
-            $gateway = Gateway::where('name', 'Remita')->first();
-            $amount = $this->setPaymentGatewayCharges($gateway);
+            $amount = $this->merchantGateways[$this->activeTab]['invoiceTotal'];
 
 
             $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no, $this->invoice->customer_email);
@@ -99,51 +101,8 @@ class PaymentPage extends Component
     public function setActiveTab($tab): void
     {
         $this->activeTab = $tab;
-        $this->calcInvoiceToal();
 
     }
-
-    public function calcInvoiceToal()
-    {
-
-        if (is_null($this->merchantGateways)) {
-
-            $this->dispatchBrowserEvent('calcInvoiceTotal');
-
-            $mGateways = $this->invoice->user->usergateway;
-            $merchantGateways = $mGateways ? $mGateways->config_details : null;
-
-            $freshArr = [];
-            if ($merchantGateways) {
-                array_walk($merchantGateways, static function ($item, $key) use (&$freshArr) {
-                    $item['gateway_id'] = $key;
-                    $freshArr[str_replace(' ', '', strtolower($item['name']))] = $item;
-                });
-            }
-
-            $this->merchantGateways = $freshArr;
-
-
-            $this->dispatchBrowserEvent('calcInvoiceTotalDone');
-
-        }
-
-        $this->invoiceTotal = $this->invoice->amount;
-
-        if ($this->merchantGateways) {
-            $mgwayActiveTab = $this->merchantGateways[$this->activeTab];
-            $charge_factor = $mgwayActiveTab['charge_factor'];
-            $this->gatewayId = $mgwayActiveTab['gateway_id'];
-
-            if ($mgwayActiveTab['status']) {
-                $this->invoiceCharge = $charge_factor ? ($mgwayActiveTab['charge'] / 100) * $this->invoice->amount : $mgwayActiveTab['charge'];
-                $this->invoiceTotal = $this->invoiceCharge + $this->invoice->amount;
-            }
-        }
-
-
-    }
-
     /**
      * @param $channel
      * @throws \JsonException
@@ -167,24 +126,6 @@ class PaymentPage extends Component
         $paymentRequest->update([
             "details" => $payload,
         ]);
-    }
-
-    /**
-     * @param Gateway $gateway
-     * @return float|int
-     */
-    public function setPaymentGatewayCharges($gateway)
-    {
-        $paymentGateway = isset($this->invoice->user->Gateways->config_details) ? $this->invoice->user->Gateways->config_details[$gateway->id] : null;
-        $amount = $this->invoice->amount;
-
-        if ($paymentGateway) {
-            //amount = gateway charge + fee;
-            //check if charge_factor is set / disable : disabled = flatrate , enabled = percentage;
-            $charge = $paymentGateway['charge_factor'] ? ($paymentGateway['charge_factor'] / 100) * $this->invoice->amount : $paymentGateway['charge_factor'];
-            $amount = $charge + $this->invoice->amount;
-        }
-        return $amount;
     }
 
     /**
@@ -241,10 +182,7 @@ class PaymentPage extends Component
      */
     public function processCardTransaction(): void
     {
-        $this->setActiveTab('card');
         //do validation;
-        //Get Merchant Charge;
-        $card = Gateway::where('name', 'Card')->first();
         $this->cardDetails = json_decode($this->cardDetails, true, 512, JSON_THROW_ON_ERROR);
 
 
@@ -256,7 +194,7 @@ class PaymentPage extends Component
             "expiry_month" => trim($expiry_month),
             "expiry_year" => trim($expiry_year),
             "currency" => "NGN",
-            "amount" => $this->invoiceTotal,
+            "amount" => $this->merchantGateways[$this->activeTab]['invoiceTotal'],
             "email" => $this->invoice->customer_email,
             "redirect_url" => config('app.url') . "/payment/card/validate/{$this->invoice->invoice_no}",
             "tx_ref" => ""
@@ -294,10 +232,10 @@ class PaymentPage extends Component
                         'invoice_no' => $this->invoice->invoice_no,
                         'merchant_transaction_ref' => $orderedUuid,
                         'flutterwave_ref' => $trnxId,
-                        'gateway_id' => $card->id,
-                        'amount' => $this->invoiceTotal - $this->invoiceCharge,
-                        'fee' => $this->invoiceCharge,
-                        'total' => $this->invoiceTotal,
+                        'gateway_id' => $this->merchantGateways[$this->activeTab]['gateway_id'],
+                        'amount' => $this->merchantGateways[$this->activeTab]['invoiceTotal'] - $this->merchantGateways[$this->activeTab]['invoiceCharge'],
+                        'fee' => $this->merchantGateways[$this->activeTab]['invoiceCharge'],
+                        'total' => $this->merchantGateways[$this->activeTab]['invoiceTotal'],
                         'status' => 'pending',
                         'flag' => 'debit',
 
@@ -310,10 +248,10 @@ class PaymentPage extends Component
                 $this->transaction->update(
                     [
                         "flutterwave_ref" => $trnxId,
-                        'gateway_id' => $card->id,
-                        'amount' => $this->invoiceTotal - $this->invoiceCharge,
-                        'fee' => $this->invoiceCharge,
-                        'total' => $this->invoiceTotal,
+                        'gateway_id' => $this->merchantGateways[$this->activeTab]['gateway_id'],
+                        'amount' => $this->merchantGateways[$this->activeTab]['invoiceTotal'] - $this->merchantGateways[$this->activeTab]['invoiceCharge'],
+                        'fee' => $this->merchantGateways[$this->activeTab]['invoiceCharge'],
+                        'total' => $this->merchantGateways[$this->activeTab]['invoiceTotal'],
                     ]
                 );
             }
@@ -358,7 +296,7 @@ class PaymentPage extends Component
     public function flwChargeCard(): array
     {
         $this->user = $this->invoice->user;
-        $this->transaction = $this->user->transaction()->firstWhere('invoice_no', $this->invoice->invoice_no);
+        $this->transaction = $this->invoice->transaction;
 
         $flwave = new Flutterwave(config('flutterwave.secret_key'));
         $response = $flwave->cardCharge($this->cardDetails);
@@ -371,8 +309,6 @@ class PaymentPage extends Component
         try {//add pin to cardDetails
             $this->cardDetails['authorization']['pin'] = $this->cc_Pin;//charge card finally
             $response = $this->flwChargeCard()[1];
-            info($response);//handle failed
-            //handle success pin validation
             $data = $response['data'];
             $this->transaction->update([
                 'flutterwave_ref' => $data['id'],
@@ -392,7 +328,8 @@ class PaymentPage extends Component
                 $details = ['status' => true, 'flag' => "otp_required"];
             }
         } catch (Exception $e) {
-            $details = ['status' => false, 'errors' => $e->getMessage()];
+            logger("An Error Occurred while trying to Authorize with PIN: \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
+            $details = ['status' => false, 'errors' => "Connection Lost."];
         }
 
         $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
@@ -407,6 +344,7 @@ class PaymentPage extends Component
             $response = $flwave->validateTransaction($this->cc_Otp, $this->cardDetails['flw_ref'], 'card');
             $this->verifyFlwaveResponse($response);
         } catch (Exception $e) {
+            logger("An Error Occurred while trying to Authorize with OTP: \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
 
             $details = ['status' => false, 'errors' => $e->getMessage()];
             $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
@@ -421,6 +359,7 @@ class PaymentPage extends Component
             $response = $flwave->cardCharge($this->cardDetails);
             $this->verifyFlwaveResponse($response);
         } catch (Exception $e) {
+            logger("An Error Occurred while trying to Authorize with AVS: \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
 
             $details = ['status' => false, 'errors' => $e->getMessage()];
             $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
@@ -466,15 +405,6 @@ class PaymentPage extends Component
 
     }
 
-    public function render()
-    {
-        $this->setActiveTab($this->activeTab);
-        //setMerchant RedirectURL;
-        $data['availableGateways'] = Gateway::all()->mapWithKeys(function ($item) {
-            return [str_replace(' ', '', strtolower($item->name)) => $item->id];
-        });
-        return view('livewire.payment-page', $data);
-    }
 
     /**
      * @param $response
@@ -512,7 +442,7 @@ class PaymentPage extends Component
                     "payment_type" => $response['data']['payment_type']
                 ]);
 
-                $transaction->handleSuccessfulPayment($transaction, $this->gatewayId, $payment_provider_message, $params, $wallet, $user, $company);
+                $transaction->handleSuccessfulPayment($transaction, $this->merchantGateways[$this->activeTab]['gateway_id'], $payment_provider_message, $params, $wallet, $user, $company);
 
 
             }
