@@ -68,7 +68,7 @@
                                 Order no. <b>{{$invoice->invoice_no}}</b>
                             </p>
                             <p class="text-sm">
-                                Code: <b>{{$invoice->transaction->transaction_ref}}</b>
+                                Code: <b>{{$transaction->transaction_ref}}</b>
                             </p>
                         </div>
                     </div>
@@ -205,20 +205,20 @@
                                 <span class="mb-2 text-sm">
  Product Price:
 </span>
-                                    <span class="text-dark font-weight-bold ms-2">{{number_format($invoice->transaction->amount)}}</span>
+                                    <span class="text-dark font-weight-bold ms-2">{{number_format($transaction->amount)}}</span>
                                 </div>
                                 <div class="d-flex justify-content-between">
                                 <span class="mb-2 text-sm">
                                     Charge:
                                 </span>
-                                    <span class="text-dark ms-2 font-weight-bold">{{number_format($invoice->transaction->fee)}}</span>
+                                    <span class="text-dark ms-2 font-weight-bold">{{number_format($transaction->fee)}}</span>
                                 </div>
 
                                 <div class="d-flex justify-content-between mt-4">
                                 <span class="mb-2 text-lg">
 Total:
 </span>
-                                    <span class="text-dark text-lg ms-2 font-weight-bold">{{$invoice->transaction->total}}</span>
+                                    <span class="text-dark text-lg ms-2 font-weight-bold">{{$transaction->total}}</span>
                                 </div>
                             </div>
                         </div>
@@ -289,20 +289,20 @@ Total:
                                     <span class="mb-2 text-sm">
                                         Product Price:
                                     </span>
-                                    <span class="text-dark font-weight-bold ms-2">{{number_format($invoice->transaction->amount)}}</span>
+                                    <span class="text-dark font-weight-bold ms-2">{{number_format($transaction->amount)}}</span>
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <span class="mb-2 text-sm">
                                         Charge:
                                     </span>
-                                    <span class="text-dark ms-2 font-weight-bold">{{number_format($invoice->transaction->fee)}}</span>
+                                    <span class="text-dark ms-2 font-weight-bold">{{number_format($transaction->fee)}}</span>
                                 </div>
 
                                 <div class="d-flex justify-content-between mt-4">
                                     <span class="mb-2 text-lg">
                                         Total:
                                     </span>
-                                    <span class="text-dark text-lg ms-2 font-weight-bold">{{$invoice->transaction->total}}</span>
+                                    <span class="text-dark text-lg ms-2 font-weight-bold">{{$transaction->total}}</span>
                                 </div>
                                 <h6 class="mb-3 mt-4">Billing Information</h6>
                                 <ul class="list-group">
@@ -334,18 +334,14 @@ Total:
 <script>
     @if(strtoupper($invoice->status) === "SUCCESSFUL")
 
-    setTimeout(() =>{
+        @if($redirect)
+            setTimeout(() =>{
 
-        stimer("Redirecting ! Please wait!",900);
-        //redirect to Merchant Page;
-        location.assign("{!! $invoice->transaction->merchantRedirectUrl() !!}");
-    },2000)
-
-    @endif
-    @if (isset($invoice->transaction->details["redirect_url"]))
-
-
-
+                stimer("Redirecting ! Please wait!",900);
+                //redirect to Merchant Page;
+                location.assign("{!! $redirect_url !!}");
+            },2000)
+        @endif
     @endif
 </script>
 </body>

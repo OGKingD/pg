@@ -61,7 +61,7 @@ class PaymentController extends Controller
     public function checkIfInvoiceExist($id)
     {
         //check if Invoice exists;
-        $invoice = Invoice::with('transaction')->where('invoice_no', $id)->first();
+        $invoice = Invoice::where('invoice_no', $id)->with(['transaction','gateway'])->first();
 
         if (!$invoice) {
             abort(404);
@@ -104,6 +104,21 @@ class PaymentController extends Controller
 
         if (isset($invoice)) {
             $data['invoice'] = $invoice;
+            /** @var Transaction $transaction */
+            $transaction = $invoice->transaction;
+
+            $data['transaction'] = $transaction;
+            $data['redirect']  = false;
+
+            if (isset($transaction['details']['redirect_url'])){
+                $data['redirect'] = true;
+                $urlQuery = $transaction->toArray();
+                $urlQuery["channel"] = $invoice->gateway->name ?? "N/A";
+                $url = $transaction['details']['redirect_url'];
+                unset($urlQuery['gateway_id'], $urlQuery['gateway'], $urlQuery['details']);
+                $data['redirect_url']  = $url ."?" . http_build_query($urlQuery);
+            }
+
         }
 
 

@@ -74,7 +74,7 @@ class Invoice extends Model
 
     public function gateway()
     {
-        return $this->transaction->gateway();
+        return  $this->hasOneThrough(Gateway::class,Transaction::class,'invoice_no','id','invoice_no','gateway_id');
 
     }
 }

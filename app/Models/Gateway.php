@@ -17,4 +17,12 @@ class Gateway extends Model
 
     }
 
+    public function invoice()
+    {
+        //Gateway = Transaction = Invoice;
+        return  $this->hasManyThrough(Invoice::class,Transaction::class,'gateway_id','invoice_no','id','invoice_no');
+
+
+    }
+
 }

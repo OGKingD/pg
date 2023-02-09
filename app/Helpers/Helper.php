@@ -20,11 +20,15 @@ function send_email($to, $name, $subject, $message, $extras = [], $type = null)
     $logo = url('/') . '/asset/img/saanapay.png';
     $data = array('name' => $name, 'subject' => $subject, 'content' => $message, 'website' => $site, 'phone' => $phone, 'details' => $details, 'email' => $email, 'logo' => $logo);
     $data = array_merge($data, $extras);
-    Mail::send(['html' => $template], $data, function ($message) use ($name, $to, $subject, $from, $site) {
-        $message->to($to, $name);
-        $message->subject($subject);
-        $message->from($from, $site);
-    });
+    try {
+        Mail::send(['html' => $template], $data, function ($message) use ($name, $to, $subject, $from, $site) {
+            $message->to($to, $name);
+            $message->subject($subject);
+            $message->from($from, $site);
+        });
+    } catch (Exception $e) {
+        logger($e->getMessage());
+    }
 }
 
 

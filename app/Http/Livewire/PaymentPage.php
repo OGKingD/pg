@@ -282,6 +282,7 @@ class PaymentPage extends Component
                 }
             }
         } catch (Exception $e) {
+            logger("An Error Occurred while trying to Process Card Payment : \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
             $details = ['status' => false, 'errors' => $e->getMessage()];
         }
 
@@ -374,8 +375,7 @@ class PaymentPage extends Component
             $this->setActiveTab(strtolower($processor));
             $flwave = new Flutterwave(config('flutterwave.secret_key'));
             $tx_ref = $flwave->getTxRef();
-            $gateway = Gateway::where('name', $processor)->first();
-            $amount = $this->setPaymentGatewayCharges($gateway);
+            $amount = $this->merchantGateways[$this->activeTab]['invoiceTotal'];
             $payload = [
                 "amount" => $amount,
                 "currency" => "NGN",
@@ -386,7 +386,8 @@ class PaymentPage extends Component
             $response = $flwave->{"charge" . $processor}($payload);
             $details = [];
             if ($response) {
-                $details['message'] = response(['message']);
+                $details['message'] = $response['message'];
+                $details['errors'] = $response['message'];
                 $details['flag'] = "payment_failed";
                 $details['status'] = isset($response['data']['meta']['authorization']['redirect']);
                 if ($details['status']) {
@@ -395,7 +396,11 @@ class PaymentPage extends Component
                 }
             }
             logger("Payment for charge$processor Response is : ", $response);
-        } catch (Exception $e) {
+            // {"status":"error","message":"Merchant is not enabled for ApplePay collections.","data":null}
+
+
+            } catch (Exception $e) {
+            logger("An Error Occurred while trying to charge$processor Payment : \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
             $details = ['status' => false, 'errors' => $e->getMessage()];
         }
 
