@@ -112,6 +112,14 @@ class Providus
         }
 
     }
+
+    public function repushNotification($settlementId = "", $sessionId = "")
+    {
+        $data = ['session_id' => $sessionId, "settlement_id" => $settlementId];
+        $response = $this->getWithHeaders()->post($this->base_url."PiP_RepushTransaction_SettlementId",$data);
+        return json_decode($response->body(), false, 512, JSON_THROW_ON_ERROR);
+
+    }
     public function  NIPFundTransfer($accountName,$accountNumber,$bankCode,$amount,$narration,$sourceAccountName,$transRef)
     {
         try {
