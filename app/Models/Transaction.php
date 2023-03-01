@@ -50,6 +50,8 @@ class Transaction extends Model
         $columns_to_select = [
             "transaction_ref",
             'merchant_transaction_ref',
+            'flutterwave_ref',
+            'bank_transfer_ref',
             'gateway_id',
             'amount',
             'fee',
@@ -57,6 +59,7 @@ class Transaction extends Model
             'description',
             'status',
             'flag',
+            'details',
             'created_at'];
 
         if (isset($query['transaction_ref'])) {
@@ -141,7 +144,7 @@ class Transaction extends Model
             return $grp_by_query;
         }
 
-        $builder = self::with(['invoice', 'gateway', 'user'])->select($columns_to_select)->where($queryArray);
+        $builder = self::with(['invoice', 'gateway', 'user'])->select($columns_to_select)->where($queryArray)->whereNotNull("invoice_no");
 
         info("Transaction Report Query parameters is :", $queryArray);
 
@@ -237,6 +240,11 @@ class Transaction extends Model
 
     }
 
+    public function dynamicAccount()
+    {
+        return $this->hasOne(DynamicAccount::class,'invoice_no');
+
+    }
     /**
      * @param Transaction $transaction
      * @param mixed $gateway_id
@@ -263,7 +271,15 @@ class Transaction extends Model
                 ]);
                 $invoice->update([
                     'status' => 'successful'
-                ]);//credit merchant wallet with amount - charge
+                ]);
+
+                //for Bank transfers close out the dynamic account
+                /** @var DynamicAccount $dynamicAccount */
+                $dynamicAccount = $invoice->dynamicAccount;
+                if (isset($dynamicAccount)){
+                    $dynamicAccount->update(['status' => 0]);
+                }
+                //credit merchant wallet with amount - charge
                 $amount = $transaction->amount;
                 $fee = $transaction->fee;
                 if ($wallet->credit($amount)) {
@@ -279,17 +295,19 @@ class Transaction extends Model
                         "status" => "successful",
                         "flag" => "credit",
                     ]);
-                    $company->transaction()->create([
-                        "transaction_ref" => "fee_credit_{$transaction->invoice_no}",
-                        "merchant_transaction_ref" => "fee_credit_{$transaction->merchant_transaction_ref}",
-                        "gateway_id" => $gateway_id,
-                        "amount" => $fee,
-                        "total" => $fee,
-                        "description" => "Fee payment for $transaction->invoice_no}",
-                        "status" => "successful",
-                        "flag" => "credit",
-                    ]);
+                    if ($fee > 0){
+                        $company->transaction()->create([
+                            "transaction_ref" => "fee_credit_{$transaction->invoice_no}",
+                            "merchant_transaction_ref" => "fee_credit_{$transaction->merchant_transaction_ref}",
+                            "gateway_id" => $gateway_id,
+                            "amount" => $fee,
+                            "total" => $fee,
+                            "description" => "Fee payment for $transaction->invoice_no}",
+                            "status" => "successful",
+                            "flag" => "credit",
+                        ]);
 
+                    }
                     $status = true;
 
                 }

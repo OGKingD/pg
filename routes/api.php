@@ -17,14 +17,23 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['terminate'])->group(function () {
-    Route::middleware(['api'])->get('/welcome', function (Request $request) {
-        $inspirationalText = inspirationalText();
-        return [ "message" => "Hello 👋  {$request->user()->first_name} : {$inspirationalText['quote']} -- {$inspirationalText['author']}", 'success' => true,];
+    Route::middleware(['api'])->group(function (){
+        Route::get('welcome',function (Request $request){
+            $inspirationalText = inspirationalText();
+            return [ "message" => "Hello 👋  {$request->user()->first_name} : {$inspirationalText['quote']} -- {$inspirationalText['author']}", 'success' => true,];
+
+        });
+        //Payment Request Routes!
+        Route::prefix('payments')->group(function () {
+            Route::post('create',[PaymentController::class,"createPaymentRequest"]);
+            Route::get('validate', [PaymentController::class, 'details']);
+        });
     });
-    Route::post('webhook/flutterwave',[WebhookController::class,'flutterwave']);
-//Payment Request Routes!
-    Route::prefix('payments')->group(function () {
-        Route::post('create',[PaymentController::class,"createPaymentRequest"]);
-        Route::get('validate', [PaymentController::class, 'details']);
+
+
+    //Unprotected Routes: Ideally webhook Routes
+    Route::prefix("webhook")->group(function (){
+        Route::post('flutterwave',[WebhookController::class,'flutterwave']);
+        Route::post('providus',[WebhookController::class,'providusSettlement']);
     });
 });

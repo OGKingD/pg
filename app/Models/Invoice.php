@@ -77,4 +77,10 @@ class Invoice extends Model
         return  $this->hasOneThrough(Gateway::class,Transaction::class,'invoice_no','id','invoice_no','gateway_id');
 
     }
+
+    public function dynamicAccount()
+    {
+        return $this->hasOne(DynamicAccount::class,'invoice_no','invoice_no');
+
+    }
 }

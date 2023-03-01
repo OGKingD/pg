@@ -470,6 +470,10 @@
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                                 data-sortable="">
+                                <a href="#" class="dataTable-sorter">Provider Ref</a>
+                            </th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Merchant Transaction Ref</a>
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
@@ -487,6 +491,10 @@
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter">Total</a>
+                            </th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
+                                <a href="#" class="dataTable-sorter">Email</a>
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                                 data-sortable="">
@@ -510,10 +518,12 @@
                                 <td class="text-sm font-weight-normal">{{++$k}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->transaction_ref}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->merchant_transaction_ref}}</td>
+                                <td class="text-sm font-weight-normal">{{$val->flutterwave_ref}}</td>
                                 <td class="text-sm font-weight-normal">{{ $val->gateway->name??  "N/A"}}</td>
                                 <td> &#{{nairaSymbol()}} {{number_format($val->amount,'2','.','')}}</td>
                                 <td>&#{{nairaSymbol()}} {{number_format($val->fee,'2','.','')}}</td>
                                 <td>&#{{nairaSymbol()}} {{number_format($val->total,'2','.','')}}</td>
+                                <td class="text-sm font-weight-normal">{{$val->details["email"] ?? "N/A"}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->status}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->flag}}</td>
 
