@@ -98,9 +98,9 @@ class Handler extends ExceptionHandler
             //something internal;
             $message = "😢  Oops! Something Unexpected happened! Please contact " .config('app.support_email')." ";
             //report internal error to Admin;
-            logger()->error("Error in file: {$e->getFile()} ", ['cause'=>$e->getMessage(), 'trace'=>$e->getTraceAsString()]);
+            logger()->error("Error in file: {$e->getFile()} ", ['path' => $request->url(), 'statusCode' => $statusCode, 'cause'=>$e->getMessage(), 'trace'=>$e->getTraceAsString()]);
         }
-        logger()->error("Error in file: {$e->getFile()} ", ['cause'=>$e->getMessage(), 'trace'=>$e->getTraceAsString()]);
+        logger()->error("Error in file: {$e->getFile()} ", ['statusCode' => $statusCode, 'path' => $request->url(), 'cause'=>$e->getMessage(), 'trace'=>$e->getTraceAsString()]);
 
         return $this->shouldReturnJson($request, $e)
             ? response()->json([

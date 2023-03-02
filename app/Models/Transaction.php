@@ -16,7 +16,6 @@ class Transaction extends Model
     public static function generateCsvReport(array $payload, array $csvHeaders)
     {
         $file = fopen(storage_path("logs/{$payload['filename']}"), "wb");
-        /** @var Builder $query */
         $query = self::reportQuery($payload);
         $query->chunk(3000, function ($results) use ($file, $csvHeaders) {
             //Define Headers;
@@ -294,6 +293,7 @@ class Transaction extends Model
                         "description" => "Credit payment for $transaction->invoice_no}",
                         "status" => "successful",
                         "flag" => "credit",
+                        "type" => "wallet",
                     ]);
                     if ($fee > 0){
                         $company->transaction()->create([
@@ -305,6 +305,7 @@ class Transaction extends Model
                             "description" => "Fee payment for $transaction->invoice_no}",
                             "status" => "successful",
                             "flag" => "credit",
+                            "type" => "wallet",
                         ]);
 
                     }
@@ -324,6 +325,7 @@ class Transaction extends Model
      * @param $gateway_id
      * @param $payment_provider_message
      * @param array $details
+     * @return bool
      */
     public function handleFailedPayment(Transaction $transaction, $gateway_id, $payment_provider_message, array $details): bool
     {

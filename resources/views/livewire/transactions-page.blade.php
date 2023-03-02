@@ -514,11 +514,26 @@
                         </thead>
                         <tbody>
                         @forelse($transactions as $k=>$val)
+                            @php
+                                $trnRef = ""
+                            @endphp
+                            @if( isset( $val->gateway) )
+                                @if($val->gateway->name === "Bank Transfer")
+                                    @php
+                                        $trnRef = $val->bank_transfer_ref
+                                    @endphp
+                                @endif
+                                @if($val->gateway->name === "Card")
+                                    @php
+                                        $trnRef = $val->flutterwave_ref
+                                    @endphp
+                                @endif
+                            @endif
                             <tr>
                                 <td class="text-sm font-weight-normal">{{++$k}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->transaction_ref}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->merchant_transaction_ref}}</td>
-                                <td class="text-sm font-weight-normal">{{$val->flutterwave_ref}}</td>
+                                <td class="text-sm font-weight-normal">{{ $trnRef }}</td>
                                 <td class="text-sm font-weight-normal">{{ $val->gateway->name??  "N/A"}}</td>
                                 <td> &#{{nairaSymbol()}} {{number_format($val->amount,'2','.','')}}</td>
                                 <td>&#{{nairaSymbol()}} {{number_format($val->fee,'2','.','')}}</td>

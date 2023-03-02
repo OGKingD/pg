@@ -272,6 +272,12 @@ class WebhookController extends Controller
                 }
 
             }
+            logger("Webhook Response for $request->settlementId",[
+                "requestSuccessful"=> $requestSuccessful,
+                "settlementId"=> $request->settlementId,
+                "responseMessage"=> $responseMessage,
+                "responseCode"=> $requestSuccessful ? "00" : "01"
+            ]);
 
             return response()->json([
                 "requestSuccessful"=> $requestSuccessful,
