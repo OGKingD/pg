@@ -15,6 +15,21 @@ use Illuminate\Support\Facades\DB;
 
 class WebhookController extends Controller
 {
+    public function index()
+    {
+        $perPage = \request('perpage');
+        $perPage = ($perPage > 7000 ? 100: $perPage) ?? 20;
+        $criteria = array_filter(\request()->query());
+
+        $result = Webhooks::criteria($criteria);
+        $webhooks = $result->paginate($perPage);
+        $transactionCount = $webhooks->total();
+
+
+        return view('admin.webhooks', compact("webhooks",'perPage','transactionCount'));
+    }
+
+
     public function flutterwave(Request $request, Webhooks $webhooks)
     {
         $requestSuccessful = false;
@@ -174,6 +189,8 @@ class WebhookController extends Controller
 
 
         $requestSuccessful = false;
+        $responseCode = "02";
+        $responseMessage = "";
         $settlementId = $request->settlementId;
         $data = $request->all();
         $userRef = "";
@@ -219,6 +236,7 @@ class WebhookController extends Controller
                             //check if transaction is successful
                             if ($spTransaction->status === "successful") {
                                 $responseMessage = "Duplicate Transaction";
+                                $responseCode = "01";
                             }
 
                             //check if transaction is pending
@@ -241,6 +259,7 @@ class WebhookController extends Controller
                                     //update transaction
                                     $responseMessage = "successful";
                                     $requestSuccessful = true;
+                                    $responseCodes = "00";
 
                                     DB::transaction(function () use ($details, $gateway_id, $transaction_status, $spTransaction, $wallet, $user, $company) {
                                         //update transaction fee and total;
@@ -276,14 +295,14 @@ class WebhookController extends Controller
                 "requestSuccessful"=> $requestSuccessful,
                 "settlementId"=> $request->settlementId,
                 "responseMessage"=> $responseMessage,
-                "responseCode"=> $requestSuccessful ? "00" : "01"
+                "responseCode"=> $responseCode
             ]);
 
             return response()->json([
                 "requestSuccessful"=> $requestSuccessful,
                 "settlementId"=> $request->settlementId,
                 "responseMessage"=> $responseMessage,
-                "responseCode"=> $requestSuccessful ? "00" : "01"
+                "responseCode"=> $responseCode
             ]);
         } catch (\Exception $e) {
             $statusCode = 500;
@@ -302,7 +321,7 @@ class WebhookController extends Controller
                 "requestSuccessful" => $requestSuccessful,
                 "settlementId" => $settlementId,
                 "responseMessage" => $responseMessage,
-                "responseCode"=> $requestSuccessful ? "00" : "01"
+                "responseCode"=> $responseCode
             ], $statusCode);
         }
 

@@ -36,7 +36,10 @@ Route::middleware(['terminate'])->group(function () {
         Route::post('flutterwave',[WebhookController::class,'flutterwave']);
         Route::post('providus',[WebhookController::class,'providusSettlement']);
     });
-    Route::get("providus/repush",function (){
-        return (new \App\Lib\Services\Providus())->repushNotification(\request()->settlement_id, \request()->session_id);
+    Route::get("providus/repush/{trnx}",function ($transaction){
+        return (new \App\Lib\Services\Providus())->repushNotification($transaction);
+    });
+    Route::get("providus/verifytransaction/{trnx}",function ($transaction){
+        return (new \App\Lib\Services\Providus())->verifyTransaction($transaction);
     });
 });

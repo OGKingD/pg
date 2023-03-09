@@ -80,6 +80,7 @@ class TransactionsPage extends Component
         }
 
         $data['transactionsCollection'] = $builder->latest()->paginate($perPage);
+        $data['transactionCount'] = $data['transactionsCollection']->total();
         $this->dispatchBrowserEvent("searchComplete");
 
         $this->transactions = $data['transactionsCollection']->items();

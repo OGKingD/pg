@@ -47,7 +47,6 @@ class Transaction extends Model
     {
         $queryArray = [];
         $columns_to_select = [
-            "transaction_ref",
             'merchant_transaction_ref',
             'flutterwave_ref',
             'bank_transfer_ref',
@@ -61,9 +60,14 @@ class Transaction extends Model
             'details',
             'created_at'];
 
-        if (isset($query['transaction_ref'])) {
-            $queryArray[] = ['transaction_ref', '=', (string)($query['transaction_ref'])];
+        if (isset($query['flutterwave_ref'])) {
+            $queryArray[] = ['flutterwave_ref', '=', (string)($query['flutterwave_ref'])];
         }
+
+        if (isset($query['bank_transfer_ref'])) {
+            $queryArray[] = ['bank_transfer_ref', '=', (string)($query['bank_transfer_ref'])];
+        }
+
         if (isset($query['merchant_transaction_ref'])) {
             $queryArray[] = ['merchant_transaction_ref', '=', (string)($query['merchant_transaction_ref'])];
         }
@@ -87,9 +91,6 @@ class Transaction extends Model
         }
         if (isset($query['user_id'])) {
             $queryArray[] = ['user_id', '=', (string)($query['user_id'])];
-        }
-        if (isset($query['transaction_ref'])) {
-            $queryArray[] = ['transaction_ref', '=', (string)($query['transaction_ref'])];
         }
 
 

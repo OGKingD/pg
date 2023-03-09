@@ -23,49 +23,80 @@
 
             <!-- Tab panes -->
             <div class="tab-content">
+                <div class="card">
+                    <div class="card-body">
+
+                        <div class="row ">
+                            <div class="text-center col-md-6">
+                                <h6 class="card-header">TOTAL TRANSACTIONS </h6>
+                                <h2>{{$transactionCount}}</h2>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <hr>
                 <div class="tab-pane container active" id="home">
-                    <form role="form" action="#"  onsubmit="event.preventDefault(); searchTransactions(this); ">
+                    <form role="form" action="{{route('transactions')}}" id="transactionSearchBox" onsubmit="event.preventDefault(); searchTransactions(this); ">
                         @csrf
                         <fieldset class="py-md-4">
                             <div class="row" id="rawFilter">
 
                                 <div class="col-lg-3 col-md-4 non_essential_summary_filter">
                                     <div class="form-group">
-                                        <label for="transaction_ref" class="col-form-label text-md-right">
-                                            {{__("Transaction Number")}}
-                                        </label>
-                                        <div class="input-group mb-3">
-                                            <span class="input-group-text">
-                                                    <i class="fa fa-mobile-alt" style="font-size: 15px;"></i>
-                                                </span>
-                                            <input id="transaction_ref" type="tel" placeholder="Transaction Ref"
-                                                   class="form-control @error('transaction_ref') is-invalid @enderror"
-                                                   name="transaction_ref"
-                                                   value="{{ old('transaction_ref') }}" autocomplete="tel"
-                                            >
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3 col-md-4 non_essential_summary_filter">
-                                    <div class="form-group">
-                                        <label for="payment_provider_id" class="col-form-label text-md-right">
+                                        <label for="merchant_transaction_ref" class="col-form-label text-md-right">
                                             {{__("Merchant Ref")}}
                                         </label>
                                         <div class="input-group input-group-merge input-group-alternative mb-3">
                                             <span class="input-group-text">
                                                     <i class="fa fa-mobile-alt" style="font-size: 15px;"></i>
                                                 </span>
-                                            <input id="payment_provider_id" type="tel" placeholder="Payment Ref"
-                                                   class="form-control @error('payment_provider_id') is-invalid @enderror"
+                                            <input id="merchant_transaction_ref" type="text" placeholder="Merchant Ref"
+                                                   class="form-control @error('merchant_transaction_ref') is-invalid @enderror"
                                                    name="merchant_transaction_ref" value="{{$merchant_transaction_ref}}"
                                             >
 
                                         </div>
                                     </div>
                                 </div>
+                                @if($isAdmin)
+                                    <div class="col-lg-3 col-md-4 non_essential_summary_filter">
+                                        <div class="form-group">
+                                            <label for="flutterwave_ref" class="col-form-label text-md-right">
+                                                {{__("Flutterwave Ref")}}
+                                            </label>
+                                            <div class="input-group mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-mobile-alt" style="font-size: 15px;"></i>
+                                                </span>
+                                                <input id="flutterwave_ref" type="text" placeholder="Card Ref"
+                                                       class="form-control @error('flutterwave_ref') is-invalid @enderror"
+                                                       name="flutterwave_ref" value="{{ old('flutterwave_ref') }}"
+                                                >
 
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-4 non_essential_summary_filter">
+                                        <div class="form-group">
+                                            <label for="bank_transfer_ref" class="col-form-label text-md-right">
+                                                {{__("Bank Transfer Ref")}}
+                                            </label>
+                                            <div class="input-group mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-mobile-alt" style="font-size: 15px;"></i>
+                                                </span>
+                                                <input id="bank_transfer_ref" type="text" placeholder="SettlementID"
+                                                       class="form-control @error('bank_transfer_ref') is-invalid @enderror"
+                                                       name="bank_transfer_ref" value="{{ old('bank_transfer_ref') }}"
+                                                >
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                @endif
                                 <div class="col-lg-3 col-md-4">
                                     <div class="form-group">
                                         <label for="status" class=" col-form-label text-md-right">
@@ -220,7 +251,7 @@
                             <div class="col text-right">
                                 <div class="d-flex justify-content-end">
                                     <button type="submit" class="btn btn-success mx-3"> Search</button>
-                                    <button type="submit" class="btn btn-danger mx-3"> Reset</button>
+                                    <button class="btn btn-danger mx-3" onclick="document.getElementById('transactionSearchBox').reset(); event.preventDefault()"> Reset</button>
                                 </div>
                             </div>
                         </fieldset>
@@ -231,7 +262,7 @@
                 </div>
 
                 <div class="tab-pane container fade" id="menu1">
-                    <form role="form" action="#"  onsubmit="event.preventDefault(); searchTransactions(this); ">
+                    <form role="form" action="{{route('transactions')}}" id="summaryTransactionForm" onsubmit="event.preventDefault(); searchTransactions(this); ">
                         @csrf
                         <fieldset class="py-md-4">
                             <div class="row" id="rawFilter">
@@ -416,7 +447,7 @@
                             <div class="col text-right">
                                 <div class="d-flex justify-content-end">
                                     <button type="submit" class="btn btn-success mx-3"> Search</button>
-                                    <button type="submit" class="btn btn-danger mx-3"> Reset</button>
+                                    <button class="btn btn-danger mx-3" onclick="document.getElementById('summaryTransactionForm').reset(); event.preventDefault()"> Reset</button>
                                 </div>
                             </div>
                         </fieldset>
@@ -464,17 +495,14 @@
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter">#</a>
                             </th>
+
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                                 data-sortable="">
-                                <a href="#" class="dataTable-sorter">Transaction Ref</a>
+                                <a href="#" class="dataTable-sorter">Merchant Ref</a>
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                                 data-sortable="">
-                                <a href="#" class="dataTable-sorter">Provider Ref</a>
-                            </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                                data-sortable="">
-                                <a href="#" class="dataTable-sorter">Merchant Transaction Ref</a>
+                                <a href="#" class="dataTable-sorter"> Transaction Ref</a>
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                                 data-sortable="">
@@ -531,7 +559,6 @@
                             @endif
                             <tr>
                                 <td class="text-sm font-weight-normal">{{++$k}}</td>
-                                <td class="text-sm font-weight-normal">{{$val->transaction_ref}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->merchant_transaction_ref}}</td>
                                 <td class="text-sm font-weight-normal">{{ $trnRef }}</td>
                                 <td class="text-sm font-weight-normal">{{ $val->gateway->name??  "N/A"}}</td>

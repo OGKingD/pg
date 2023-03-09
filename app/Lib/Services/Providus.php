@@ -39,6 +39,23 @@ class Providus
         }
 
     }
+    public function repushNotification($trnx)
+    {
+        try {
+            //if $trnx length > 25 that means it's session Id
+            if (strlen($trnx)>25) {
+                $data = ['session_id' => $trnx];
+            } else {
+                $data = ["settlement_id" => $trnx];
+            }
+            $response = $this->getWithHeaders()->post($this->base_url."PiP_RepushTransaction_SettlementId",$data);
+            return json_decode($response->body(), false, 512, JSON_THROW_ON_ERROR);
+
+        }catch (\Exception $exception){
+            return $exception->getMessage();
+        }
+
+    }
 
     public function verifyTransaction($trnx)
     {
@@ -113,13 +130,6 @@ class Providus
 
     }
 
-    public function repushNotification($settlementId = "", $sessionId = "")
-    {
-        $data = ['session_id' => $sessionId, "settlement_id" => $settlementId];
-        $response = $this->getWithHeaders()->post($this->base_url."PiP_RepushTransaction_SettlementId",$data);
-        return json_decode($response->body(), false, 512, JSON_THROW_ON_ERROR);
-
-    }
     public function  NIPFundTransfer($accountName,$accountNumber,$bankCode,$amount,$narration,$sourceAccountName,$transRef)
     {
         try {
