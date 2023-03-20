@@ -157,7 +157,7 @@
 
                         @endforelse
 
-                        {{$gatewaysCollection->links()}}
+                        {{$gatewaysCollection->withQueryString()-> links()}}
 
                         </tbody>
                     </table>

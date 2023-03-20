@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WebhookController;
+use App\Lib\Services\Providus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,8 @@ Route::middleware(['terminate'])->group(function () {
         Route::prefix('payments')->group(function () {
             Route::post('create',[PaymentController::class,"createPaymentRequest"]);
             Route::get('validate', [PaymentController::class, 'details']);
+            Route::get('details/{id}',[\App\Http\Controllers\CashAtBankController::class,'show']);
+            Route::post('pay',[\App\Http\Controllers\CashAtBankController::class, 'store']);
         });
     });
 
@@ -37,9 +40,9 @@ Route::middleware(['terminate'])->group(function () {
         Route::post('providus',[WebhookController::class,'providusSettlement']);
     });
     Route::get("providus/repush/{trnx}",function ($transaction){
-        return (new \App\Lib\Services\Providus())->repushNotification($transaction);
+        return (new Providus())->repushNotification($transaction);
     });
     Route::get("providus/verifytransaction/{trnx}",function ($transaction){
-        return (new \App\Lib\Services\Providus())->verifyTransaction($transaction);
+        return (new Providus())->verifyTransaction($transaction);
     });
 });

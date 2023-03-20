@@ -20,6 +20,7 @@ class GatewaySeeder extends Seeder
             ['name' => "Remita", 'status' => 0],
             ['name' => "Googlepay", 'status' => 0],
             ['name' => "Applepay", 'status' => 0],
+            ['name' => "CashAtBank", 'status' => 0],
         ]);
         //
     }

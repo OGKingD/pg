@@ -343,11 +343,23 @@ class Transaction extends Model
 
     public function merchantRedirectUrl()
     {
-        $transaction = self::with('gateway')->select(["merchant_transaction_ref", "invoice_no", "gateway_id", "amount", "fee", "total", "description", "status", "flag", "currency", "updated_at"])->firstWhere('id', $this->id)->toArray();
-        $transaction["channel"] = $transaction['gateway']['name'] ?? "N/A";
-        unset($transaction['gateway_id'], $transaction['gateway']);
-        return $this->details["redirect_url"] . "?" . http_build_query($transaction);
+        $transaction = self::with('gateway')->firstWhere('id', $this->id);
+        return $this->details["redirect_url"] . "?" . http_build_query($transaction->transactionToPayload());
 
 
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @return array
+     */
+    public function transactionToPayload(): array
+    {
+        $payload = $this->only(["gateway","transaction_ref", "merchant_transaction_ref", "invoice_no", "gateway_id", "amount", "fee", "total", "description", "status", "flag", "currency","details", "updated_at"]);
+        $payload['customer_name'] = $payload['details']['name'] ?? null;
+        $payload['customer_email'] = $payload['details']['email'] ?? null;
+        $payload["channel"] = $payload['gateway']['name'] ?? "N/A";
+        unset($payload['gateway_id'], $payload['gateway'], $payload['details']);
+        return $payload;
     }
 }

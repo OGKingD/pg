@@ -21,7 +21,7 @@ class WebhookController extends Controller
         $perPage = ($perPage > 7000 ? 100: $perPage) ?? 20;
         $criteria = array_filter(\request()->query());
 
-        $result = Webhooks::criteria($criteria);
+        $result = Webhooks::latest()->criteria($criteria);
         $webhooks = $result->paginate($perPage);
         $transactionCount = $webhooks->total();
 

@@ -49,9 +49,9 @@ class Webhooks extends Model
             $queryArray[] = ['user_ref', '=', (string)($criteria['user_ref'])];
         }
 
-        $query->where($queryArray)->orderBy('id', 'desc');
+        $query->where($queryArray)->select('payment_provider_id','payment_provider_message','response','count','user_ref','created_at','updated_at');
 
-        queryWithDateRange($criteria, $query);
+        return queryWithDateRange($criteria, $query);
 
 
     }
