@@ -17,7 +17,7 @@ class CashAtBankController extends Controller
 
     public function store(Request $request)
     {
-        $transaction = Transaction::firstWhere('merchant_transaction_ref', $request->transaction);
+        $transaction = Transaction::firstWhere('transaction_ref', $request->transaction);
 
         $request->validate([
             "transaction" => ["bail", "required", "min:6",
