@@ -61,6 +61,14 @@
                     <span class="nav-link-text ms-1">Webhook Logs</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link @if(request()->path() === "requestlogs") active @endif" href="{{route('webhooks')}}" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <i class="fas fa-receipt @if(request()->path() === "requestlogs") text-white @else text-dark @endif"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">API Request Logs</span>
+                </a>
+            </li>
 
 
             <li class="nav-item">

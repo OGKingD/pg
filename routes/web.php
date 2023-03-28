@@ -48,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
            Route::patch('payment_gateways', [\App\Http\Controllers\PaymentController::class,'update'] )->name('paymentgateway.edit');
            Route::get('users', [\App\Http\Controllers\UserController::class, 'index'])->name('admin.users');
            Route::get('webhooks',[\App\Http\Controllers\WebhookController::class,'index'])->name('webhooks');
+           Route::get("requestlogs",[\App\Http\Controllers\RequestLogsController::class,'index']);
        });
 
 

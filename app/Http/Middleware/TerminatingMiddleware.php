@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\RequestLog;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -36,19 +37,29 @@ class TerminatingMiddleware
         //Log to csv file
 
 
-            $trnxRef = str_pad((int)preg_replace('/\D/', "", microtime(true)) . random_int(0, 99999), 16, random_int(0, 999999), STR_PAD_RIGHT);
-            $payload = json_encode($request->all(), JSON_THROW_ON_ERROR);
+        if ($request->is("api*")) {
+            //log only specific routes;
             $url = $request->path();
-            $method = $request->method();
-            $request_response =  json_encode($response->content(), JSON_THROW_ON_ERROR) ;
-            $merchant_id = $request->user()->id ?? null;
-            $request_id = $request->requestId ?? null;
-            $created_at = $request->get('created_at');
-            $created_at_withMilliseconds = $request->get('created_atwithMilliseconds');
-            $updated_at = Carbon::now();
-            $updated_at_withMilliseconds = $updated_at->format("Y-m-d H:i:s:u A");
-            $response_time = Carbon::parse($updated_at)->diffInMilliseconds($created_at);
-            Log::channel('merchant_request_log')->info("$trnxRef,$merchant_id,$request_id,$method,$url,$payload,$request_response,{$response->status()},$created_at_withMilliseconds,$updated_at_withMilliseconds,$response_time ");
+
+            if (preg_match("/".config('request_logs.routes')."/i",substr($url,4))) {
+                $trnxRef = str_pad((int)preg_replace('/\D/', "", microtime(true)) . random_int(0, 99999), 16, random_int(0, 999999), STR_PAD_RIGHT);
+                $payload = json_encode($request->all(), JSON_THROW_ON_ERROR);
+                $url = $request->path();
+                $method = $request->method();
+                $request_response = json_encode($response->content(), JSON_THROW_ON_ERROR);
+                $merchant_id = $request->user()->id ?? null;
+                $request_id = $request->requestId ?? null;
+                $created_at = $request->get('created_at');
+                $created_at_withMilliseconds = $request->get('created_atwithMilliseconds');
+                $updated_at = Carbon::now();
+                $updated_at_withMilliseconds = $updated_at->format("Y-m-d H:i:s:u A");
+                $response_time = Carbon::parse($updated_at)->diffInMilliseconds($created_at);
+                Log::channel('merchant_request_log')->info("$trnxRef,$merchant_id,$request_id,$method,$url,$payload,$request_response,{$response->status()},$created_at_withMilliseconds,$updated_at_withMilliseconds,$response_time ");
+                RequestLog::logRequest($trnxRef,$url,$merchant_id, $request->all(), json_decode($request_response, false, 512, JSON_THROW_ON_ERROR));
+
+            }
+        }
+
 
     }
 }

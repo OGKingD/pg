@@ -9,5 +9,6 @@ class Model extends Eloquent
 {
     use HasFactory;
     protected $dateFormat = "Y-m-d H:i:s.u";
+    protected $guarded = ['id'];
 
 }
