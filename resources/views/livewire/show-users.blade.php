@@ -177,7 +177,7 @@
                                             <legend> {{$gway['name']}}</legend>
 
                                             <div class="row">
-                                                <div class="col-5">
+                                                <div class="col-4">
                                                     <label class="form-label " for="charge_factor"> Charge Type
                                                         :</label>
                                                     <select class="form-control form-select " id="charge_factor"
@@ -192,7 +192,7 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="col-6">
+                                                <div class="col-4">
                                                     <label class="form-label" for="charge_factor_{{$key}}}}"> Charge
                                                         Factor
                                                         Value:</label>
@@ -204,17 +204,18 @@
                                                                onfocusout="defocused(this)" name="charge+{{$key}}">
                                                     </div>
                                                 </div>
-                                            </div>
+                                                <div class="col">
+                                                    <label class="form-check-label" for="status">Gateway Status:</label>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="status"
+                                                               name="status+{{$key}}"
+                                                               @if($gway['status'] === 1) checked @endif> Active
 
-                                            <div class="col">
-                                                <label class="form-check-label" for="status">Gateway Status:</label>
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input" type="checkbox" id="status"
-                                                           name="status+{{$key}}"
-                                                           @if($gway['status'] === 1) checked @endif> Active
-
+                                                    </div>
                                                 </div>
+
                                             </div>
+
 
                                             <div class="col d-none">
                                                 <label>

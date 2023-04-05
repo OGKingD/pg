@@ -43,7 +43,7 @@ class ShowUsers extends Component
         $this->dispatchBrowserEvent('openEditPaymentGatewayModal');
         $config_details = [];
 
-        $merchantGateways = json_decode($merchantGateways, true, 512, JSON_THROW_ON_ERROR);
+        $merchantGateways = json_decode($merchantGateways, true, 512, JSON_THROW_ON_ERROR)['config_details'];
         $this->selectedUser = $merchantId;
         $this->selectedUserName = $merchantName;
         //Get all the gateways;
@@ -51,10 +51,10 @@ class ShowUsers extends Component
 
         foreach ($gateways as $gateway) {
             $config_details[$gateway->id] = [
-                "charge" => $merchantGateways['charge+'.$gateway->id] ?? 0,
-                "name" => $merchantGateways['name+'.$gateway->id] ?? $gateway->name,
-                'charge_factor' => $merchantGateways['charge_type+'.$gateway->id] ?? 0,
-                'status' =>   (isset($merchantGateways["status+$gateway->id"])) ? 1 : 0
+                "charge" => $merchantGateways[$gateway->id]['charge'] ?? 0,
+                "name" => $merchantGateways[$gateway->id]['name'] ?? $gateway->name,
+                'charge_factor' => $merchantGateways[$gateway->id]['charge_type'] ?? 0,
+                'status' =>   (isset($merchantGateways[$gateway->id]["status"])) ? 1 : 0
             ];
         }
         $this->merchantGateways = $config_details;
