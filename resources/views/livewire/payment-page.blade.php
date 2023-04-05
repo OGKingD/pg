@@ -7,7 +7,7 @@
 
                 <!-- Nav pills -->
                 <ul class="nav nav-pills flex-column " role="tablist">
-                    @if($merchantGateways['card']['status'])
+                    @if(isset($merchantGateways['card']))
                         <li class="nav-item">
                             <a class="nav-link @if($activeTab === "card") active @endif mt-5 " data-bs-toggle="pill"
                                href="#card" wire:click="setActiveTab('card') ">
@@ -18,7 +18,7 @@
                         </li>
                     @endif
 
-                    @if($merchantGateways['remita']['status'])
+                    @if(isset($merchantGateways['remita']))
                         <li class="nav-item" wire:click="setActiveTab('remita')">
                             <a class="nav-link mt-5 @if($activeTab === "remita") active @endif" data-bs-toggle="pill"
                                href="#remita">
@@ -30,7 +30,7 @@
                     @endif
 
 
-                    @if($merchantGateways['banktransfer']['status'])
+                    @if(isset($merchantGateways['banktransfer']))
                         <li class="nav-item" wire:click="setActiveTab('banktransfer')">
                             <a class="nav-link mt-5 @if($activeTab === "banktransfer") active @endif" data-bs-toggle="pill"
                                href="#banktransfer">
@@ -41,7 +41,19 @@
                         </li>
                     @endif
 
-                    @if($merchantGateways['googlepay']['status'])
+                    @if(isset($merchantGateways['cashatbank']))
+                            <li class="nav-item" wire:click="setActiveTab('cashatbank')">
+                                <a class="nav-link mt-5 @if($activeTab === "cashatbank") active @endif" data-bs-toggle="pill"
+                                   href="#cashatbank">
+                                    <i class="fas fa-landmark ">
+                                        &nbsp; Cash At Bank
+                                    </i>
+                                </a>
+                            </li>
+                    @endif
+
+
+                    @if(isset($merchantGateways['googlepay']))
                         <li class="nav-item" wire:click="setActiveTab('googlepay')">
                             <a class="nav-link mt-5 @if($activeTab === "googlepay") active @endif" data-bs-toggle="pill"
                                href="#googlepay">
@@ -52,7 +64,7 @@
                         </li>
                     @endif
 
-                    @if($merchantGateways['applepay']['status'])
+                    @if(isset($merchantGateways['applepay']))
                         <li class="nav-item" wire:click="setActiveTab('applepay')">
                             <a class="nav-link mt-5 @if($activeTab === "applepay") active @endif" data-bs-toggle="pill"
                                href="#applepay">
@@ -95,7 +107,7 @@
             <!-- Tab panes -->
 
             <div class="tab-content min-vh-55">
-                @if($merchantGateways['card']['status'])
+                @if(isset($merchantGateways['card']))
                     <div id="card" class="container tab-pane @if($activeTab === "card") active @endif"><br>
                         <div class=" mt-3">
                             <h3 class="text-secondary font-weight-normal text-center">Pay Using Card.</h3>
@@ -375,7 +387,7 @@
                     </div>
                 @endif
 
-                @if($merchantGateways['remita']['status'])
+                @if(isset($merchantGateways['remita']))
                     <div id="remita" class="container tab-pane  @if($activeTab === "remita") active @endif"><br>
                         <div class="text-center mt-3">
                             <h3 class="text-secondary font-weight-normal">Pay Using Remita.</h3>
@@ -443,7 +455,7 @@
                 @endif
 
 
-                @if($merchantGateways['banktransfer']['status'])
+                @if(isset($merchantGateways['banktransfer']))
                     <div id="banktransfer" class="container tab-pane  @if($activeTab === "banktransfer") active @endif"><br>
                         <div class="text-center mt-3">
                             <h3 class="text-secondary font-weight-normal">Pay Using Bank Transfer.</h3>
@@ -515,7 +527,28 @@
                 @endif
 
 
-                @if($merchantGateways['googlepay']['status'])
+                @if(isset($merchantGateways['cashatbank']))
+                        <div id="cashatbank" class="container tab-pane  @if($activeTab === "cashatbank") active @endif"><br>
+
+                            <div class="text-center mt-3">
+                                <h3 class="text-secondary font-weight-normal">Pay Using CashAtBank.</h3>
+
+                                <div>
+                                    <div class="mx-auto mt-4">
+                                        <h4 class=" mb-0 mt-2 up" > Kindly Visit the University of Ibadan Micro Finance Bank with your Invoice Number and Cash</h4>
+                                        <br>
+                                        <h2 class=" mb-0 mt-2 up" > {{str_replace("INV","",$invoice->invoice_no)}} </h2>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    @endif
+
+
+                @if(isset($merchantGateways['googlepay']))
                     <div id="googlepay" class="container tab-pane  @if($activeTab === "googlepay") active @endif"><br>
 
                         <div class="text-center mt-3">
@@ -538,7 +571,7 @@
                     </div>
                 @endif
 
-                @if($merchantGateways['applepay']['status'])
+                @if(isset($merchantGateways['applepay']))
                     <div id="applepay" class="container tab-pane  @if($activeTab === "applepay") active @endif"><br>
                         <div class="text-center mt-3">
                             <h3 class="text-secondary font-weight-normal">Pay Using ApplePAY.</h3>

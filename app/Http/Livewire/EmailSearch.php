@@ -35,6 +35,7 @@ class EmailSearch extends Component
 
     public function passEmailToAllLivewireComponents($email)
     {
+        logger($email);
         $this->emitTo('show-users','refreshUsers',$email);
 
     }

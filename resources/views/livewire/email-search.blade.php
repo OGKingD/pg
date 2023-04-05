@@ -4,8 +4,8 @@
             <span class="input-group-text">
                     <i class="fa fa-envelope-circle-check" style="font-size: 15px;"></i>
                 </span>
-        <input id="customer_email" type="tel" placeholder="Email Address"
-               class="form-control" name="customer_email" wire:model="emailToSearch"
+        <input id="customer_email" type="text" placeholder="Email Address"
+               class="form-control" name="customer_email" wire:model.debounce.550ms="emailToSearch"
                wire:keydown.debounce.550ms="searchForUser()"
                autocomplete="email"
         >
@@ -16,7 +16,7 @@
         <div id="emailListing" >
             <ul class="list-group">
                 @foreach($emails as $email)
-                    <li class="list-group-item" onclick="setUserField('{{$email->id}}','{{$email->email}}')" wire:keydown="passEmailToAllLivewireComponents('{{$email->email}}')">
+                    <li class="list-group-item" wire:click.debounce.550ms="passEmailToAllLivewireComponents('{{$email->email}}')"   >
                         {{$email->email}}
                     </li>
                 @endforeach

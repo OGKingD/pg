@@ -80,11 +80,12 @@ function toggleModal(modalId) {
     $(modalId).modal('toggle');
 }
 
-function setUserField(id,email) {
-    document.getElementById('userId').value = id;
-    document.getElementById('customer_email').value = email;
+function setUserField(email) {
+
     let emailDiv = document.getElementById('emailListing');
-    emailDiv ? emailDiv.style.display = "none" :"";
+    emailDiv.style.display = "none";
+    let emailField = document.getElementById('customer_email');
+    emailField.value = email;
 }
 
 function triggerConfigurationOptions() {

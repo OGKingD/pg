@@ -13,12 +13,14 @@ class ShowUsers extends Component
 {
     use WithPagination;
 
-    protected $listeners = ['refreshUsers','editUserPaymentGateways'];
+    protected $listeners = ['refreshUsers','editUserPaymentGateways','fetchUsersPaymentGateways'];
 
-    public $users;
     public $selectedUser;
     public $selectedUserName;
     public $gateways;
+    public $merchantGateways;
+    public $refreshUsers = false;
+    private $usersCollection;
     public $editedUsersGateways;
 
     public $searchUsers = false;
@@ -30,24 +32,51 @@ class ShowUsers extends Component
 
     public function render()
     {
-        if ((isset($this->gateways) && is_array($this->gateways))) {
-            $selUser = User::whereId($this->selectedUser)->first();
-            $this->selectedUserName = $selUser->first_name. " ". $selUser->last_name;
-            $this->dispatchBrowserEvent('gatewaysFetched');
-        }
-
         $builder = User::with('usergateway')->where('type','=', 5);
-        $users_tpl = !$this->searchUsers ? $builder->Paginate(10) : $builder->where('email', 'like', "{$this->searchUsers}%")->paginate(10);
+        $this->usersCollection = !$this->searchUsers ? $builder->Paginate(10) : $builder->where('email', 'like', "{$this->searchUsers}%")->paginate(10);
 
-        $this->users = collect($users_tpl->items());
+        return view('livewire.show-users',["usersCollection" => $this->usersCollection, 'users' => $this->usersCollection]);
+    }
 
-        return view('livewire.show-users',["usersCollection" => $users_tpl]);
+    public function openEditPaymentGatewayModal($merchantGateways, $merchantId, $merchantName)
+    {
+        $this->dispatchBrowserEvent('openEditPaymentGatewayModal');
+        $config_details = [];
+
+        $merchantGateways = json_decode($merchantGateways, true, 512, JSON_THROW_ON_ERROR);
+        $this->selectedUser = $merchantId;
+        $this->selectedUserName = $merchantName;
+        //Get all the gateways;
+        $gateways = Gateway::select(['id','name'])->get();
+
+        foreach ($gateways as $gateway) {
+            $config_details[$gateway->id] = [
+                "charge" => $merchantGateways['charge+'.$gateway->id] ?? 0,
+                "name" => $merchantGateways['name+'.$gateway->id] ?? $gateway->name,
+                'charge_factor' => $merchantGateways['charge_type+'.$gateway->id] ?? 0,
+                'status' =>   (isset($merchantGateways["status+$gateway->id"])) ? 1 : 0
+            ];
+        }
+        $this->merchantGateways = $config_details;
+
+        $this->dispatchBrowserEvent('gatewaysFetched');
+
+    }
+
+    public function searchUsers()
+    {
+        $builder = User::with('usergateway')->where('type','=', 5);
+        $this->usersCollection = !$this->searchUsers ? $builder->Paginate(10) : $builder->where('email', 'like', "{$this->searchUsers}%")->paginate(10);
+
+        $this->resetPage();
+
     }
 
 
     public function refreshUsers($email)
     {
         $this->searchUsers = $email;
+        $this->dispatchBrowserEvent('setSearchField',['email' => $email]);
 
     }
 

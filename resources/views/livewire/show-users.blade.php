@@ -1,5 +1,48 @@
 <div>
+    <div class="card card-plain">
 
+        <div class="card-body pb-3">
+            <div>
+                <div class="page-header   position-relative m-3 border-radius-xl">
+                    <img src="{{asset('assets/img/shapes/waves-white.svg')}}" alt="pattern-lines"
+                         class="position-absolute opacity-6 start-0 top-0 w-100">
+
+                </div>
+                <form role="form" action="#"  wire:submit.prevent="searchUsers">
+                    @csrf
+
+                    <div class="pb-lg-3 pb-3 pt-2 postion-relative z-index-2">
+                        <h3 class="text">Search</h3>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="customer_email" class="col-form-label text-md-right">
+                                        {{__("Merchant Email")}}
+                                    </label>
+                                    <livewire:email-search />
+                                </div>
+
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-success mx-3"> Search</button>
+                                <button type="submit" class="btn btn-danger mx-3"> Reset</button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </form>
+
+
+            </div>
+
+        </div>
+    </div>
+    <div class="card-header header-elements-inline">
+        <h3 class="mb-0">{{__('Users')}}</h3>
+    </div>
     <table class="container table table-flush" id="datatable-basic">
         <thead>
         <tr>
@@ -9,7 +52,7 @@
             <th>{{__('Business name')}}</th>
             <th>{{__('Email')}}</th>
             <th>{{__('Status')}}</th>
-            <th>{{__('Balance')}}</th>
+{{--            <th>{{__('Balance')}}</th>--}}
             <th>{{__('Created')}}</th>
             <th>{{__('Updated')}}</th>
         </tr>
@@ -30,8 +73,9 @@
                             aria-labelledby="dropdownUserOptions">
                             <li>
                                 <a class="dropdown-item border-radius-md text-info" href="javascript:"
-                                   onclick="openEditPaymentGatewayModal({{$val->usergateway}},'{{$val->id}}')">
-                                    Edit {{$val->first_name}} Gateway(s)
+                                   wire:click="openEditPaymentGatewayModal('{{ json_encode($val['usergateway']) }}','{{$val['id']}}','{{$val['first_name']." ". $val['last_name']}}')"
+                                   >
+                                    Edit {{$val['first_name']}} Gateway(s)
                                 </a>
                                 <hr class="dropdown-divider">
                             </li>
@@ -42,21 +86,21 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                @if($val->status==0)
+                                @if($val['status']==0)
 
                                     <a class="dropdown-item border-radius-md text-danger" href="javascript:"
-                                       wire:click="blockUser('{{$val->email}}','block')"
+                                       wire:click="blockUser('{{$val['email']}}','block')"
                                        onclick="salert('SUCCESS','Done','success')">
                                         <i class="fas fa-stop-circle"> </i>
-                                        Disable {{$val->first_name}}
+                                        Disable {{$val['first_name']}}
                                     </a>
 
-                                @elseif($val->status==1)
+                                @elseif($val['status']==1)
                                     <a class="dropdown-item border-radius-md text-success" href="javascript:"
-                                       wire:click="blockUser('{{$val->email}}','activate')"
+                                       wire:click="blockUser('{{$val['email']}}','activate')"
                                        onclick="salert('SUCCESS','Done','success')">
                                         <i class="fas fa-check-circle"> </i>
-                                        Activate {{$val->first_name}}
+                                        Activate {{$val['first_name']}}
                                     </a>
 
                                 @endif
@@ -67,19 +111,19 @@
                     </div>
                 </td>
 
-                <td>{{$val->first_name.' '.$val->last_name}}</td>
-                <td>{{$val->business_name}}</td>
-                <td>{{$val->email}}</td>
+                <td>{{$val['first_name'].' '.$val['last_name']}}</td>
+                <td>{{$val['business_name']}}</td>
+                <td>{{$val['email']}}</td>
                 <td>
-                    @if($val->status==0)
-                        <span class="badge badge-pill badge-success" id="{{$val->email}}+status">{{__('Active')}}</span>
-                    @elseif($val->status==1)
-                        <span class="badge badge-pill badge-danger" id="{{$val->email}}+status">{{__('Blocked')}}</span>
+                    @if($val['status']==0)
+                        <span class="badge badge-pill badge-success" id="{{$val['email']}}+status">{{__('Active')}}</span>
+                    @elseif($val['status']==1)
+                        <span class="badge badge-pill badge-danger" id="{{$val['email']}}+status">{{__('Blocked')}}</span>
                     @endif
                 </td>
-                <td>{{number_format($val->balance,'2','.','')}}</td>
-                <td>{{date("Y/m/d h:i:A", strtotime($val->created_at))}}</td>
-                <td>{{date("Y/m/d h:i:A", strtotime($val->updated_at))}}</td>
+{{--                <td>{{number_format($val['balance'] ?? 0,'2','.','')}}</td>--}}
+                <td>{{date("Y/m/d h:i:A", strtotime($val['created_at']))}}</td>
+                <td>{{date("Y/m/d h:i:A", strtotime($val['updated_at']))}}</td>
             </tr>
             @empty
             <tr>
@@ -125,9 +169,9 @@
                         <div class="card card-plain justify-content-center">
 
                             <div class="card-body">
-                                @if(!is_null($gateways))
+                                @if(!is_null($merchantGateways))
 
-                                    @foreach($gateways as $key => $gway)
+                                    @foreach($merchantGateways as $key => $gway)
 
                                         <fieldset>
                                             <legend> {{$gway['name']}}</legend>
@@ -204,11 +248,17 @@
 
     @section('scripts')
         <script>
-            function openEditPaymentGatewayModal(payload, userId) {
+            addEventListener('openEditPaymentGatewayModal', function () {
+               openEditPaymentGatewayModal()
+            });
 
-                @this.selectedUser= userId;
-                @this.gateways = payload.config_details;
+            addEventListener('setSearchField',function () {
+                let value = event.detail.email;
+                setUserField(value);
+                document.getElementById('customer_email').value = value;
 
+            });
+            function openEditPaymentGatewayModal() {
 
                 Swal.fire({
                     title: 'Fetching ' + name + ' Gateways!',
@@ -218,7 +268,6 @@
                     allowOutsideClick: false,
                     allowEnterKey: false,
                 })
-
 
             }
 
