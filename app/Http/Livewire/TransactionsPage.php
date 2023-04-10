@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Jobs\GenerateCsvReport;
+use App\Models\Gateway;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Pagination\Paginator;
@@ -32,6 +33,7 @@ class TransactionsPage extends Component
     public $payment_created_at;
 
     public $payment_end_date;
+    public $gateways;
 
     protected $listeners = ["exportCsv", "downloadReport", "searchTransactions"];
 
@@ -39,6 +41,11 @@ class TransactionsPage extends Component
 
     protected $paginationTheme = 'bootstrap';
 
+    public function mount()
+    {
+        $this->gateways = Gateway::select(['name','id'])->get();
+
+    }
 
     public function render()
     {

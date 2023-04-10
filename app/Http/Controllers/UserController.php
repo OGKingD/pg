@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Gateway;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\MySqlConnection;
@@ -49,7 +50,6 @@ class UserController extends Controller
 
         $data['title'] = "Merchant Dashboard";
 
-        $year = !empty((request('year'))) ? (request('year')) : "Today";
         $data['greeting'] = " Good Evening!🌝 ";
         $data['time_of_day'] = "Night";
 
@@ -64,6 +64,7 @@ class UserController extends Controller
 
         $transactionsTable = $db->table('transactions');
 
+        $data['gateways'] = Gateway::select(['name','id'])->get();
 
         $transactionsQuery = $transactionsTable
             //count transactions issued out for people to pay
@@ -87,50 +88,21 @@ class UserController extends Controller
             ->selectRaw("SUM( CASE WHEN flag = 'credit' AND  transaction_ref LIKE 'fee_credit_%' THEN total END) as total_fees_charge")
             ->selectRaw("SUM( CASE WHEN flag = 'credit' AND  transaction_ref LIKE 'fee_credit_%' AND status = 'successful' THEN total END) as total_successful_fees_charge")
             //count of all the fees;
-            ->selectRaw("COUNT( CASE WHEN flag = 'credit' AND  transaction_ref LIKE 'fee_credit_%' THEN total END) as total_fees_count")
+            ->selectRaw("COUNT( CASE WHEN flag = 'credit' AND  transaction_ref LIKE 'fee_credit_%' THEN total END) as total_fees_count");
 
-            //GATEWAYS SECTION;
+        //GATEWAYS SECTION;
+        foreach ($data['gateways'] as $gateway) {
+            $channel = strtolower(str_replace(" ", "_", $gateway->name));
+            $transactionsQuery
+                ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  gateway_id = $gateway->id THEN total END) as total_{$channel}_transactions_count")
+                ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  gateway_id = $gateway->id THEN total END) as total_{$channel}_transactions_amount")
+                ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = $gateway->id THEN total END) as successful_{$channel}_transactions")
+                ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = $gateway->id THEN total END) as successful_{$channel}_transactions_total")
+                ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = $gateway->id THEN total END) as pending_{$channel}_transactions")
+                ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = $gateway->id THEN total END) as pending_{$channel}_transactions_total");
+        }
 
-            //card gateways
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  gateway_id = 1 THEN total END) as total_card_transactions_count")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  gateway_id = 1 THEN total END) as total_card_transactions_amount")
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = 1 THEN total END) as successful_card_transactions")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = 1 THEN total END) as successful_card_transactions_total")
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = 1 THEN total END) as pending_card_transactions")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = 1 THEN total END) as pending_card_transactions_total")
-
-            //bank transfer gateways
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit'  AND gateway_id = 2 THEN total END) as total_bank_transfer_transactions_count")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit'  AND gateway_id = 2 THEN total END) as total_bank_transfer_transactions_amount")
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = 2 THEN total END) as successful_bank_transfer_transactions")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = 2 THEN total END) as successful_bank_transfer_transactions_total")
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = 2 THEN total END) as pending_bank_transfer_transactions")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = 2 THEN total END) as pending_bank_transfer_transactions_total")
-
-            //Remita gateways
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit'  AND gateway_id = 3 THEN total END) as total_remita_transactions_count")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit'  AND gateway_id = 3 THEN total END) as total_remita_transactions_amount")
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = 3 THEN total END) as successful_remita_transactions")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = 3 THEN total END) as successful_remita_transactions_total")
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = 3 THEN total END) as pending_remita_transactions")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = 3 THEN total END) as pending_remita_transactions_total")
-
-            //GooglePay gateways
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit'  AND gateway_id = 4 THEN total END) as total_google_pay_transactions_count")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit'  AND gateway_id = 4 THEN total END) as total_google_pay_transactions_amount")
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = 4 THEN total END) as successful_google_pay_transactions")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = 4 THEN total END) as successful_google_pay_transactions_total")
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = 4 THEN total END) as pending_google_pay_transactions")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = 4 THEN total END) as pending_google_pay_transactions_total")
-
-            //ApplePay gateways
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit'  AND gateway_id = 5 THEN total END) as total_apple_pay_transactions_count")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit'  AND gateway_id = 5 THEN total END) as total_apple_pay_transactions_amount")
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = 5 THEN total END) as successful_apple_pay_transactions")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'successful' AND gateway_id = 5 THEN total END) as successful_apple_pay_transactions_total")
-            ->selectRaw("COUNT( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = 5 THEN total END) as pending_apple_pay_transactions")
-            ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = 5 THEN total END) as pending_apple_pay_transactions_total")
-            ->selectRaw("SUM( CASE WHEN type = 'Withdrawal' AND status = 'successful' THEN total END) as withdrawal");
+        $transactionsQuery->selectRaw("SUM( CASE WHEN type = 'Withdrawal' AND status = 'successful' THEN total END) as withdrawal");
 
         if (!$user->isAdmin()) {
             $transactionsQuery = $transactionsQuery
@@ -184,51 +156,20 @@ class UserController extends Controller
         $data['total_successful_fees_charge'] = $transactionsQuery->total_successful_fees_charge;
         $data['total_fees_charge_count'] = $transactionsQuery->total_fees_count;
 
-        $data['card_transactions_count'] = $transactionsQuery->total_card_transactions_count;
-        $data['card_transactions_total'] = $transactionsQuery->total_card_transactions_amount;
-        $data['successful_card_transactions_total'] = $transactionsQuery->successful_card_transactions_total;
-        $data['successful_card_transactions_count'] = $transactionsQuery->successful_card_transactions;
-        $data['pending_card_transactions_total'] = $transactionsQuery->pending_card_transactions_total;
-        $data['pending_card_transactions_count'] = $transactionsQuery->pending_card_transactions;
-        $data['failed_card_transactions_total'] = $data['card_transactions_total'] - ($data['successful_card_transactions_total'] + $data['pending_card_transactions_total']);
-        $data['failed_card_transactions_count'] = $data['card_transactions_count'] - ($data['successful_card_transactions_count'] + $data['pending_card_transactions_count']);
 
-        $data['bank_transfer_transactions_count'] = $transactionsQuery->total_bank_transfer_transactions_count;
-        $data['bank_transfer_transactions_total'] = $transactionsQuery->total_bank_transfer_transactions_amount;
-        $data['successful_bank_transfer_transactions_total'] = $transactionsQuery->successful_bank_transfer_transactions_total;
-        $data['successful_bank_transfer_transactions_count'] = $transactionsQuery->successful_bank_transfer_transactions;
-        $data['pending_bank_transfer_transactions_total'] = $transactionsQuery->pending_bank_transfer_transactions_total;
-        $data['pending_bank_transfer_transactions_count'] = $transactionsQuery->pending_bank_transfer_transactions;
-        $data['failed_bank_transfer_transactions_total'] = $data['bank_transfer_transactions_total'] - ($data['successful_bank_transfer_transactions_total'] + $data['pending_bank_transfer_transactions_total']);
-        $data['failed_bank_transfer_transactions_count'] = $data['bank_transfer_transactions_count'] - ($data['successful_bank_transfer_transactions_count'] + $data['pending_bank_transfer_transactions_count']);
+        //GATEWAYS SECTION;
+        foreach ($data['gateways'] as $gateway) {
+            $channel = strtolower(str_replace(" ", "_", $gateway->name));
+            $data[$channel.'_transactions_count'] = $transactionsQuery->{"total_".$channel."_transactions_count"};
+            $data[$channel.'_transactions_total'] = $transactionsQuery->{"total_".$channel."_transactions_amount"};
+            $data['successful_'.$channel.'_transactions_total'] = $transactionsQuery->{"successful_".$channel."_transactions_total"};
+            $data['successful_'.$channel.'_transactions_count'] = $transactionsQuery->{"successful_".$channel."_transactions"};
+            $data['pending_'.$channel.'_transactions_total'] = $transactionsQuery->{"pending_".$channel."_transactions_total"};
+            $data['pending_'.$channel.'_transactions_count'] = $transactionsQuery->{"pending_".$channel."_transactions"};
+            $data['failed_'.$channel.'_transactions_total'] = $data[$channel.'_transactions_total'] - ($data['successful_'.$channel.'_transactions_total'] + $data['pending_'.$channel.'_transactions_total']);
+            $data['failed_'.$channel.'_transactions_count'] = $data[$channel.'_transactions_count'] - ($data['successful_'.$channel.'_transactions_count'] + $data['pending_'.$channel.'_transactions_count']);
 
-        $data['remita_transactions_count'] = $transactionsQuery->total_remita_transactions_count;
-        $data['remita_transactions_total'] = $transactionsQuery->total_remita_transactions_amount;
-        $data['successful_remita_transactions_total'] = $transactionsQuery->successful_remita_transactions_total;
-        $data['successful_remita_transactions_count'] = $transactionsQuery->successful_remita_transactions;
-        $data['pending_remita_transactions_total'] = $transactionsQuery->pending_remita_transactions_total;
-        $data['pending_remita_transactions_count'] = $transactionsQuery->pending_remita_transactions;
-        $data['failed_remita_transactions_total'] = $data['remita_transactions_total'] - ($data['successful_remita_transactions_total'] + $data['pending_remita_transactions_total']);
-        $data['failed_remita_transactions_count'] = $data['remita_transactions_count'] - ($data['successful_remita_transactions_count'] + $data['pending_remita_transactions_count']);
-
-        $data['google_pay_transactions_count'] = $transactionsQuery->total_google_pay_transactions_count;
-        $data['google_pay_transactions_total'] = $transactionsQuery->total_google_pay_transactions_amount;
-        $data['successful_google_pay_transactions_total'] = $transactionsQuery->successful_google_pay_transactions_total;
-        $data['successful_google_pay_transactions_count'] = $transactionsQuery->successful_google_pay_transactions;
-        $data['pending_google_pay_transactions_total'] = $transactionsQuery->pending_google_pay_transactions_total;
-        $data['pending_google_pay_transactions_count'] = $transactionsQuery->pending_google_pay_transactions;
-        $data['failed_google_pay_transactions_total'] = $data['google_pay_transactions_total'] - ($data['successful_google_pay_transactions_total'] + $data['pending_google_pay_transactions_total']);
-        $data['failed_google_pay_transactions_count'] = $data['google_pay_transactions_count'] - ($data['successful_google_pay_transactions_count'] + $data['pending_google_pay_transactions_count']);
-
-        $data['apple_pay_transactions_count'] = $transactionsQuery->total_apple_pay_transactions_count;
-        $data['apple_pay_transactions_total'] = $transactionsQuery->total_apple_pay_transactions_amount;
-        $data['successful_apple_pay_transactions_total'] = $transactionsQuery->successful_apple_pay_transactions_total;
-        $data['successful_apple_pay_transactions_count'] = $transactionsQuery->successful_apple_pay_transactions;
-        $data['pending_apple_pay_transactions_total'] = $transactionsQuery->pending_apple_pay_transactions_total;
-        $data['pending_apple_pay_transactions_count'] = $transactionsQuery->pending_apple_pay_transactions;
-        $data['failed_apple_pay_transactions_total'] = $data['apple_pay_transactions_total'] - ($data['successful_apple_pay_transactions_total'] + $data['pending_apple_pay_transactions_total']);
-        $data['failed_apple_pay_transactions_count'] = $data['apple_pay_transactions_count'] - ($data['successful_apple_pay_transactions_count'] + $data['pending_apple_pay_transactions_count']);
-
+        }
 
 //
 //        $created_at = \request()->created_at;
