@@ -69,7 +69,7 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> {{$transactions_count ?? number_format((($successful_transactions_count/$transactions_count) * 100) ,1)}}% ({{$successful_transactions_count}})</span>
+                                                <span class="text-xs font-weight-bold">  {{$successful_transactions_count}} == {{empty($transactions_count) ?0 : number_format((($successful_transactions_count/$transactions_count) * 100) ,1). "%" }}</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -82,7 +82,7 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> {{$transactions_count ?? number_format((($pending_transactions_count/$transactions_count) * 100) ,1)}}% ({{$pending_transactions_count}})</span>
+                                                <span class="text-xs font-weight-bold"> {{$pending_transactions_count}} == {{empty($transactions_count) ?0 : number_format((($pending_transactions_count/$transactions_count) * 100) ,1). "%" }}</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -95,7 +95,7 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> {{$transactions_count ?? number_format((($failed_transactions_count/$transactions_count) * 100) ,1)}}% ({{$failed_transactions_count}})</span>
+                                                <span class="text-xs font-weight-bold"> {{$failed_transactions_count}} == {{empty($transactions_count) ?0 : number_format((($failed_transactions_count/$transactions_count) * 100) ,1). "%" }}</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -192,56 +192,24 @@
                     </div>
                     <div class="card-body p-0 mb-4">
                         <div class="row ">
-                            <div class="col-md-6 mb-md-2">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <h1 class="text-gradient text-primary"><span id="status3" countto="{{$card_transactions_count}}">{{$card_transactions_count}}</span> <span
-                                                class="text-lg ms-n2">°</span></h1>
-                                        <h6 class="mb-0 font-weight-bolder">Card</h6>
+                            @foreach($gateways as $gateway)
+                                @php
+                                    $channel = strtolower(str_replace(" ", "_", $gateway->name));
+                                @endphp
 
+
+                                <div class="col-md-6 mb-md-2">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h1 class="text-gradient text-primary"><span id="status3" countto="{{(${$channel."_transactions_count"})}}">{{(${$channel."_transactions_count"})}}</span> <span
+                                                    class="text-lg ms-n2">°</span></h1>
+                                            <h6 class="mb-0 font-weight-bolder">{{$gateway->name}}</h6>
+
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6 mb-md-2 ">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$bank_transfer_transactions_count}}">{{$bank_transfer_transactions_count}}</span> <span
-                                                class="text-lg ms-n2">°</span></h1>
-                                        <h6 class="mb-0 font-weight-bolder">Bank Transfer</h6>
+                            @endforeach
 
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-md-2 ">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$remita_transactions_count}}">{{$remita_transactions_count}}</span> <span
-                                                class="text-lg ms-n2">°</span></h1>
-                                        <h6 class="mb-0 font-weight-bolder">Remita</h6>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-md-2 ">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$google_pay_transactions_count}}">{{$google_pay_transactions_count}}</span> <span
-                                                class="text-lg ms-n2">°</span></h1>
-                                        <h6 class="mb-0 font-weight-bolder">GooglePay</h6>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-md-2 ">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$apple_pay_transactions_count}}">{{$apple_pay_transactions_count}}</span> <span
-                                                class="text-lg ms-n2">°</span></h1>
-                                        <h6 class="mb-0 font-weight-bolder">Applepay</h6>
-
-                                    </div>
-                                </div>
-                            </div>
 
 
                         </div>
@@ -503,7 +471,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
-                                        + &#{{nairaSymbol()}} {{ number_format($successful_google_pay_transactions_total)}}
+                                        + &#{{nairaSymbol()}} {{ number_format($successful_googlepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -520,7 +488,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-warning text-gradient text-sm font-weight-bold ms-auto">
-                                        + &#{{nairaSymbol()}} {{ number_format($pending_google_pay_transactions_total)}}
+                                        + &#{{nairaSymbol()}} {{ number_format($pending_googlepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -537,7 +505,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
-                                        - &#{{nairaSymbol()}} {{ number_format($failed_google_pay_transactions_total)}}
+                                        - &#{{nairaSymbol()}} {{ number_format($failed_googlepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -555,7 +523,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
-                                        + &#{{nairaSymbol()}} {{ number_format($successful_apple_pay_transactions_total)}}
+                                        + &#{{nairaSymbol()}} {{ number_format($successful_applepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -572,7 +540,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-warning text-gradient text-sm font-weight-bold ms-auto">
-                                        + &#{{nairaSymbol()}} {{ number_format($pending_apple_pay_transactions_total)}}
+                                        + &#{{nairaSymbol()}} {{ number_format($pending_applepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -589,7 +557,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
-                                        - &#{{nairaSymbol()}} {{ number_format($failed_apple_pay_transactions_total)}}
+                                        - &#{{nairaSymbol()}} {{ number_format($failed_applepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">

@@ -176,22 +176,11 @@
                                             <select id="flag"
                                                     data-style="btn border" class=" form-control " name="gateway_id">
                                                 <option value="">Choose Type</option>
-
-                                                <option @if($payment_channel === 1 ) selected @endif value="1">
-                                                    Card
-                                                </option>
-                                                <option @if($payment_channel === 2 ) selected @endif value="2">
-                                                    Bank Transfer
-                                                </option>
-                                                <option @if($payment_channel === "3" ) selected @endif value="3">
-                                                    Remita
-                                                </option>
-                                                <option @if($payment_channel === "4" ) selected @endif value="4">
-                                                    GooglePay
-                                                </option>
-                                                <option @if($payment_channel === "5" ) selected @endif value="5">
-                                                    ApplePay
-                                                </option>
+                                                @foreach($gateways as  $gateway)
+                                                    <option @if($payment_channel === $gateway['id'] ) selected @endif value="{{$gateway['id']}}">
+                                                        {{$gateway['name']}}
+                                                    </option>
+                                                @endforeach
 
                                             </select>
 
