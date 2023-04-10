@@ -49,6 +49,8 @@ Route::middleware(['auth'])->group(function () {
            Route::get('users', [\App\Http\Controllers\UserController::class, 'index'])->name('admin.users');
            Route::get('webhooks',[\App\Http\Controllers\WebhookController::class,'index'])->name('webhooks');
            Route::get("requestlogs",[\App\Http\Controllers\RequestLogsController::class,'index'])->name('requestlogs');
+           Route::get('requery_tool', \App\Http\Livewire\RequeryTool::class )->name('requery-tool');
+
        });
 
 

@@ -70,6 +70,35 @@
                 </a>
             </li>
 
+            <li class="nav-item ">
+                <a class="nav-link collapsed" data-bs-toggle="collapse"
+                   @if(request()->path() === "requery_tool") active @endif" href="default.html#vrExamples">
+                <div
+                    class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                    <i class="fas fa-recycle  text-dark"></i>
+                </div>
+                <span class="nav-link-text ms-1"> Tools</span>
+
+                </a>
+                <div class="collapse " id="vrExamples">
+                    <ul style="list-style-type: none">
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->path() === "requery_tool") active @endif"
+                               href="{{route('requery-tool')}}">
+                                <div
+                                    class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                                    <i class="fas fa-repeat @if(request()->path() === "requery_tool") text-white @else text-dark @endif"></i>
+                                </div>
+                                <span class="nav-link-text ms-1">Requery Tool</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <hr class="horizontal dark mt-0">
+
+                </div>
+            </li>
+
+
 
             <li class="nav-item">
                 <hr class="horizontal dark mt-0">

@@ -36,13 +36,7 @@ Route::middleware(['terminate'])->group(function () {
 
     //Unprotected Routes: Ideally webhook Routes
     Route::prefix("webhook")->group(function (){
-        Route::post('flutterwave',[WebhookController::class,'flutterwave']);
+        Route::post('flutterwave',[WebhookController::class,'flutterwave'])->name('webhook.flutterwave');
         Route::post('providus',[WebhookController::class,'providusSettlement']);
-    });
-    Route::get("providus/repush/{trnx}",function ($transaction){
-        return (new Providus())->repushNotification($transaction);
-    });
-    Route::get("providus/verifytransaction/{trnx}",function ($transaction){
-        return (new Providus())->verifyTransaction($transaction);
     });
 });

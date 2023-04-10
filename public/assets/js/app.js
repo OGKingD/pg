@@ -6,6 +6,22 @@ function salert(title, text, icon) {
     });
 }
 
+function positonedAlert(position,htmlMessage) {
+    Swal.fire({
+        position: position,
+        showConfirmButton: false,
+        showCloseButton: true,
+        html: htmlMessage,
+        width: 300,
+        background: "#fb6340",
+        allowOutsideClick: false,
+        allowEnterKey: false,
+        allowEscapeKey: false,
+
+    });
+
+}
+
 function sprocessing(title,allowEscapeKey=false, showConfirmButton=false, allowOutsideClick= false ) {
     Swal.fire({
         title: title,
