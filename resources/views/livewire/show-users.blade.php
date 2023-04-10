@@ -25,10 +25,6 @@
 
                             </div>
 
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-success mx-3"> Search</button>
-                                <button type="submit" class="btn btn-danger mx-3"> Reset</button>
-                            </div>
 
                         </div>
                     </div>

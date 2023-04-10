@@ -323,7 +323,6 @@
 
 </style>
 
-@include('partials.scripts')
 
 <script>
     window.onload = function () {

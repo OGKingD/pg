@@ -8,7 +8,7 @@
                         document.write(new Date().getFullYear())
                     </script>,
                      with <i class="fa fa-heart"></i> by
-                    <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Saanapay</a>
+                    <a href="https://saanapay.com" class="font-weight-bold" target="_blank">Saanapay</a>
                     for a smarter web.
                 </div>
             </div>
