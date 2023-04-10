@@ -113,7 +113,7 @@
 
                                             <select id="status" title="Choose a Status"
                                                     data-style="btn border"
-                                                    class="selectpicker form-control" name="status">
+                                                    class=" form-control" name="status">
 
                                                 <option value="">Choose Status</option>
 
@@ -146,7 +146,7 @@
                                                 </span>
                                             </div>
                                             <select id="flag" title="Credit / Debit"
-                                                    data-style="btn border" class="selectpicker form-control " name="flag">
+                                                    data-style="btn border" class=" form-control " name="flag">
                                                 <option value="">Choose Type</option>
 
                                                 <option @if($payment_flag === "credit" ) selected @endif value="credit">
@@ -285,7 +285,7 @@
 
                                             <select id="status" title="Choose a Status"
                                                     data-style="btn border"
-                                                    class="selectpicker form-control" name="status">
+                                                    class=" form-control" name="status">
 
                                                 <option value="">Choose Status</option>
 
@@ -318,7 +318,7 @@
                                                 </span>
                                             </div>
                                             <select id="flag" title="Credit / Debit"
-                                                    data-style="btn border" class="selectpicker form-control " name="flag">
+                                                    data-style="btn border" class=" form-control " name="flag">
                                                 <option value="">Choose Type</option>
 
                                                 <option @if($payment_flag === "credit" ) selected @endif value="credit">
@@ -536,6 +536,9 @@
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter">Date</a>
                             </th>
+                            <th>
+
+                            </th>
 
 
                         </tr>
@@ -570,6 +573,11 @@
                                 <td class="text-sm font-weight-normal">{{$val->flag}}</td>
 
                                 <td>{{date("Y/m/d h:i:A", strtotime($val->created_at))}}</td>
+                                <td>
+                                    @if( in_array(strtoupper($val->status),["SUCCESSFUL","FAILED"]))
+                                        <a target="_blank" href="{{route('receipt',['id'=>"INV$val->merchant_transaction_ref"])}}" class="btn btn-success"> Receipt »</a>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
 
