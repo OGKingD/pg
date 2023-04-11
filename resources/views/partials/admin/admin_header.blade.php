@@ -54,8 +54,6 @@
         <script src="{{asset('assets/js/plugins/flatpickr.min.js')}}"></script>
 
         <script src="{{asset('assets/js/fontawesome.js')}}"></script>
-        <script src="{{asset('assets/js/soft-ui-dashboard.min.js')}}"></script>
-        <script src="{{asset('assets/js/app.js')}}"></script>
 
 
 
