@@ -1,18 +1,7 @@
 @extends('layouts.admin.admin_dashboardapp')
 
 @section('content')
-    <style>
-        .successful{
-            color: green;
-        }
-        .failed{
-            color: red;
-        }
-        .pending{
-            color: #e0d003;
-        }
 
-    </style>
     <div class="container">
         <div class="container mt--6">
             <div class="row">
@@ -217,8 +206,5 @@
             </div>
         </div>
     </div>
-
-    <script src="{{asset('js/app.js')}}"></script>
-
 
 @endsection
