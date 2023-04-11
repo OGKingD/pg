@@ -14,7 +14,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      *
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\View\View
      */
     public function create()
     {
@@ -36,9 +36,9 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
         $ip_address = $request->ip();
         $user = User::whereid(auth()->user()->id)->first();
-        if ($ip_address != $user->ip_address) {
-            send_email($user->email, $user->username, 'Suspicious Login Attempt', ' Your account was just accessed from an unknown IP address<br> <b> ' . $ip_address . '</b><br>If this was you, please you can ignore this message or reset your account password.', [], 'error');
-        }
+//        if ($ip_address != $user->ip_address) {
+//            send_email($user->email, $user->username, 'Suspicious Login Attempt', ' Your account was just accessed from an unknown IP address<br> <b> ' . $ip_address . '</b><br>If this was you, please you can ignore this message or reset your account password.', [], 'error');
+//        }
         $user->last_login = Carbon::now();
         $user->ip_address = $ip_address;
         $user->save();
