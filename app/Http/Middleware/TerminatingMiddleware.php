@@ -55,7 +55,7 @@ class TerminatingMiddleware
                 $updated_at_withMilliseconds = $updated_at->format("Y-m-d H:i:s:u A");
                 $response_time = Carbon::parse($updated_at)->diffInMilliseconds($created_at);
                 Log::channel('merchant_request_log')->info("$trnxRef,$merchant_id,$request_id,$method,$url,$payload,$request_response,{$response->status()},$created_at_withMilliseconds,$updated_at_withMilliseconds,$response_time ");
-                RequestLog::logRequest($trnxRef,$url,$merchant_id, $request->all(), json_decode($request_response, false, 512, JSON_THROW_ON_ERROR));
+                RequestLog::logRequest($request_id??$trnxRef,$url,$merchant_id, $request->all(), json_decode($request_response, false, 512, JSON_THROW_ON_ERROR));
 
             }
         }
