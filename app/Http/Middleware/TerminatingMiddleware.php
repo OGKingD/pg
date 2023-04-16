@@ -48,7 +48,7 @@ class TerminatingMiddleware
                 $method = $request->method();
                 $request_response = json_encode($response->content(), JSON_THROW_ON_ERROR);
                 $merchant_id = $request->user()->id ?? null;
-                $request_id = $request->requestId ?? null;
+                $request_id = $request->request_id ?? null;
                 $created_at = $request->get('created_at');
                 $created_at_withMilliseconds = $request->get('created_atwithMilliseconds');
                 $updated_at = Carbon::now();
