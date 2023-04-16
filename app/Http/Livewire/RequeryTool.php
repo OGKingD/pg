@@ -2,11 +2,9 @@
 
 namespace App\Http\Livewire;
 
-use App\Http\Controllers\WebhookController;
 use App\Lib\Services\Flutterwave;
 use App\Lib\Services\Providus;
 use App\Models\Transaction;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
 

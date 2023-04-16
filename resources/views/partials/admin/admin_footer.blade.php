@@ -28,6 +28,8 @@
             </div>
         </div>
     </div>
+    <script src="{{asset('assets/js/soft-ui-dashboard.min.js')}}"></script>
+    <script src="{{asset('assets/js/app.js')}}"></script>
 </footer>
 
 

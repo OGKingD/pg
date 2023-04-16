@@ -62,7 +62,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link @if(request()->path() === "requestlogs") active @endif" href="{{route('requestlogs')}}" >
+                <a class="nav-link @if(request()->path() === "requestlogs") active @endif" href="{{route('request-logs')}}" >
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
                         <i class="fas fa-receipt @if(request()->path() === "requestlogs") text-white @else text-dark @endif"></i>
                     </div>
