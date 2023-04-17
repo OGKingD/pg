@@ -535,7 +535,7 @@
 
                                 <div>
                                     <div class="mx-auto mt-4">
-                                        <h4 class=" mb-0 mt-2 up" > Kindly Visit the University of Ibadan Micro Finance Bank with your Invoice Number and Cash</h4>
+                                        <h4 class=" mb-0 mt-2 up" > Kindly Visit the UNIBADAN MICROFINANCE Bank with your Invoice Number</h4>
                                         <br>
                                         <h2 class=" mb-0 mt-2 up" > {{str_replace("INV","",$invoice->invoice_no)}} </h2>
 
