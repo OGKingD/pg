@@ -15,7 +15,7 @@ class EmailSearch extends Component
     /**
      * @var mixed
      */
-    public $emails = [];
+    public $users = [];
 
     public function render()
     {
@@ -25,10 +25,10 @@ class EmailSearch extends Component
     {
         //search for User;
         if (empty($this->emailToSearch)){
-            $this->emails = [];
+            $this->users = [];
         }
         if (!empty($this->emailToSearch)){
-            $this->emails = User::select(['id','email'])->where('email', 'like', "%{$this->emailToSearch}%")->get()->take(5);
+            $this->users = User::select(['id','email'])->where('email', 'like', "%{$this->emailToSearch}%")->get()->take(5);
         }
         //change and search by phone when result is empty
     }

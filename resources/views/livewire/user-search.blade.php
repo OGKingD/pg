@@ -4,9 +4,9 @@
             <span class="input-group-text">
                     <i class="fa fa-envelope-circle-check" style="font-size: 15px;"></i>
                 </span>
-        <input id="customer_email" type="text" placeholder="Email Address"
-               class="form-control" name="customer_email" wire:model.debounce.550ms="emailToSearch"
-               wire:keydown.debounce.550ms="searchForUser()"
+        <input id="username" type="text" placeholder="Name"
+               class="form-control" name="username" wire:model.debounce.350ms="username"
+               wire:keydown.debounce.350ms="searchForUser()"
         >
 
     </div>
@@ -15,8 +15,8 @@
         <div id="userListing" >
             <ul class="list-group">
                 @foreach($users as $user)
-                    <li class="list-group-item"  onclick="setUserField('email','{{$user->email}}','{{$user->id}}')" >
-                        {{$user->email}}
+                    <li class="list-group-item"  onclick="setUserField('name','{{$user->first_name." ".$user->last_name}}','{{$user->id}}')"  >
+                        {{$user->first_name." ".$user->last_name}}
                     </li>
                 @endforeach
             </ul>

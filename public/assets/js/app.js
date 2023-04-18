@@ -96,12 +96,23 @@ function toggleModal(modalId) {
     $(modalId).modal('toggle');
 }
 
-function setUserField(email) {
+function setUserField(type,value,id) {
+    let userDiv = document.getElementById('userListing');
+    userDiv.style.display = "none";
 
-    let emailDiv = document.getElementById('emailListing');
-    emailDiv.style.display = "none";
-    let emailField = document.getElementById('customer_email');
-    emailField.value = email;
+    if (type === "email"){
+        let emailField = document.getElementById('customer_email');
+        emailField.value = value;
+    }
+    if (type === "name"){
+        let nameField = document.getElementById('username');
+        nameField.value = value;
+    }
+    let userIdField = document.getElementById('userId');
+    userIdField.value = id;
+
+    console.log(type,document.getElementById('username').value)
+
 }
 
 function triggerConfigurationOptions() {

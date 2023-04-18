@@ -6,7 +6,6 @@ use App\Jobs\GenerateCsvReport;
 use App\Models\Gateway;
 use App\Models\Transaction;
 use App\Models\User;
-use Illuminate\Pagination\Paginator;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -92,8 +91,7 @@ class TransactionsPage extends Component
 
         $this->transactions = $data['transactionsCollection']->items();
 
-        $view = view('livewire.transactions-page', $data)->extends($layout, ["title" => "Transactions "]);
-        return $view;
+        return view('livewire.transactions-page', $data)->extends($layout, ["title" => "Transactions "]);
     }
 
     /**
@@ -103,7 +101,7 @@ class TransactionsPage extends Component
     {
         $searchParams = json_decode($this->searchParameters, true, 512, JSON_THROW_ON_ERROR);
         //check if key exists group_by;
-        if (!array_key_exists("group_by", $searchParams)) {
+        if (empty($searchParams['group_by'])) {
             //build array for search;
             $query = array_filter($searchParams);
             unset($query['_token'], $query['customer_email']);
@@ -117,7 +115,7 @@ class TransactionsPage extends Component
         }
 
         // Transaction Summary;
-        if (array_key_exists("group_by", $searchParams)) {
+        if (!empty($searchParams['group_by'])) {
             $this->summaryTransactions();
         }
 
@@ -132,13 +130,8 @@ class TransactionsPage extends Component
         //build array for search;
         $query = array_filter(json_decode($this->searchParameters, true, 512, JSON_THROW_ON_ERROR));
         unset($query['_token']);
-        if (!isset($query['group_by'])) {
-            $query['group_by'] = true;
-        }
 
         //group by user_id, status, flag,gateway_id
-        $this->searchQuery = $query;
-
         $this->exportCsv($query);
 
 
