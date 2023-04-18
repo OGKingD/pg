@@ -16,20 +16,24 @@ class Transaction extends Model
     public static function generateCsvReport(array $payload, array $csvHeaders)
     {
         $file = fopen(storage_path("logs/{$payload['filename']}"), "wb");
-        $query = self::reportQuery($payload);
+        $query = self::reportQuery($payload)->orderBy('user_id','desc');
         $query->chunk(3000, function ($results) use ($file, $csvHeaders) {
             //Define Headers;
             fputcsv($file, $csvHeaders);
             foreach ($results as $result) {
+
                 //Define Content;
                 $contents = [
+                    $result->user->first_name. " ". $result->user->last_name,
                     $result->merchant_transaction_ref,
-                    $result->gateway->name ?? "N/A",
-                    number_format($result->amount, 2),
-                    number_format($result->fee, 2),
-                    number_format($result->total, 2),
-                    $result->description,
                     $result->status,
+                    $result->gateway->name ?? "N/A",
+                    $result->type,
+                    number_format($result->fee, 2),
+                    number_format($result->amount, 2),
+                    number_format($result->total, 2),
+                    $result->details["name"]?? "N/A",
+                    $result->details["email"]?? "N/A",
                     $result->flag,
                     $result->created_at,
                 ];
@@ -51,6 +55,8 @@ class Transaction extends Model
             'flutterwave_ref',
             'bank_transfer_ref',
             'gateway_id',
+            'user_id',
+            'invoice_no',
             'amount',
             'fee',
             'total',
