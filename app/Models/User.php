@@ -167,4 +167,12 @@ class User extends Authenticatable implements MustVerifyEmail
         ]);
 
         return new NewAccessToken($token, $token->getKey().'|'.$plainTextToken);
-    }}
+    }
+
+    public function webhook_url()
+    {
+        return $this->hasOne(MerchantWebhook::class);
+
+    }
+
+}
