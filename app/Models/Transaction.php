@@ -283,7 +283,11 @@ class Transaction extends Model
                 /** @var DynamicAccount $dynamicAccount */
                 $dynamicAccount = $invoice->dynamicAccount;
                 if (isset($dynamicAccount)){
-                    $dynamicAccount->update(['status' => 0]);
+                    $dynamicAccount->update([
+                        'status' => 0,
+                        'session_id' => $details['sessionId'],
+                        'settlement_id' => $details['settlementId'],
+                    ]);
                 }
                 //credit merchant wallet with amount - charge
                 $amount = $transaction->amount;

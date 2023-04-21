@@ -203,92 +203,102 @@ class WebhookController extends Controller
                 // query for the status of the transaction to really be sure that the payment was made
                 $transaction_status = $providus->verifyTransaction($settlementId);
                 info("call PROVIDUS to get transaction $settlementId status.", (array)$transaction_status);
-                $responseMessage = $transaction_status->tranRemarks;
-                if (isset($transaction_status->settlementId)){
-                    if ($transaction_status->settlementId === $settlementId){
-                        $gateway = Gateway::where('name', "Bank Transfer")->get()->pluck("id", "name");
-
-                        //check if transaction Exists on Saanapay
-                        /** @var Transaction $transactionExists */
-                        $transactionExists = DynamicAccount::with(['invoice','transaction'])->where("initiationTranRef", $request->initiationTranRef)->first();
-
-
-                        if (is_null($transactionExists)){
-
-                            $responseMessage = "Transaction Not Found On Saana.";
-                        }
-                        if ($transactionExists) {
-
-                            /**
-                             * @var User $user
-                             * @var User $company
-                             * @var Wallet $wallet
-                             **/
-                            /** @var Transaction $spTransaction */
-                            $spTransaction = $transactionExists->transaction;
-                            $user = $spTransaction->user;
-                            $userRef = $user->id;
-                            $company = company();
-                            $wallet = $user->wallet;
-                            $statusCode = 200;
-
-
-                            //check if transaction is successful
-                            if ($spTransaction->status === "successful") {
-                                $responseMessage = "Duplicate Transaction";
-                                $responseCode = "01";
-                            }
-
-                            //check if transaction is pending
-                            if ($spTransaction->status === "pending") {
-
-                                if ($transaction_status->transactionAmount < $spTransaction->total ){
-
-                                    $responseMessage = "Amount Paid less than Transaction Amount";
-                                }
-
-                                //make sure amount equal to or greater than transaction amount;
-                                if ($transaction_status->transactionAmount >= $spTransaction->total) {
-                                    $gateway_id = $gateway["Bank Transfer"];
-                                    $details = [
-                                        "initiationTranRef" => $transaction_status->initiationTranRef,
-                                        "sourceAccountNumber" => $transaction_status->sourceAccountNumber,
-                                        "sourceBankName" => $transaction_status->sourceBankName,
-                                        "settlementId" => $transaction_status->settlementId,
-                                        ];
-                                    //update transaction
-                                    $responseMessage = "successful";
-                                    $requestSuccessful = true;
-                                    $responseCodes = "00";
-
-                                    DB::transaction(function () use ($details, $gateway_id, $transaction_status, $spTransaction, $wallet, $user, $company) {
-                                        //update transaction fee and total;
-                                        $spTransaction->update([
-                                            'total' => $transaction_status->transactionAmount,
-                                            'fee' => $transaction_status->transactionAmount - $spTransaction->amount,
-                                            'bank_transfer_ref' => $transaction_status->settlementId
-                                            ]);
-                                        $spTransaction->handleSuccessfulPayment($spTransaction, $gateway_id, $transaction_status->tranRemarks, $details, $wallet, $user, $company);
-
-                                    });
-
-                                }
-                                //update transaction;
-
-                            }
-
-                            $webhookResponse = [
-                                "status_code" => $statusCode,
-                                "message" => $responseMessage
-                            ];
-
-
-                            $webhooks->logWebhook($settlementId,$userRef,$data,$webhookResponse);
-
-                        }
+                $processTransaction = false;
+                if (isset($transaction_status)){
+                    $responseMessage = $transaction_status->tranRemarks;
+                    if (empty($transaction_status->initiationTranRef)){
+                        $processTransaction = false;
+                        $responseMessage = "Transaction with settlementId : $transaction_status->settlementId cannot be processed, initiationTranRef is Missing ";
+                    }
+                    if ($transaction_status->settlementId === $request->settlementId){
+                        $processTransaction = true;
+                        $responseMessage = "SettlmentId Mismatch ";
 
                     }
                 }
+                if ($processTransaction){
+                    $gateway = Gateway::where('name', "Bank Transfer")->get()->pluck("id", "name");
+
+                    //check if transaction Exists on Saanapay
+                    /** @var Transaction $transactionExists */
+                    $transactionExists = DynamicAccount::with(['invoice','transaction'])->where("initiationTranRef", $request->initiationTranRef)->first();
+
+
+                    if (is_null($transactionExists)){
+
+                        $responseMessage = "Transaction Not Found On Saana.";
+                    }
+                    if ($transactionExists) {
+
+                        /**
+                         * @var User $user
+                         * @var User $company
+                         * @var Wallet $wallet
+                         **/
+                        /** @var Transaction $spTransaction */
+                        $spTransaction = $transactionExists->transaction;
+                        $user = $spTransaction->user;
+                        $userRef = $user->id;
+                        $company = company();
+                        $wallet = $user->wallet;
+                        $statusCode = 200;
+
+
+                        //check if transaction is successful
+                        if ($spTransaction->status === "successful") {
+                            $responseMessage = "Duplicate Transaction";
+                            $responseCode = "01";
+                        }
+
+                        //check if transaction is pending
+                        if ($spTransaction->status === "pending") {
+
+                            if ($transaction_status->transactionAmount < $spTransaction->total ){
+
+                                $responseMessage = "Amount Paid less than Transaction Amount";
+                            }
+
+                            //make sure amount equal to or greater than transaction amount;
+                            if ($transaction_status->transactionAmount >= $spTransaction->total) {
+                                $gateway_id = $gateway["Bank Transfer"];
+                                $details = [
+                                    "initiationTranRef" => $transaction_status->initiationTranRef,
+                                    "sourceAccountNumber" => $transaction_status->sourceAccountNumber,
+                                    "sourceBankName" => $transaction_status->sourceBankName,
+                                    "settlementId" => $transaction_status->settlementId,
+                                    "sessionId" => $transaction_status->sessionId,
+                                ];
+                                //update transaction
+                                $responseMessage = "successful";
+                                $requestSuccessful = true;
+
+                                DB::transaction(function () use ($details, $gateway_id, $transaction_status, $spTransaction, $wallet, $user, $company) {
+                                    //update transaction fee and total;
+                                    $spTransaction->update([
+                                        'total' => $transaction_status->transactionAmount,
+                                        'fee' => $transaction_status->transactionAmount - $spTransaction->amount,
+                                        'bank_transfer_ref' => $transaction_status->settlementId
+                                    ]);
+                                    $spTransaction->handleSuccessfulPayment($spTransaction, $gateway_id, $transaction_status->tranRemarks, $details, $wallet, $user, $company);
+
+                                });
+
+                            }
+                            //update transaction;
+
+                        }
+
+                        $webhookResponse = [
+                            "status_code" => $statusCode,
+                            "message" => $responseMessage
+                        ];
+
+
+                        $webhooks->logWebhook($settlementId,$userRef,$data,$webhookResponse);
+
+                    }
+                }
+
 
             }
             logger("Webhook Response for $request->settlementId",[
