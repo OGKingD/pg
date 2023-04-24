@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\PushtoWebhookJob;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
@@ -285,8 +286,6 @@ class Transaction extends Model
                 if (isset($dynamicAccount)){
                     $dynamicAccount->update([
                         'status' => 0,
-                        'session_id' => $details['sessionId'],
-                        'settlement_id' => $details['settlementId'],
                     ]);
                 }
                 //credit merchant wallet with amount - charge
@@ -323,6 +322,7 @@ class Transaction extends Model
                     $status = true;
 
                 }
+                PushtoWebhookJob::dispatch($transaction)->delay(now()->addMinutes(3));
 
             });
         } catch (\Throwable $e) {

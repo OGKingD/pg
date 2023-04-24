@@ -242,6 +242,10 @@ class WebhookController extends Controller
                         $company = company();
                         $wallet = $user->wallet;
                         $statusCode = 200;
+                        $transactionExists->update([
+                            'session_id' => $transaction_status->settlementId,
+                            'settlement_id' =>  $transaction_status->sessionId,
+                        ]);
 
 
                         //check if transaction is successful

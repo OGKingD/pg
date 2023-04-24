@@ -29,12 +29,12 @@ class PushtoWebhookJob implements ShouldQueue
 
     public function handle(WebhookPush $webhookPush)
     {
-        //log into webhook push table that request has been triggered;
-        $payload = $this->transaction->transactionToPayload();
-        $webhookPush = $webhookPush->logWebhookPush($this->transaction->id,$this->user_id,$payload);
-        //send request to webhookUrl;
         $webhook_url = $this->transaction->user->webhook_url;
         if ($webhook_url) {
+            //log into webhook push table that request has been triggered;
+            $payload = $this->transaction->transactionToPayload();
+            $webhookPush = $webhookPush->logWebhookPush($this->transaction->id,$this->user_id,$payload);
+            //send request to webhookUrl;
             $url = $webhook_url->url;
             //send to the URL;
             $response = Http::withoutVerifying()->post($url, $payload)->json();
