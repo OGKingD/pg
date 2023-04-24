@@ -182,22 +182,6 @@
                 sprocessing(message ??"Fetching Transaction" + "!")
             }
 
-            addEventListener('alertBox',function () {
-                let type = event.detail.type;
-                let message = event.detail.message;
-                if (type === "processing"){
-                    sprocessing("Fetching Transaction")
-                }
-                if (type === "success"){
-                    salert("Success", message ?? "Transaction Fetched!",'success')
-                }
-                if (type === "info"){
-                    salert("Info",message,'success')
-                }
-            })
-            addEventListener("closeAlert",function () {
-                Swal.close();
-            })
         </script>
     @endsection
 

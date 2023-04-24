@@ -58,6 +58,22 @@ function stimer(title,timer = 2000) {
     })
 
 }
+addEventListener('alertBox',function () {
+    let type = event.detail.type;
+    let message = event.detail.message;
+    if (type === "processing"){
+        sprocessing(message ?? "Fetching Transaction")
+    }
+    if (type === "success"){
+        salert("Success", message ?? "Transaction Fetched!",'success')
+    }
+    if (type === "info"){
+        salert("Info",message,'success')
+    }
+})
+addEventListener("closeAlert",function () {
+    Swal.close();
+})
 function copyTextToClipboard(elementId) {
 
     var textArea = document.createElement("textarea");
