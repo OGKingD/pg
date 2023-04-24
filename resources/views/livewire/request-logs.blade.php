@@ -48,7 +48,7 @@
                                                     <i class="fa fa fa-keyboard py-1" style="font-size: 18px;"></i>
                                                 </span>
                                                             </div>
-                                                            <input id ="request_id" type="text" class="form-control" name="request_id" wire:model.lazy="request_id">
+                                                            <input id ="request_id" type="text" class="form-control" name="request_id" wire:model="request_id">
                                                         </div>
 
                                                     </div>
