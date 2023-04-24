@@ -43,7 +43,7 @@ class RequestLog extends Model
         $queryArray = [];
 
         if (array_key_exists('request_id', $criteria) && !empty($criteria['request_id'])) {
-            $queryArray[] = ['request_id', '=', (string)($criteria['request_id'])];
+            $queryArray[] = ['request_id', 'like', (string)($criteria['request_id']."%")];
         }
         if (array_key_exists('user_id', $criteria) && !empty($criteria['user_id'])) {
             $queryArray[] = ['user_id', '=', (string)($criteria['user_id'])];
