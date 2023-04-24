@@ -46,7 +46,21 @@ class PaymentPage extends Component
 
     public function render()
     {
+        $this->dispatchBrowserEvent('alertBox', ['type' => 'processing','message' =>'Please Wait!']);
         $this->setActiveTab($this->activeTab);
+
+        if (isset($this->invoice->transaction)){
+
+            $this->invoice->transaction->update(
+                [
+                    'gateway_id' => $this->merchantGateways[$this->activeTab]['gateway_id'],
+                    'amount' => $this->merchantGateways[$this->activeTab]['invoiceTotal'] - $this->merchantGateways[$this->activeTab]['invoiceCharge'],
+                    'fee' => $this->merchantGateways[$this->activeTab]['invoiceCharge'],
+                    'total' => $this->merchantGateways[$this->activeTab]['invoiceTotal'],
+                ]
+            );
+        }
+        $this->dispatchBrowserEvent('closeAlert');
 
         return view('livewire.payment-page');
     }
