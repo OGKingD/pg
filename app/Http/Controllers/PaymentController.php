@@ -112,10 +112,8 @@ class PaymentController extends Controller
 
             if (isset($transaction['details']['redirect_url'])){
                 $data['redirect'] = true;
-                $urlQuery = $transaction->toArray();
-                $urlQuery["channel"] = $invoice->gateway->name ?? "N/A";
+                $urlQuery = $transaction->transactionToPayload();
                 $url = $transaction['details']['redirect_url'];
-                unset($urlQuery['gateway_id'], $urlQuery['gateway'], $urlQuery['details']);
                 $data['redirect_url']  = $url ."?" . http_build_query($urlQuery);
             }
 

@@ -33,7 +33,7 @@ class PushtoWebhookJob implements ShouldQueue
         if ($webhook_url) {
             //log into webhook push table that request has been triggered;
             $payload = $this->transaction->transactionToPayload();
-            $webhookPush = $webhookPush->logWebhookPush($this->transaction->id,$this->user_id,$payload);
+            $webhookPush = $webhookPush->logWebhookPush($this->transaction->id,$this->transaction->merchant_transaction_ref,$this->user_id,$payload);
             //send request to webhookUrl;
             $url = $webhook_url->url;
             //send to the URL;

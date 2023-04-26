@@ -12,6 +12,7 @@ return new class extends Migration {
 
             $table->foreignId('user_id');
             $table->foreignId('transaction_id');
+            $table->string('merchant_transaction_ref');
             $table->integer('count')->nullable();
             $table->json('payload')->nullable();
             $table->json('response')->nullable();
