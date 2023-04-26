@@ -17,10 +17,11 @@ class WebhookPush extends Model
      * @param $payload
      * @return WebhookPush
      */
-    public function logWebhookPush($tranx_id, $user_id, $payload)
+    public function logWebhookPush($tranx_id,$merchant_ref, $user_id, $payload)
     {
         $webhookPush = $this->firstOrCreate(
             ["transaction_id" => $tranx_id],
+            ["merchant_transaction_ref" => $merchant_ref],
             ["user_id" => $user_id]
         );
 
