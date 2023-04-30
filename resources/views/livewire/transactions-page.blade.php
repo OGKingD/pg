@@ -8,18 +8,12 @@
 
             </div>
             <!-- Nav pills -->
-            <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="pill" href="#home">Filter Transactions</a>
-                </li>
+            @if($isAdmin)
+                <button type="button" class="btn btn-primary" onclick="toggleEssentialReportFilters('detailed')">Detailed Report</button>
+                <button type="button" class="btn  btn-warning info-hover-primary" onclick="toggleEssentialReportFilters('summary')">Summary Report</button>
 
-                @if($isAdmin)
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#menu1">Summary Report </a>
-                    </li>
-                @endif
+            @endif
 
-            </ul>
 
             <!-- Tab panes -->
             <div class="tab-content">
@@ -37,7 +31,7 @@
                     </div>
                 </div>
                 <hr>
-                <div class="tab-pane container active" id="home">
+                <div class=" container " id="home">
                     <form role="form" action="{{route('transactions')}}" id="transactionSearchBox" onsubmit="event.preventDefault(); searchTransactions(this); ">
                         @csrf
                         <fieldset class="py-md-4">
@@ -134,7 +128,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-3 col-md-4">
+                                <div class="col-lg-3 col-md-4 non_essential_summary_filter">
                                     <div class="form-group">
                                         <label for="flag"
                                                class=" col-form-label text-md-right">{{ __('Payment Flag') }}</label>
@@ -192,10 +186,10 @@
 
                                 <div class="col-lg-3 col-md-4 ">
                                     <div class="form-group">
-                                        <label for="customer_email" class="col-form-label text-md-right">
-                                            {{__("Merchant Email")}}
+                                        <label for="username" class="col-form-label text-md-right">
+                                            {{__("Merchant ")}}
                                         </label>
-                                        <livewire:email-search />
+                                        <livewire:user-search />
                                     </div>
 
                                 </div>
@@ -233,6 +227,39 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="col-lg-4 col-md-4" id="groupByFilter" hidden>
+                                    <div class="form-group">
+                                        <label for="group_by"
+                                               class=" col-form-label text-md-right">{{ __('Group By') }}</label>
+
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa fa-flag py-1" style="font-size: 18px;"></i>
+                                                </span>
+                                            </div>
+                                            <select id="group_by" title="Summarize By"
+                                                    data-style="btn border" class="form-control " name="group_by">
+                                                <option value="">Choose Type</option>
+
+                                                <option  value="user_id">
+                                                    Merchant
+                                                </option>
+                                                <option value="gateway_id">
+                                                    Payment Channel
+                                                </option>
+                                                <option value="status">
+                                                    Status
+                                                </option>
+
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
 
                             </div>
 
@@ -250,201 +277,6 @@
                     </form>
                 </div>
 
-                <div class="tab-pane container fade" id="menu1">
-                    <form role="form" action="{{route('transactions')}}" id="summaryTransactionForm" onsubmit="event.preventDefault(); searchTransactions(this); ">
-                        @csrf
-                        <fieldset class="py-md-4">
-                            <div class="row" id="rawFilter">
-
-
-                                <div class="col-lg-4 col-md-4">
-                                    <div class="form-group">
-                                        <label for="status" class=" col-form-label text-md-right">
-                                            {{ __('Payment Status') }}
-                                        </label>
-
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fa fa fa-university py-1" style="font-size: 18px;"></i>
-                                                </span>
-                                            </div>
-
-
-
-                                            <select id="status" title="Choose a Status"
-                                                    data-style="btn border"
-                                                    class=" form-control" name="status">
-
-                                                <option value="">Choose Status</option>
-
-                                                <option @if($payment_status === "pending" ) selected
-                                                        @endif value="pending">PENDING
-                                                </option>
-                                                <option @if($payment_status === "failed" ) selected
-                                                        @endif value="failed">FAILED
-                                                </option>
-                                                <option @if($payment_status === "successful" ) selected
-                                                        @endif value="successful">SUCCESSFUL
-                                                </option>
-                                            </select>
-
-                                        </div>
-
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-4">
-                                    <div class="form-group">
-                                        <label for="flag"
-                                               class=" col-form-label text-md-right">{{ __('Payment Flag') }}</label>
-
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fa fa fa-flag py-1" style="font-size: 18px;"></i>
-                                                </span>
-                                            </div>
-                                            <select id="flag" title="Credit / Debit"
-                                                    data-style="btn border" class=" form-control " name="flag">
-                                                <option value="">Choose Type</option>
-
-                                                <option @if($payment_flag === "credit" ) selected @endif value="credit">
-                                                    CREDIT
-                                                </option>
-                                                <option @if($payment_flag === "debit" ) selected @endif value="debit">
-                                                    DEBIT
-                                                </option>
-                                            </select>
-
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-4">
-                                    <div class="form-group">
-                                        <label for="flag"
-                                               class=" col-form-label text-md-right">{{ __('Payment Channel') }}</label>
-
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fa fa fa-flag py-1" style="font-size: 18px;"></i>
-                                                </span>
-                                            </div>
-                                            <select id="flag"
-                                                    data-style="btn border" class=" form-control " name="gateway_id">
-                                                <option value="">Choose Type</option>
-
-                                                <option @if($payment_channel === 1 ) selected @endif value="1">
-                                                    Card
-                                                </option>
-                                                <option @if($payment_channel === 2 ) selected @endif value="2">
-                                                    Bank Transfer
-                                                </option>
-                                                <option @if($payment_channel === "3" ) selected @endif value="3">
-                                                    Remita
-                                                </option>
-                                                <option @if($payment_channel === "4" ) selected @endif value="4">
-                                                    GooglePay
-                                                </option>
-                                                <option @if($payment_channel === "5" ) selected @endif value="5">
-                                                    ApplePay
-                                                </option>
-
-                                            </select>
-
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-4">
-                                    <div class="form-group">
-                                        <label for="group_by"
-                                               class=" col-form-label text-md-right">{{ __('Group By') }}</label>
-
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fa fa fa-flag py-1" style="font-size: 18px;"></i>
-                                                </span>
-                                            </div>
-                                            <select id="group_by" title="Group By"
-                                                    data-style="btn border" class="form-control " name="group_by">
-                                                <option value="">Choose Type</option>
-
-                                                <option @if($payment_flag === "user_id" ) selected @endif value="user_id">
-                                                    Merchant
-                                                </option>
-                                                <option @if($payment_flag === "gateway_id" ) selected @endif value="gateway_id">
-                                                    Payment Channel
-                                                </option>
-                                                <option @if($payment_flag === "status" ) selected @endif value="status">
-                                                    Status
-                                                </option>
-                                                <option @if($payment_flag === "flag" ) selected @endif value="flag">
-                                                    Flag (Credit/Debit)
-                                                </option>
-                                            </select>
-
-                                        </div>
-
-                                    </div>
-                                </div>
-
-
-                                <div class="col-lg-4 col-md-4">
-                                    <div class="form-group">
-                                        <label for="created_at" class="col-form-label text-md-right">
-                                            {{__("Start Date")}}
-                                        </label>
-                                        <div class="input-group input-group-merge input-group-alternative mb-3">
-                                            <span class="input-group-text">
-                                                    <i class="fa fa-calendar-alt" style="font-size: 15px;"></i>
-                                                </span>
-                                            <input id="created_at" type="date" placeholder="yyyy-mm-dd"
-                                                   class="datechk form-control @error('created_at') is-invalid @enderror"
-                                                   name="created_at" value="{{$payment_created_at}}"
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-4">
-                                    <div class="form-group">
-                                        <label for="created_at" class="col-form-label text-md-right">
-                                            {{__("End Date")}}
-                                        </label>
-                                        <div class="input-group input-group-merge input-group-alternative mb-3">
-                                            <span class="input-group-text">
-                                                    <i class="fa fa-calendar-alt" style="font-size: 15px;"></i>
-                                            </span>
-                                            <input id="created_at" type="date" placeholder="yyyy-mm-dd"
-                                                   class="datechk form-control @error('created_at') is-invalid @enderror"
-                                                   name="end_date" value="{{$payment_end_date}}"
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            <div class="col text-right">
-                                <div class="d-flex justify-content-end">
-                                    <button type="submit" class="btn btn-success mx-3"> Search</button>
-                                    <button class="btn btn-danger mx-3" onclick="document.getElementById('summaryTransactionForm').reset(); event.preventDefault()"> Reset</button>
-                                </div>
-                            </div>
-                        </fieldset>
-
-
-
-                    </form>
-                </div>
 
             </div>
 
@@ -461,7 +293,22 @@
     @if(isset($reportExists))
         <a href="#">
             <div class="alert alert-info alert-dismissible fade show" role="alert" style="font-size: 25px"
-                 onclick=" downloadReport('reportGeneratedAlert')" id="reportGeneratedAlert">
+                 onclick=" downloadReport('reportGeneratedAlert','{{$reportDownloadLink}}')" id="reportGeneratedAlert">
+                        <span class="alert-text">
+                            <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
+                            <strong>Info! </strong>Report Generated! click me to download
+                        </span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+        </a>
+    @endif
+    @if(isset($summaryReportExists))
+        <a href="#">
+            <div class="alert alert-info alert-dismissible fade show" role="alert" style="font-size: 25px"
+                 onclick=" downloadReport('reportGeneratedAlert','{{$summaryReportDownloadLink}}')" id="reportGeneratedAlert">
                         <span class="alert-text">
                             <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
                             <strong>Info! </strong>Report Generated! click me to download
@@ -557,7 +404,7 @@
                                 <td> &#{{nairaSymbol()}} {{number_format($val->amount,'2','.','')}}</td>
                                 <td>&#{{nairaSymbol()}} {{number_format($val->fee,'2','.','')}}</td>
                                 <td>&#{{nairaSymbol()}} {{number_format($val->total,'2','.','')}}</td>
-                                <td class="text-sm font-weight-normal">{{$val->details["email"] ?? "N/A"}}</td>
+                                <td class="text-sm font-weight-normal">{{$val->invoice->customer_email ?? "N/A"}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->status}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->flag}}</td>
 
@@ -636,11 +483,10 @@
                 Swal.close();
             })
 
-            function downloadReport(element, filename) {
-                var alertNode = document.querySelector('#' + element);
-                console.log(alertNode);
+            function downloadReport(element, downloadLink) {
+                let alertNode = document.querySelector('#' + element);
                 alertNode.style.display = "none";
-                location.assign("{{$reportDownloadLink}}")
+                location.assign(downloadLink)
             }
 
             function generateCsvReport() {
@@ -660,6 +506,27 @@
                 }
 
             });
+
+            function toggleEssentialReportFilters(type) {
+                const elements = document.querySelectorAll('.non_essential_summary_filter');
+                if (type === "summary"){
+                    document.getElementById('group_by').value = "user_id";
+
+                    document.getElementById('groupByFilter').hidden = false;
+
+                    elements.forEach(element => {
+                        element.setAttribute('hidden', true);
+                    });
+                }
+                if (type === "detailed"){
+                    document.getElementById('group_by').value = "";
+
+                    document.getElementById('groupByFilter').hidden = true;
+                    elements.forEach(element => {
+                        element.removeAttribute('hidden');
+                    });
+                }
+            }
         </script>
     @endsection
 

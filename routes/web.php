@@ -19,9 +19,7 @@ Route::get('/', function () {
 
 
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth','verified'])->name('dashboard');
+
 
 require __DIR__.'/auth.php';
 
@@ -61,7 +59,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-Route::get('payment/process/{id}',[\App\Http\Controllers\PaymentController::class, "paymentPage"]);
+Route::get('payment/process/{id}',[\App\Http\Controllers\PaymentController::class, "paymentPage"])->name('payment-page');
 Route::get('payment/card/validate/{id}',[\App\Http\Controllers\PaymentController::class, "validateCardPayment"]);
 Route::get('payment/receipt/{id}',[\App\Http\Controllers\PaymentController::class,'receipt'])->name('receipt');
 

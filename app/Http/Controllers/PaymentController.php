@@ -146,12 +146,13 @@ class PaymentController extends Controller
         $request_id = $request->request_id;
 
         //check if invoice Exists;
-        $transaction = Transaction::select('merchant_transaction_ref')->firstWhere('merchant_transaction_ref',$request_id);
+        $transaction = Transaction::firstWhere('merchant_transaction_ref',$request_id);
         if ($transaction){
-            $error = [
-                "request_id" => ["Payment Request already Exists, Please Use a Unique Request ID!"],
-            ];
-            return response()->json(errorResponseJson('Payment Request Failed',$error),404);
+
+            return response()->json(['status' => false,  "data" => [
+                "url" => route('payment-page',['id' => $transaction->invoice_no])
+            ]
+            ]);
         }
 
         DB::transaction(function () use ($request,$request_id, $user, &$data) {
@@ -172,12 +173,14 @@ class PaymentController extends Controller
             //check if merchantRedirectURL is set and add it ;
             if (isset($redirect_url)) {
                 $trn_details['redirect_url'] = $redirect_url;
+                $trn_details['full_name'] = $request->full_name;
             }
             $invoiceAdded->transaction()->create([
                 "transaction_ref" => $uuid,
                 "user_id" => $invoiceAdded->user_id,
                 "merchant_transaction_ref" => $request_id ?? $uuid,
                 "status" => "pending",
+                "type" => $request->service_type,
                 "amount" => $amount,
                 "total" => $amount,
                 'details' => $trn_details,

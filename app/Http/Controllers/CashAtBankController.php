@@ -36,7 +36,9 @@ class CashAtBankController extends Controller
 
         try {
             //when transaction is pending mark payment as successful and change channel;
-            $gateway = Gateway::firstWhere('name', "CashAtBank");
+            $gateway = $this->getGateway();
+            $gateway_id = $gateway->id;
+            $transactionChargeAndTotal = $transaction->computeChargeAndTotal($gateway_id);
 
             /** @var User $user */
             $user = $transaction->user;
@@ -44,6 +46,10 @@ class CashAtBankController extends Controller
             $wallet = $user->wallet;
             $company = company();
             $transaction->handleSuccessfulPayment($transaction, $gateway->id, '', [], $wallet, $user, $company);
+            $transaction->update([
+                "total" => $transactionChargeAndTotal['total'],
+                "fee" => $transactionChargeAndTotal['charge']
+            ]);
 
             return response()->json([
                 "status" => true,
@@ -65,8 +71,13 @@ class CashAtBankController extends Controller
 
     public function show($id)
     {
-        $transactionToPayload = Transaction::with('gateway')->firstWhere('merchant_transaction_ref', $id);
+        $transactionToPayload = Transaction::firstWhere('merchant_transaction_ref', $id);
         $status = false;
+        $gateway = $this->getGateway();
+        $gateway_id = $gateway->id;
+        $transactionChargeAndTotal = $transactionToPayload->computeChargeAndTotal($gateway_id);
+        $transactionToPayload->fee = $transactionChargeAndTotal['charge'];
+        $transactionToPayload->total = $transactionChargeAndTotal['total'];
         if (isset($transactionToPayload)){
             $status = true;
             $transactionToPayload = $transactionToPayload->transactionToPayload();
@@ -84,5 +95,13 @@ class CashAtBankController extends Controller
 
     public function destroy($id)
     {
+    }
+
+    /**
+     * @return Gateway
+     */
+    public function getGateway(): Gateway
+    {
+        return Gateway::firstWhere('name', "CashAtBank");
     }
 }

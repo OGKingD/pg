@@ -57,11 +57,20 @@ class TransactionsPage extends Component
         /** @var Transaction $builder */
         //check if report exists for download;
         $filename = "{$this->user->first_name}_{$this->user->id}_Transaction Report.csv";
+        $filename2 = "Summary_Report_{$this->user->id}.csv";
         $reportExists = file_exists(storage_path("logs/$filename"));
-        $data['reportDownloadLink'] = "download/$filename/logs";
+        $summaryReportExists = file_exists(storage_path("logs/$filename2"));
         if ($reportExists) {
             $data['filename'] = $filename;
             $data['reportExists'] = true;
+            $data['reportDownloadLink'] = "download/$filename/logs";
+
+        }
+        if ($summaryReportExists) {
+            $data['summary_filename'] = $filename2;
+            $data['summaryReportExists'] = true;
+            $data['summaryReportDownloadLink'] = "download/$filename2/logs";
+
         }
 
 
