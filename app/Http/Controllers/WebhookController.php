@@ -238,6 +238,10 @@ class WebhookController extends Controller
                         /** @var Transaction $spTransaction */
                         $spTransaction = $transactionExists->transaction;
                         $user = $spTransaction->user;
+                        $gateway_id = $gateway["Bank Transfer"];
+                        $transactionTotal['total'] = $spTransaction->computeChargeAndTotal($gateway_id);
+                        $spTransaction->total = $transactionTotal['total'];
+                        $spTransaction->fee = $transactionTotal['charge'];
                         $userRef = $user->id;
                         $company = company();
                         $wallet = $user->wallet;

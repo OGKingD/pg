@@ -45,7 +45,7 @@ class GenerateCsvReport implements ShouldQueue
     {
         //call the model Report Method;
         /** @var Transaction $transaction */
-        $transaction = $this->model;
+        $transaction = new $this->model;
         $filename = "{$this->user->first_name}_{$this->user->id}_Transaction Report.csv";
         $this->payload["filename"] = $filename;
         if (!$this->user->isAdmin()) {
@@ -53,13 +53,14 @@ class GenerateCsvReport implements ShouldQueue
         }
         //check if group_by is set and call summary report;
         if (isset($this->payload['group_by'])) {
-            $transaction::summaryReport($this->payload);
+            $this->payload["filename"] = "Summary_Report_{$this->user->id}.csv";
+            $transaction->summaryReport($this->payload);
         }
 
         if (!isset($this->payload['group_by'])) {
             //when it's a detailed report
             $headers = ["Merchant Name","Merchant Ref","Status","Channel","Type","Fee","Amount","Total","Customer Name", "Customer Email","Flag", "Date" ];
-            $transaction::generateCsvReport($this->payload, $headers);
+            $transaction->generateCsvReport($this->payload, $headers);
         }
         //send Mail insert to Notification DB;
 
