@@ -52,7 +52,7 @@ class AuthenticatedSessionController extends Controller
 
         return redirect()->intended($this->redirectPath());
 
-        return redirect()->route('user.dashboard');
+//        return redirect()->route('user.dashboard');
 
     }
 

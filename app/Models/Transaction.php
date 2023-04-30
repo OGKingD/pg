@@ -422,7 +422,8 @@ class Transaction extends Model
             //Set the Headers;
             fputcsv($file, $csvHeaders);
 
-            $result = $builder->
+            $result = $builder->select('user_id')->
+
             selectRaw("COUNT(CASE WHEN status = 'successful' THEN 1 end) as successful_bills")->
             selectRaw("COUNT(CASE WHEN status = 'pending' THEN 1 end) as pending_bills")->
             selectRaw("COUNT(CASE WHEN status = 'failed' THEN 1 end) as failed_bills")->
