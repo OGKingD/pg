@@ -21,8 +21,7 @@ class WebhookPush extends Model
     {
         $webhookPush = $this->firstOrCreate(
             ["transaction_id" => $tranx_id],
-            ["merchant_transaction_ref" => $merchant_ref],
-            ["user_id" => $user_id]
+            ["user_id" => $user_id, "merchant_transaction_ref" => $merchant_ref],
         );
 
         $webhookPush->update([
