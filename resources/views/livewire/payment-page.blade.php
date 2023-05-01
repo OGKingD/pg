@@ -9,8 +9,8 @@
                 <ul class="nav nav-pills flex-column " role="tablist">
                     @if(isset($merchantGateways['card']))
                         <li class="nav-item">
-                            <a class="nav-link @if($activeTab === "card") active @endif mt-5 " data-bs-toggle="pill"
-                               href="#card" wire:click="setActiveTab('card') " onclick="sprocessing('Please Wait!')">
+                            <a onclick="sprocessing('Please Wait!')" class="nav-link @if($activeTab === "card") active @endif mt-5 " data-bs-toggle="pill"
+                               href="#card" wire:click="setActiveTab('card') " >
                                 <i class="fa-solid fa-credit-card ">
                                     &nbsp; Card
                                 </i>
@@ -19,8 +19,8 @@
                     @endif
 
                     @if(isset($merchantGateways['remita']))
-                        <li class="nav-item" wire:click="setActiveTab('remita')" onclick="sprocessing('Please Wait!')">
-                            <a class="nav-link mt-5 @if($activeTab === "remita") active @endif" data-bs-toggle="pill"
+                        <li class="nav-item" wire:click="setActiveTab('remita')" >
+                            <a onclick="sprocessing('Please Wait!')"  class="nav-link mt-5 @if($activeTab === "remita") active @endif" data-bs-toggle="pill"
                                href="#remita">
                                 <i class="fas fa-school ">
                                     &nbsp; Remita
@@ -31,8 +31,8 @@
 
 
                     @if(isset($merchantGateways['banktransfer']))
-                        <li class="nav-item" wire:click="setActiveTab('banktransfer')" onclick="sprocessing('Please Wait!')">
-                            <a class="nav-link mt-5 @if($activeTab === "banktransfer") active @endif" data-bs-toggle="pill"
+                        <li class="nav-item" wire:click="setActiveTab('banktransfer')" >
+                            <a onclick="sprocessing('Please Wait!')"  class="nav-link mt-5 @if($activeTab === "banktransfer") active @endif" data-bs-toggle="pill"
                                href="#banktransfer">
                                 <i class="fas fa-landmark ">
                                     &nbsp; Bank Transfer
@@ -42,7 +42,7 @@
                     @endif
 
                     @if(isset($merchantGateways['cashatbank']))
-                            <li class="nav-item" wire:click="setActiveTab('cashatbank')" onclick="sprocessing('Please Wait!')">
+                            <li onclick="sprocessing('Please Wait!')"  class="nav-item" wire:click="setActiveTab('cashatbank')" >
                                 <a class="nav-link mt-5 @if($activeTab === "cashatbank") active @endif" data-bs-toggle="pill"
                                    href="#cashatbank">
                                     <i class="fas fa-landmark ">
@@ -54,7 +54,7 @@
 
 
                     @if(isset($merchantGateways['googlepay']))
-                        <li class="nav-item" wire:click="setActiveTab('googlepay')" onclick="sprocessing('Please Wait!')">
+                        <li onclick="sprocessing('Please Wait!')"  class="nav-item" wire:click="setActiveTab('googlepay')" >
                             <a class="nav-link mt-5 @if($activeTab === "googlepay") active @endif" data-bs-toggle="pill"
                                href="#googlepay">
                                 <i class="fa-brands fa-google-pay">
@@ -65,8 +65,8 @@
                     @endif
 
                     @if(isset($merchantGateways['applepay']))
-                        <li class="nav-item" wire:click="setActiveTab('applepay')" onclick="sprocessing('Please Wait!')">
-                            <a class="nav-link mt-5 @if($activeTab === "applepay") active @endif" data-bs-toggle="pill"
+                        <li class="nav-item" wire:click="setActiveTab('applepay')" >
+                            <a onclick="sprocessing('Please Wait!')"  class="nav-link mt-5 @if($activeTab === "applepay") active @endif" data-bs-toggle="pill"
                                href="#applepay">
                                 <i class="fa-brands fa-cc-apple-pay ">
                                     &nbsp; Apple Pay
