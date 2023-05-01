@@ -83,11 +83,13 @@ class PaymentController extends Controller
 
         if ($merchantGateways) {
             array_walk($merchantGateways, static function ($item, $key) use (&$freshArr, $invoice) {
-                $item['gateway_id'] = $key;
-                $item["invoiceCharge"] = $item['charge_factor'] ?  ($item['charge'] / 100) * $invoice->amount : $item['charge'];
-                $item["invoiceTotal"] = $invoice->amount + $item['invoiceCharge'];
-                $freshArr[str_replace(' ', '', strtolower($item['name']))] = $item;
+                if ($item['status']){
+                    $item['gateway_id'] = $key;
+                    $item["invoiceCharge"] = $item['charge_factor'] ?  ($item['charge'] / 100) * $invoice->amount : $item['charge'];
+                    $item["invoiceTotal"] = $invoice->amount + $item['invoiceCharge'];
+                    $freshArr[str_replace(' ', '', strtolower($item['name']))] = $item;
 
+                }
             });
 
         }
