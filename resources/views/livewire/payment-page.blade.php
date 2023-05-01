@@ -8,8 +8,8 @@
                 <!-- Nav pills -->
                 <ul class="nav nav-pills flex-column " role="tablist">
                     @if(isset($merchantGateways['card']))
-                        <li class="nav-item">
-                            <a onclick="sprocessing('Please Wait!')" class="nav-link @if($activeTab === "card") active @endif mt-5 " data-bs-toggle="pill"
+                        <li onclick="sprocessing('Please Wait!')" class="nav-item">
+                            <a  class="nav-link @if($activeTab === "card") active @endif mt-5 " data-bs-toggle="pill"
                                href="#card" wire:click="setActiveTab('card') " >
                                 <i class="fa-solid fa-credit-card ">
                                     &nbsp; Card
@@ -19,8 +19,8 @@
                     @endif
 
                     @if(isset($merchantGateways['remita']))
-                        <li class="nav-item" wire:click="setActiveTab('remita')" >
-                            <a onclick="sprocessing('Please Wait!')"  class="nav-link mt-5 @if($activeTab === "remita") active @endif" data-bs-toggle="pill"
+                        <li onclick="sprocessing('Please Wait!')" class="nav-item" wire:click="setActiveTab('remita')" >
+                            <a  class="nav-link mt-5 @if($activeTab === "remita") active @endif" data-bs-toggle="pill"
                                href="#remita">
                                 <i class="fas fa-school ">
                                     &nbsp; Remita
@@ -31,8 +31,8 @@
 
 
                     @if(isset($merchantGateways['banktransfer']))
-                        <li class="nav-item" wire:click="setActiveTab('banktransfer')" >
-                            <a onclick="sprocessing('Please Wait!')"  class="nav-link mt-5 @if($activeTab === "banktransfer") active @endif" data-bs-toggle="pill"
+                        <li onclick="sprocessing('Please Wait!')" class="nav-item" wire:click="setActiveTab('banktransfer')" >
+                            <a   class="nav-link mt-5 @if($activeTab === "banktransfer") active @endif" data-bs-toggle="pill"
                                href="#banktransfer">
                                 <i class="fas fa-landmark ">
                                     &nbsp; Bank Transfer
