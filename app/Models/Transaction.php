@@ -351,8 +351,8 @@ class Transaction extends Model
         $payload['customer_name'] = $payload['details']['name'] ?? null;
         $payload['customer_email'] = $payload['details']['email'] ?? null;
         $payload["channel"] = $payload['gateway']['name'] ?? "N/A";
-        $payload['updated_at'] = Carbon::parse($payload['updated_at'])->toDateTimeLocalString();
-        $payload['created_at'] = Carbon::parse($payload['updated_at'])->toDateTimeLocalString();
+        $payload['updated_at'] = str_replace("T"," ",Carbon::parse($payload['updated_at'])->toDateTimeLocalString());
+        $payload['created_at'] = str_replace("T"," ",Carbon::parse($payload['updated_at'])->toDateTimeLocalString());
         unset($payload['gateway_id'], $payload['gateway'], $payload['details']);
         return $payload;
     }
