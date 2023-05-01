@@ -65,8 +65,8 @@
                     @endif
 
                     @if(isset($merchantGateways['applepay']))
-                        <li class="nav-item" wire:click="setActiveTab('applepay')" >
-                            <a onclick="sprocessing('Please Wait!')"  class="nav-link mt-5 @if($activeTab === "applepay") active @endif" data-bs-toggle="pill"
+                        <li onclick="sprocessing('Please Wait!')" class="nav-item" wire:click="setActiveTab('applepay')" >
+                            <a   class="nav-link mt-5 @if($activeTab === "applepay") active @endif" data-bs-toggle="pill"
                                href="#applepay">
                                 <i class="fa-brands fa-cc-apple-pay ">
                                     &nbsp; Apple Pay
