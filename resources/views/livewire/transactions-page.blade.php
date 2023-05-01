@@ -311,7 +311,7 @@
                  onclick=" downloadReport('reportGeneratedAlert','{{$summaryReportDownloadLink}}')" id="reportGeneratedAlert">
                         <span class="alert-text">
                             <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
-                            <strong>Info! </strong>Report Generated! click me to download
+                            <strong>Info! </strong>Summary Report Generated! click me to download
                         </span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
