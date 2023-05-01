@@ -66,6 +66,7 @@ class Transaction extends Model
             'gateway_id',
             'user_id',
             'invoice_no',
+            'type',
             'amount',
             'fee',
             'total',
