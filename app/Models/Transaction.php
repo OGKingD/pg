@@ -318,13 +318,17 @@ class Transaction extends Model
      */
     public function handleFailedPayment(Transaction $transaction, $gateway_id, $payment_provider_message, array $details): bool
     {
+        /** @var Invoice $invoice */
+        $invoice = $transaction->invoice;
         $transaction->update([
             "status" => "failed",
             "gateway_id" => $gateway_id,
             "payment_provider_message" => $payment_provider_message,
             "details" => $details
         ]);
-
+        $invoice->update([
+            'status' => 'failed'
+        ]);
         return true;
 
     }
