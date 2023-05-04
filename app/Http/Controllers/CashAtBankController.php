@@ -73,12 +73,13 @@ class CashAtBankController extends Controller
     {
         $transactionToPayload = Transaction::firstWhere('merchant_transaction_ref', $id);
         $status = false;
-        $gateway = $this->getGateway();
-        $gateway_id = $gateway->id;
-        $transactionChargeAndTotal = $transactionToPayload->computeChargeAndTotal($gateway_id);
-        $transactionToPayload->fee = $transactionChargeAndTotal['charge'];
-        $transactionToPayload->total = $transactionChargeAndTotal['total'];
+
         if (isset($transactionToPayload)){
+            $gateway = $this->getGateway();
+            $gateway_id = $gateway->id;
+            $transactionChargeAndTotal = $transactionToPayload->computeChargeAndTotal($gateway_id);
+            $transactionToPayload->fee = $transactionChargeAndTotal['charge'];
+            $transactionToPayload->total = $transactionChargeAndTotal['total'];
             $status = true;
             $transactionToPayload = $transactionToPayload->transactionToPayload();
         }
