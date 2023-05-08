@@ -185,26 +185,28 @@ class Transaction extends Model
         $groupBy = $payload['group_by'];
         unset($payload['group_by'], $payload['filename']);
 
-        $builder = self::with('user')->where($queryArray);
+        $builder = self::with(['user','gateway'])->where($queryArray);
 
         //check what type of grouping;
         $result = $this->summaryReportQuery($groupBy, $file, $builder);
         $sql = $result['query'];
+        $gateways = $result['gateways'];
         $csvHeaders = $result['csvHeaders'];
 
-        $this->writeSummaryReport($groupBy,$sql,$payload,$file,$csvHeaders);
+        $this->writeSummaryReport($groupBy,$sql,$payload,$file,$csvHeaders,$gateways);
 
         fclose($file);
 
     }
 
-    public function writeSummaryReport($type,$query,$payload,$file,$csvHeaders)
+    public function writeSummaryReport($type,$query,$payload,$file,$csvHeaders, $gateways)
     {
-        $results = queryWithDateRange($payload, $query)->get();
-        $gateways = Gateway::select(['name','id'])->get();
-        foreach ($results as $result) {
-            $this->generateContentForReport($type, $result, $file,$csvHeaders, $gateways);
-        }
+        queryWithDateRange($payload, $query)->chunk(100,function ($results) use ($file,$type,$csvHeaders,$gateways){
+            $currentMerchant = 0;
+            foreach ($results as $result) {
+                $currentMerchant = $this->generateContentForReport($type, $result, $file,$csvHeaders, $gateways, $currentMerchant);
+            }
+        });
 
     }
 
@@ -363,10 +365,46 @@ class Transaction extends Model
      * @param  Transaction$result
      * @param resource $file
      */
-    public function generateContentForReport($type, Transaction $result, $file,$csvHeaders, $gateways): void
+    public function generateContentForReport($type, Transaction $result, $file,$csvHeaders, $gateways, $currentMerchant)
     {
         $username = isset($result->user) ? $result->user->first_name . " " . $result->user->last_name : "N/A";
         $body = [];
+
+        if ($type === "default"){
+            $merchant = "";
+            if ($currentMerchant !== $result->user_id){
+                $merchant = $username;
+            }
+
+            $currentMerchant = $result->user_id;
+            $channel = "N/A";
+            $gatewayName = "N/A";
+           if (isset($result->gateway)){
+               $channel =  strtolower(str_replace(" ", "_", $result->gateway->name));
+               $gatewayName = $result->gateway->name;
+           }
+
+            $body = [
+                $merchant,
+                $result->type,
+                $gatewayName,
+                number_format($result->successful_bills),
+                number_format($result->pending_bills),
+                number_format($result->failed_bills),
+                0,
+                0,
+                number_format($result->{$channel."_total_successful_fees"},2),
+                0,
+                number_format($result->{$channel."_total_successful_amount"},2),
+
+                number_format($result->{$channel."_total_successful"},2),
+                0,
+                number_format($result->{$channel."_total_successful_amount"},2),
+
+            ];
+
+
+        }
 
         if ($type === "user_id") {
             $body = [
@@ -407,6 +445,7 @@ class Transaction extends Model
 
         //Set the Content;
         fputcsv($file, $body);
+        return $currentMerchant;
     }
 
     /**
@@ -418,6 +457,7 @@ class Transaction extends Model
     public function summaryReportQuery($groupBy,  $file, $builder)
     {
         $result = "";
+        $gateways = Gateway::select(['name','id'])->get();
         $csvHeaders = [];
         if ($groupBy === "user_id") {
 
@@ -455,37 +495,9 @@ class Transaction extends Model
                 "Merchant",
                 ];
 
-            $gateways = Gateway::select(['name','id'])->get();
             $builder = $builder->select('user_id');
 
-            foreach ($gateways as $gateway) {
-                $channel = strtolower(str_replace(" ", "_", $gateway->name));
-                array_push($csvHeaders,"{$channel}_Count",
-                    "Successful_{$channel}_Count","Pending_{$channel}_Count", "Failed_{$channel}_Count",
-                    "Successful_{$channel}_Amount","Pending_{$channel}_Amount","Failed_{$channel}_Amount",
-                    "Successful_{$channel}_Fees","Pending_{$channel}_Fees","Failed_{$channel}_Fees",
-                    "Successful_{$channel}_Total","Pending_{$channel}_Total","Failed_{$channel}_Total");
-
-                $builder->
-                selectRaw("COUNT(CASE WHEN status = 'successful' AND gateway_id = $gateway->id THEN 1 end) as {$channel}_successful_bills")->
-                selectRaw("COUNT(CASE WHEN status = 'pending' AND gateway_id = $gateway->id THEN 1 end) as {$channel}_pending_bills")->
-                selectRaw("COUNT(CASE WHEN status = 'failed' AND gateway_id = $gateway->id THEN 1 end) as {$channel}_failed_bills")->
-
-                //sum amount
-                selectRaw("SUM(CASE WHEN status = 'successful' AND gateway_id = $gateway->id  THEN amount end) as {$channel}_total_successful_amount")->
-                selectRaw("SUM(CASE WHEN status = 'pending' AND gateway_id = $gateway->id  THEN amount end) as {$channel}_total_pending_amount")->
-                selectRaw("SUM(CASE WHEN status = 'failed' AND gateway_id = $gateway->id  THEN amount end) as {$channel}_total_failed_amount")->
-
-                //sum fee
-                selectRaw("SUM(CASE WHEN status = 'successful' AND gateway_id = $gateway->id  THEN fee end) as {$channel}_total_successful_fees")->
-                selectRaw("SUM(CASE WHEN status = 'pending' AND gateway_id = $gateway->id  THEN fee end) as {$channel}_total_pending_fees")->
-                selectRaw("SUM(CASE WHEN status = 'failed' AND gateway_id = $gateway->id  THEN fee end) as {$channel}_total_failed_fees")->
-
-                //sum total
-                selectRaw("SUM(CASE WHEN status = 'successful' AND gateway_id = $gateway->id  THEN total end) as {$channel}_total_successful")->
-                selectRaw("SUM(CASE WHEN status = 'pending' AND gateway_id = $gateway->id  THEN total end) as {$channel}_total_pending")->
-                selectRaw("SUM(CASE WHEN status = 'failed' AND gateway_id = $gateway->id  THEN total end) as {$channel}_total_failed");
-            }
+            [$csvHeaders, $builder] = $this->summaryQueryWithGateways($gateways, $csvHeaders, $builder);
 
             fputcsv($file, $csvHeaders);
 
@@ -493,8 +505,24 @@ class Transaction extends Model
 
 
         }
+        if ($groupBy === "default"){
+            $csvHeaders = [
+                "Merchant",
+            ];
 
-        return ["query" =>$result, "csvHeaders"=> $csvHeaders];
+            $builder = $builder->select(['user_id','type','gateway_id']);
+
+            [$csvHeaders,$builder] = $this->summaryQueryWithGateways($gateways, $csvHeaders, $builder);
+            $csvHeaders = [
+                "Merchant","Service Type", "Payment Channel", "Successful", "Initiated", "Failed", "Refunded", "Saanapay Transaction Charge", "Saanapay Merchant Service Charge", "Bank Charges", "Amount", "Total Amount", "Refund Amount", "Merchant Amount"
+            ];
+            fputcsv($file, $csvHeaders);
+
+            $result = $builder->groupBy('user_id')->groupBy('type')->groupBy('gateway_id')->orderBy('user_id');
+
+        }
+
+        return ["query" =>$result, "csvHeaders"=> $csvHeaders, "gateways" => $gateways];
     }
 
 
@@ -513,5 +541,44 @@ class Transaction extends Model
         }
         return ["total" => $transactionTotal, "charge" => $gateway_charge ];
 
+    }
+
+    /**
+     * @param $gateways
+     * @param array $csvHeaders
+     * @param $builder
+     * @return array
+     */
+    public function summaryQueryWithGateways($gateways, array $csvHeaders, $builder): array
+    {
+        foreach ($gateways as $gateway) {
+            $channel = strtolower(str_replace(" ", "_", $gateway->name));
+            array_push($csvHeaders, "{$channel}_Count",
+                "Successful_{$channel}_Count", "Pending_{$channel}_Count", "Failed_{$channel}_Count",
+                "Successful_{$channel}_Amount", "Pending_{$channel}_Amount", "Failed_{$channel}_Amount",
+                "Successful_{$channel}_Fees", "Pending_{$channel}_Fees", "Failed_{$channel}_Fees",
+                "Successful_{$channel}_Total", "Pending_{$channel}_Total", "Failed_{$channel}_Total");
+
+            $builder->
+            selectRaw("COUNT(CASE WHEN status = 'successful' AND gateway_id = $gateway->id THEN 1 end) as {$channel}_successful_bills")->
+            selectRaw("COUNT(CASE WHEN status = 'pending' AND gateway_id = $gateway->id THEN 1 end) as {$channel}_pending_bills")->
+            selectRaw("COUNT(CASE WHEN status = 'failed' AND gateway_id = $gateway->id THEN 1 end) as {$channel}_failed_bills")->
+
+            //sum amount
+            selectRaw("SUM(CASE WHEN status = 'successful' AND gateway_id = $gateway->id  THEN amount end) as {$channel}_total_successful_amount")->
+            selectRaw("SUM(CASE WHEN status = 'pending' AND gateway_id = $gateway->id  THEN amount end) as {$channel}_total_pending_amount")->
+            selectRaw("SUM(CASE WHEN status = 'failed' AND gateway_id = $gateway->id  THEN amount end) as {$channel}_total_failed_amount")->
+
+            //sum fee
+            selectRaw("SUM(CASE WHEN status = 'successful' AND gateway_id = $gateway->id  THEN fee end) as {$channel}_total_successful_fees")->
+            selectRaw("SUM(CASE WHEN status = 'pending' AND gateway_id = $gateway->id  THEN fee end) as {$channel}_total_pending_fees")->
+            selectRaw("SUM(CASE WHEN status = 'failed' AND gateway_id = $gateway->id  THEN fee end) as {$channel}_total_failed_fees")->
+
+            //sum total
+            selectRaw("SUM(CASE WHEN status = 'successful' AND gateway_id = $gateway->id  THEN total end) as {$channel}_total_successful")->
+            selectRaw("SUM(CASE WHEN status = 'pending' AND gateway_id = $gateway->id  THEN total end) as {$channel}_total_pending")->
+            selectRaw("SUM(CASE WHEN status = 'failed' AND gateway_id = $gateway->id  THEN total end) as {$channel}_total_failed");
+        }
+        return array($csvHeaders, $builder);
     }
 }

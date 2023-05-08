@@ -242,6 +242,7 @@
                                             <select id="group_by" title="Summarize By"
                                                     data-style="btn border" class="form-control " name="group_by">
                                                 <option value="">Choose Type</option>
+                                                <option value="default">General</option>
 
                                                 <option  value="user_id">
                                                     Merchant
@@ -510,7 +511,7 @@
             function toggleEssentialReportFilters(type) {
                 const elements = document.querySelectorAll('.non_essential_summary_filter');
                 if (type === "summary"){
-                    document.getElementById('group_by').value = "user_id";
+                    document.getElementById('group_by').value = "default";
 
                     document.getElementById('groupByFilter').hidden = false;
 
