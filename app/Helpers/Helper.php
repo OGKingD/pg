@@ -103,14 +103,14 @@ function nairaSymbol()
 
 function queryWithDateRange($query, $builder)
 {
-    if ((array_key_exists('created_at', $query) && !empty($query['created_at'])) && (array_key_exists('end_date', $query) && !empty($query['end_date']))) {
-        return $builder->whereBetween("created_at", [$query['created_at'], $query['end_date'] . " 23:59:59.999",]);
+    if ((array_key_exists('updated_at', $query) && !empty($query['updated_at'])) && (array_key_exists('end_date', $query) && !empty($query['end_date']))) {
+        return $builder->whereBetween("updated_at", [$query['updated_at'], $query['end_date'] . " 23:59:59.999",]);
     }
-    if (array_key_exists('created_at', $query) && !empty($query['created_at'])) {
-        return $builder->whereDate('created_at', $query['created_at']);
+    if (array_key_exists('updated_at', $query) && !empty($query['updated_at'])) {
+        return $builder->whereDate('updated_at', $query['updated_at']);
     }
     if (array_key_exists('end_date', $query) && !empty($query['end_date'])) {
-        return $builder->whereDate('created_at', $query['end_date']);
+        return $builder->whereDate('updated_at', $query['end_date']);
     }
     return $builder;
 
