@@ -41,7 +41,7 @@ class Transaction extends Model
                     $result->details["name"]?? "N/A",
                     $result->invoice->customer_email ?? "N/A",
                     $result->flag,
-                    $result->created_at,
+                    $result->updated_at,
                 ];
                 fputcsv($file, $contents);
             }
@@ -74,7 +74,9 @@ class Transaction extends Model
             'status',
             'flag',
             'details',
-            'created_at'];
+            'created_at',
+            'updated_at'
+        ];
 
         if (isset($query['flutterwave_ref'])) {
             $queryArray[] = ['flutterwave_ref', '=', (string)($query['flutterwave_ref'])];
