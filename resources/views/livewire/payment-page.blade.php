@@ -98,7 +98,7 @@
                             </span>
                         <br>
                         <span class="text-success  text-bold">
-                                NGN {{number_format($merchantGateways[$activeTab]['invoiceTotal'])}}
+                                NGN {{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}
                     </span>
                     </li>
                 </ul>

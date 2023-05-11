@@ -195,7 +195,7 @@
                                                     <div class=" input-group mb-3">
                                                         <input type="number" class="form-control"
                                                                id="charge_factor_{{$key}}" placeholder="Value..."
-                                                               value="{{$gway['charge']}}"
+                                                               value="{{$gway['charge']}}" step="0.1"
                                                                aria-label="Charge_Factor_value" onfocus="focused(this)"
                                                                onfocusout="defocused(this)" name="charge+{{$key}}">
                                                     </div>
