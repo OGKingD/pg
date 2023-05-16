@@ -65,8 +65,8 @@
                                                     <i class="fa fa-mobile-alt" style="font-size: 15px;"></i>
                                                 </span>
                                                 <input id="flutterwave_ref" type="text" placeholder="Card Ref"
-                                                       class="form-control @error('flutterwave_ref') is-invalid @enderror"
-                                                       name="flutterwave_ref" value="{{ old('flutterwave_ref') }}"
+                                                       class="form-control @error('spay_ref') is-invalid @enderror"
+                                                       name="spay_ref" value="{{ old('spay_ref') }}"
                                                 >
 
                                             </div>
@@ -193,6 +193,24 @@
                                     </div>
 
                                 </div>
+
+                                <div class="col-lg-3 col-md-4 non_essential_summary_filter">
+                                    <div class="form-group">
+                                        <label for="email" class="col-form-label text-md-right">
+                                            {{__("Email")}}
+                                        </label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-mobile-alt" style="font-size: 15px;"></i>
+                                                </span>
+                                            <input id="email" type="email" placeholder="Email Address"
+                                                   class="form-control @error('email') is-invalid @enderror"
+                                                   name="email" value="{{ old('email') }}"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+
 
                                 <div class="col-lg-3 col-md-4">
                                     <div class="form-group">

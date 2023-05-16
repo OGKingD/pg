@@ -64,22 +64,27 @@ class Transaction extends Model
             'flutterwave_ref',
             'bank_transfer_ref',
             'gateway_id',
-            'user_id',
-            'invoice_no',
+            'transactions.user_id',
+            'transactions.invoice_no',
             'type',
-            'amount',
+            'transactions.amount',
             'fee',
             'total',
             'description',
-            'status',
+            'transactions.status',
             'flag',
             'details',
-            'created_at',
-            'updated_at'
+            'transactions.created_at',
+            'transactions.updated_at'
         ];
 
-        if (isset($query['flutterwave_ref'])) {
-            $queryArray[] = ['flutterwave_ref', '=', (string)($query['flutterwave_ref'])];
+        $builder = self::with(['invoice', 'gateway', 'user'])->select($columns_to_select);
+        if (isset($query['spay_ref'])) {
+            $queryArray[] = ['spay_ref', '=', (string)($query['spay_ref'])];
+        }
+        if (isset($query['email'])) {
+            $queryArray[] = ['invoices.customer_email', '=', (string)($query['email'])];
+            $builder->leftJoin('invoices','transactions.invoice_no',"=","invoices.invoice_no");
         }
 
         if (isset($query['bank_transfer_ref'])) {
@@ -108,7 +113,7 @@ class Transaction extends Model
             $queryArray[] = ['flag', '=', (string)($query['flag'])];
         }
         if (isset($query['user_id'])) {
-            $queryArray[] = ['user_id', '=', (string)($query['user_id'])];
+            $queryArray[] = ['transactions.user_id', '=', (string)($query['user_id'])];
         }
 
 
@@ -120,7 +125,6 @@ class Transaction extends Model
             $grp_by = $query['group_by'];
 
             unset($query['filename'], $query['group_by']);
-            $builder = "";
             $exclude_from_columns_to_select = ['end_date'];
             $columns_to_select = array_diff(array_keys($query), $exclude_from_columns_to_select);
             if ($grp_by === "gateway_id") {
@@ -162,7 +166,7 @@ class Transaction extends Model
             return $grp_by_query;
         }
 
-        $builder = self::with(['invoice', 'gateway', 'user'])->select($columns_to_select)->where($queryArray)->whereNotNull("invoice_no");
+        $builder = $builder->where($queryArray)->whereNotNull("transactions.invoice_no");
 
         info("Transaction Report Query parameters is :", $queryArray);
 

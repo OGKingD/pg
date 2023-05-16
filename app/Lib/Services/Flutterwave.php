@@ -49,6 +49,14 @@ class Flutterwave extends Rave
 
     }
 
+    public function verifyTansactionByRef($ref)
+    {
+        $url = $this->baseUrl.'/v3/transactions/verify_by_reference';
+        $payload = ['tx_ref' => $ref];
+
+        return $this->callEndpoint($url,"GET",$payload);
+    }
+
     public function callEndpoint($url,$httpVerb,$payload)
     {
         return Http::withHeaders([
