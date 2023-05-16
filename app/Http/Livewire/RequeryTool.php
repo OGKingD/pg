@@ -75,14 +75,30 @@ class RequeryTool extends Component
         if ($provider === "FLUTTERWAVE") {
 
             //check to see if transaction is not already successful;
-            $transactionExists = Transaction::firstWhere('flutterwave_ref', $trnx);
+            ////check to see if transaction is prefixed with RV_ or SPAY
+            $byTranxRef = false;
+            if (str_contains($trnx,"RV_") || str_contains($trnx,"SPAY")){
+                $transactionExists = Transaction::firstWhere('spay_ref',$trnx);
+                $byTranxRef = true;
+            }else{
+                $transactionExists = Transaction::firstWhere('flutterwave_ref',$trnx);
+            }
             if ($transactionExists && $transactionExists->status === "successful") {
                 $processTransaction = false;
                 $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
                 $this->messageType = "info";
             }
-            $flutterwave = (new Flutterwave(config('flutterwave.secret_key')))->verifyTransaction($trnx);
-
+            if (is_null($transactionExists)){
+                $processTransaction = false;
+                $this->message = "Transaction  : $trnx cannot be processed, transaction Not Found";
+                $this->messageType = "danger";
+            }
+            if ($byTranxRef){
+                $flutterwave = (new Flutterwave(config('flutterwave.secret_key')))->verifyTansactionByRef($trnx);
+            }
+            if (!$byTranxRef){
+                $flutterwave = (new Flutterwave(config('flutterwave.secret_key')))->verifyTransaction($trnx);
+            }
             if ($processTransaction) {
                 if (isset($flutterwave)) {
 
@@ -92,12 +108,8 @@ class RequeryTool extends Component
                     }
                     if (isset($flutterwave['data']['status'])){
                         if ( strtoupper($flutterwave['data']['status']) === "SUCCESSFUL"){
-                            $this->transactionDetails = array_merge($flutterwave,[
-                                "transaction_ref" => $flutterwave['data']['id'],
-                                "amount" => $flutterwave['data']['amount'],
-                                "date" => $flutterwave['data']['customer']['created_at'],
-                                "remarks" => $flutterwave['data']['processor_response'],
-                            ]);
+                            $transactionExists->update(["flutterwave_ref" => $flutterwave['data']['id']]);
+                            Http::withoutVerifying()->post("https://gateway.saanapay.ng/api/webhook/flutterwave", $flutterwave);
                         }
                     }
 
