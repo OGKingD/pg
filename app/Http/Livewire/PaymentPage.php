@@ -2,8 +2,9 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Settings;
 use Exception;
-use App\Lib\Services\{Flutterwave, Providus, Remita};
+use App\Lib\Services\{Flutterwave, NinePSB, Providus, Remita};
 use App\Models\DynamicAccount;
 use App\Models\Gateway;
 use App\Models\PaymentRequest;
@@ -90,7 +91,7 @@ class PaymentPage extends Component
             $amount = $this->merchantGateways[$this->activeTab]['invoiceTotal'];
 
 
-            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no, $this->invoice->customer_email);
+            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no, $this->invoice->customer_email,$this->invoice->name);
             $parsedResult = $response;
             if (str_contains($parsedResult, "jsonp")) {
                 $status = true;
@@ -147,47 +148,85 @@ class PaymentPage extends Component
      */
     public function generateVirtualAccountNumber(Providus $providus)
     {
-        $status = false;
-        $this->setActiveTab('banktransfer');
-        $accountName = "PROVIDUS BANK";
 
-        //check table to see if virtual Account Exists;
-        $virtualAcc = DynamicAccount::where('invoice_no', $this->invoice->invoice_no)->first();
-
-        //Add Payment Request;
-        $this->logPaymentRequest("bank transfer");
-
-
-        if ($virtualAcc) {
-            $status = true;
-            $this->virtualAccDetails = ["status" => $status, "accountNumber" => $virtualAcc->account_number, "accountName" => $virtualAcc->account_name, "bankName" => $accountName];
-
-        } else {
-            //call Providus or Db to generate Account Number;
-            //$result = (new Providus())->reserveAccount("SAANAPAY LIMITED","", "","","","");
-            $result = $providus->generateDynamicAccountNumber('SAANAPAY LIMITED', '');
-
-
-            if ($result->requestSuccessful) {
+        try {
+            $status = false;
+            $accountName = "";
+            $generateDynamic = "";
+            $this->setActiveTab('banktransfer');
+            $transferProvider = strtoupper(Settings::firstWhere("name", 'bank_transfer_provider')->value);
+            $result = null;//check table to see if virtual Account Exists;
+            $virtualAcc = DynamicAccount::firstWhere('invoice_no', $this->invoice->invoice_no);
+            if ($virtualAcc) {
                 $status = true;
-                //store details into table;
-                DynamicAccount::create(
-                    [
-                        'invoice_no' => $this->invoice->invoice_no,
-                        'account_number' => $result->account_number,
-                        'account_name' => $result->account_name,
-                        'initiationTranRef' => $result->initiationTranRef,
-                        'status' => 1
-                    ]
-                );
+                //check if virtual Account has expired;
+                if (Carbon::parse()->diffInHours($virtualAcc->updated_at)>= 1){
+                    //regenerate another account;
+                    $generateDynamic = true;
+                }
+                if (Carbon::parse()->diffInHours($virtualAcc->updated_at) < 1){
+                    $generateDynamic = false;
+                    $this->virtualAccDetails = ["status" => $status, "accountNumber" => $virtualAcc->account_number, "accountName" => $virtualAcc->account_name, "bankName" => $virtualAcc->bank_name , "endtime" => Carbon::parse($virtualAcc->updated_at)->addHours(1)];
+
+                }
 
             }
-            //failed call to providus return false
-            $this->virtualAccDetails = ["status" => $status, "accountNumber" => $result->account_number, "accountName" => $result->account_name, "bankName" => $accountName];
+            if ($generateDynamic) {
+
+                //Check provider for bank transfer
+                // Default;
+                if ($transferProvider !== "9PSB") { //call Providus or Db to generate Account Number;
+                    //$result = (new Providus())->reserveAccount("SAANAPAY LIMITED","", "","","","");
+                    $result = $providus->generateDynamicAccountNumber($this->invoice->invoice_no, '');
+                    $accountName = "PROVIDUS BANK";
+
+                }
+
+                // if provider = NINEPSB
+                if ($transferProvider === "9PSB") {
+                    $gateway = Gateway::where('name', "Bank Transfer")->get()->pluck("id", "name");
+                    $gateway_id = $gateway["Bank Transfer"];
+                    $transactionTotal = $this->invoice->transaction->computeChargeAndTotal($gateway_id);
+
+                    $result = (new NinePSB())->reserveDynamicAccount($this->invoice->invoice_no, $transactionTotal['total']);
+
+                    if ($result['status']) {
+                        $result = (object)$result['data'];
+                        $result->requestSuccessful = true;
+                        $accountName = "9PSB";
+
+                    }
+                }
+
+
+                if ($result->requestSuccessful) {
+                    $status = true;
+                    //store details into table;
+                    DynamicAccount::updateOrCreate(
+                        ['invoice_no' => $this->invoice->invoice_no],
+                        [
+                            'invoice_no' => $this->invoice->invoice_no,
+                            'account_number' => $result->account_number,
+                            'account_name' => $result->account_name,
+                            'bank_name' => $accountName,
+                            'initiationTranRef' => $result->initiationTranRef,
+                            'status' => 1
+                        ]
+                    );
+
+                }
+                $this->virtualAccDetails = ["status" => $status, "accountNumber" => $result->account_number, "accountName" => $result->account_name, "bankName" => $accountName, "endtime" => Carbon::parse()->addHours(1) ];
+
+            }
+        } catch (Exception $e) {
+            logger("Error Happened while trying to generate Dynamic Account Number : {$e->getMessage()} \n {$e->getTraceAsString()}");
+
+            $this->virtualAccDetails = ["status" => $status, "accountNumber" => null, "accountName" => null, "bankName" => $accountName];
 
         }
 
         $this->dispatchBrowserEvent('virtualAccountGenerated', $this->virtualAccDetails);
+
 
     }
 

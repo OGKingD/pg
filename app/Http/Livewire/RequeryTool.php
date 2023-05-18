@@ -51,7 +51,7 @@ class RequeryTool extends Component
 
                         //check if initiationTranRef is missing;
                         if (empty($providus->initiationTranRef)) {
-                            $this->message = "Transaction with settlementId : $providus->settlementId cannot be processed, initiationTranRef is Missing. Please Contact Providus to add initiationTranRef To Payload.";
+                            $this->message = "Transaction with settlementId : $providus->settlementId cannot be processed, initiationTranRef is Missing. Dynamic Account Expired when Payment was made.";
                             $this->messageType = "danger";
                         }
                         if (!empty($providus->initiationTranRef)) {

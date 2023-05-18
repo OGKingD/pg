@@ -158,7 +158,7 @@ class TransactionsPage extends Component
         if (isset($this->transactions)) {
             //collect Query and pass to Job to generate CSV Report;
             $csvHeader = ["Merchant Ref", "Gateway", 'Amount', 'Fee', 'Total', 'Description', 'Status', 'Flag', 'Date'];
-            info("search parameters for report generation :", $queryString);
+
             GenerateCsvReport::dispatch(Transaction::class, $queryString, $csvHeader, $user);
             $status = true;
         }
