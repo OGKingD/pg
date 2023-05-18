@@ -211,9 +211,8 @@ class WebhookController extends Controller
                         $processTransaction = false;
                         $responseMessage = "Transaction with settlementId : $transaction_status->settlementId cannot be processed, initiationTranRef is Missing ";
                     }
-                    if ($transaction_status->settlementId !== $request->settlementId){
+                    if ($transaction_status->settlementId === $request->settlementId){
                         $processTransaction = true;
-                        $responseMessage = "SettlmentId Mismatch ";
 
                     }
                 }
@@ -247,10 +246,6 @@ class WebhookController extends Controller
                         $company = company();
                         $wallet = $user->wallet;
                         $statusCode = 200;
-                        $transactionExists->update([
-                            'session_id' => $transaction_status->settlementId,
-                            'settlement_id' =>  $transaction_status->sessionId,
-                        ]);
 
 
                         //check if transaction is successful
@@ -280,6 +275,10 @@ class WebhookController extends Controller
                                 //update transaction
                                 $responseMessage = "successful";
                                 $requestSuccessful = true;
+                                $transactionExists->update([
+                                    'session_id' => $transaction_status->settlementId,
+                                    'settlement_id' =>  $transaction_status->sessionId,
+                                ]);
 
                                 DB::transaction(function () use ($details, $gateway_id, $transaction_status, $spTransaction, $wallet, $user, $company) {
                                     //update transaction fee and total;
