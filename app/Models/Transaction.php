@@ -394,9 +394,9 @@ class Transaction extends Model
                 $merchant,
                 $result->type,
                 $gatewayName,
-                number_format($result->successful_bills),
-                number_format($result->pending_bills),
-                number_format($result->failed_bills),
+                number_format($result->{$channel."_successful_bills"}),
+                number_format($result->{$channel."_pending_bills"}),
+                number_format($result->{$channel."_failed_bills"}),
                 0,
                 0,
                 number_format($result->{$channel."_total_successful_fees"},2),
@@ -516,7 +516,7 @@ class Transaction extends Model
                 "Merchant",
             ];
 
-            $builder = $builder->select(['user_id','type','gateway_id']);
+            $builder = $builder->where("type","!=","Wallet")->select(['user_id','type','gateway_id']);
 
             [$csvHeaders,$builder] = $this->summaryQueryWithGateways($gateways, $csvHeaders, $builder);
             $csvHeaders = [

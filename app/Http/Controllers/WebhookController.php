@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Lib\Services\Flutterwave;
+use App\Lib\Services\NinePSB;
 use App\Lib\Services\Providus;
 use App\Models\DynamicAccount;
 use App\Models\Gateway;
@@ -210,7 +211,7 @@ class WebhookController extends Controller
                         $processTransaction = false;
                         $responseMessage = "Transaction with settlementId : $transaction_status->settlementId cannot be processed, initiationTranRef is Missing ";
                     }
-                    if ($transaction_status->settlementId === $request->settlementId){
+                    if ($transaction_status->settlementId !== $request->settlementId){
                         $processTransaction = true;
                         $responseMessage = "SettlmentId Mismatch ";
 

@@ -495,10 +495,10 @@
                             @endif
 
                             <div id="genVirtualAccstep2" class=" text-center mt-4">
-                                <div class="col-lg-6 mx-auto card  ">
+                                <div class="col-lg-7 mx-auto card  ">
                                     <div class="card-body pt-4 text-center">
                                         @if(!empty($virtualAccDetails))
-                                            <h3 class=" mb-0 mt-2 up" id="bankName"> {{$virtualAccDetails['bankName']}}</h3>
+                                            <h3 class=" mb-0 mt-2 mb-4 up" id="bankName"> {{$virtualAccDetails['bankName']}}</h3>
                                             <h4 class=" mb-0 up"
                                                 id="bankAccount"> {{$virtualAccDetails['accountName']}} </h4>
                                             <h1 class=" mb-0 up"
@@ -508,7 +508,10 @@
 
 
                                         @if(!empty($virtualAccDetails) && $virtualAccDetails['status'])
-
+                                            <h6 class="bg-warning text-dark">Please do not save this Account Number as it expires in </h6>
+                                            <!-- HTML code for the countdown timer -->
+                                                <div id="countdown" class=" text-danger"></div>
+                                                <br>
                                             <span class="badge badge-lg d-block bg-gradient-dark mb-2 up" role="button"
                                                   onclick="copyTextToClipboard('bankAccountNumber')">
                                     <i class="fas fa-clipboard"></i>
@@ -660,7 +663,6 @@
 
                 let response = event.detail;
 
-                console.log(response);
 
                 let bankName = document.getElementById('bankName');
 
@@ -676,6 +678,11 @@
                     // document.getElementById('genVirtualAccstep1').style.display = "none";
                     document.getElementById('genVirtualAccstep2').style.display = "block";
 
+                    // Usage: Set the desired end time for the countdown
+                    const endTime = new Date(response.endtime).getTime();
+                    countdownTimer(endTime);
+
+
                 } else {
                     // document.getElementById('genVirtualAccstep1').style.display = "block";
                     document.getElementById('genVirtualAccstep2').style.display = "block";
@@ -687,6 +694,41 @@
 
 
             })
+
+            // JavaScript code for the countdown timer
+            function countdownTimer(endTime) {
+                const countdownElement = document.getElementById('countdown');
+
+                // Update the countdown every second
+                const timer = setInterval(updateCountdown, 1000);
+
+                function updateCountdown() {
+                    const currentTime = new Date().getTime();
+                    const distance = endTime - currentTime;
+
+                    // Check if the countdown is over
+                    if (distance <= 0) {
+                        clearInterval(timer);
+                        countdownElement.textContent = 'Countdown is over!';
+                        return;
+                    }
+
+                    // Calculate the remaining time
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    // Format the remaining time as a string
+                    const countdownString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+                    // Update the countdown element with the remaining time
+                    countdownElement.textContent = countdownString;
+                }
+
+                // Initial update to prevent delay
+                updateCountdown();
+            }
 
             function cardPayment(element) {
                 event.preventDefault();
