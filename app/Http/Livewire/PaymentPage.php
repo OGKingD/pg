@@ -484,7 +484,7 @@ class PaymentPage extends Component
         $user = $this->user;
         $wallet = $user->wallet;
         $transaction = $this->transaction;
-        info("Response for " . $this->cardDetails['flw_ref'], $response);
+        info("Response for " . $this->cardDetails['flw_ref']. json_encode($response));
 
         $details = ['status' => true, 'flag' => 'processing'];
         if (isset($response['data'])) {

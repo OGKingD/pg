@@ -166,6 +166,7 @@ class PaymentController extends Controller
                 'invoice_no' => 'INV' . $request_id,
                 'quantity' => 1,
                 'customer_email' => $request->email,
+                'customer_name' => $request->full_name,
                 'due_date' => Carbon::now()->addDays(7),
                 'amount' => $amount,
                 'name' => $request->name,
