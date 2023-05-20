@@ -210,6 +210,22 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-lg-3 col-md-4 non_essential_summary_filter">
+                                    <div class="form-group">
+                                        <label for="customer_name" class="col-form-label text-md-right">
+                                            {{__("Customer Name")}}
+                                        </label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-mobile-alt" style="font-size: 15px;"></i>
+                                                </span>
+                                            <input id="customer_name" type="customer_name" placeholder="Customer Name"
+                                                   class="form-control @error('customer_name') is-invalid @enderror"
+                                                   name="customer_name" value="{{ old('customer_name') }}"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
 
 
                                 <div class="col-lg-3 col-md-4">
@@ -381,6 +397,10 @@
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                                 data-sortable="">
+                                <a href="#" class="dataTable-sorter">Name</a>
+                            </th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Status</a>
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
@@ -424,6 +444,7 @@
                                 <td>&#{{nairaSymbol()}} {{number_format($val->fee,'2','.','')}}</td>
                                 <td>&#{{nairaSymbol()}} {{number_format($val->total,'2','.','')}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->invoice->customer_email ?? "N/A"}}</td>
+                                <td class="text-sm font-weight-normal">{{$val->invoice->customer_name ?? "N/A"}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->status}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->flag}}</td>
 

@@ -86,6 +86,10 @@ class Transaction extends Model
             $queryArray[] = ['invoices.customer_email', '=', (string)($query['email'])];
             $builder->leftJoin('invoices','transactions.invoice_no',"=","invoices.invoice_no");
         }
+        if (isset($query['customer_name'])) {
+            $queryArray[] = ['invoices.customer_name', 'like', '%'.(string)($query['customer_name']).'%'];
+            $builder->leftJoin('invoices','transactions.invoice_no',"=","invoices.invoice_no");
+        }
 
         if (isset($query['bank_transfer_ref'])) {
             $queryArray[] = ['bank_transfer_ref', '=', (string)($query['bank_transfer_ref'])];
