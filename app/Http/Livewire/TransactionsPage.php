@@ -113,6 +113,11 @@ class TransactionsPage extends Component
         if (empty($searchParams['group_by'])) {
             //build array for search;
             $query = array_filter($searchParams);
+            if (isset($query['merchant_transaction_ref'])){
+                if (strpos($query['merchant_transaction_ref'], "INV") === 0){
+                    $query['merchant_transaction_ref'] = substr($query['merchant_transaction_ref'],3,);
+                }
+            }
             unset($query['_token'], $query['customer_email']);
             $this->merchant_transaction_ref = $query['merchant_transaction_ref'] ?? null;
             $this->payment_status = $query['status'] ?? null;

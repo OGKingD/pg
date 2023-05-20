@@ -28,6 +28,11 @@ class RequestLogs extends Component
 
     public function render()
     {
+        if (isset($this->request_id)){
+            if (strpos($this->request_id, "INV") === 0){
+                $this->request_id = substr($this->request_id,3,);
+            }
+        }
 
         $this->perPage = ($this->perPage > 7000 ? 100: $this->perPage) ?? 20;
         $criteria = [
