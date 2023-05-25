@@ -494,24 +494,50 @@
                                 </div>
                             @endif
 
-                            <div id="genVirtualAccstep2" class=" text-center mt-4">
-                                <div class="col-lg-7 mx-auto card  ">
-                                    <div class="card-body pt-4 text-center">
+                            <div id="genVirtualAccstep2" class=" mt-4">
+                                <div class="col-10 mx-auto card  word-break ">
+                                    <div class="card-body pt-4 text-start ">
                                         @if(!empty($virtualAccDetails))
-                                            <h3 class=" mb-0 mt-2 mb-4 up" id="bankName"> {{$virtualAccDetails['bankName']}}</h3>
-                                            <h4 class=" mb-0 up"
-                                                id="bankAccount"> {{$virtualAccDetails['accountName']}} </h4>
-                                            <h1 class=" mb-0 up"
-                                                id="bankAccountNumber"> {{$virtualAccDetails['accountNumber']}}</h1>
+                                            <p class="fs-4  mb-0 mt-1 mb-2 ">
+                                                <b>Bank Name:   </b>
+                                                <span id="bankName" class="fs-5"> {{$virtualAccDetails['bankName']}} </span>
+                                            </p>
+                                            <p class="fs-4  mb-0 mt-1 mb-2 ">
+                                                <b>Account Number:   </b>
+                                                <span id="bankAccountNumber" class="fs-5">  {{$virtualAccDetails['accountNumber']}} </span>
+                                            </p>
+                                            <p class="fs-4  mb-0 mt-1 mb-2 ">
+                                                <b>Account Name:   </b>
+                                                <span id="bankAccount" class="fs-5">  {{$virtualAccDetails['accountName']}} </span>
+                                            </p>
+                                            <p class="fs-4  mb-0 mt-1 mb-2 ">
+                                                <b>Amount Payable:   </b>
+                                                <span class="text-success  text-bold fs-5">
+                                                    NGN {{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}
+                                                </span>
+                                            </p>
+
                                         @endif
                                         <br>
 
 
                                         @if(!empty($virtualAccDetails) && $virtualAccDetails['status'])
-                                            <h6 class="bg-warning text-dark">Please do not save this Account Number as it expires in </h6>
-                                            <!-- HTML code for the countdown timer -->
+                                            <div class="">
+                                                <span><b class="bg-info text-white">NOTE:</b></span>
+                                                <ul>
+                                                    <li> <b class="text-danger">Always ensure the Account name matches before making a transfer </b> </li>
+                                                    <li> <b class="text-danger">This is a one-off account number, do not save or re-use it</b> </li>
+                                                    <li> <b class="text-danger"> Due to delays on the banking networks, please allow time for our bank to acknowledge receipt. </b> </li>
+                                                    <li> <b class="text-danger">Ensure you complete your transfer within the period displayed by the timer below </b> </li>
+
+                                                </ul>
+                                            </div>
+                                            <div class="text-center">
+                                                <h6 class="bg-warning text-dark"> Account Number expires in </h6>
+                                                <!-- HTML code for the countdown timer -->
                                                 <div id="countdown" class=" text-danger"></div>
                                                 <br>
+                                            </div>
                                             <span class="badge badge-lg d-block bg-gradient-dark mb-2 up" role="button"
                                                   onclick="copyTextToClipboard('bankAccountNumber')">
                                     <i class="fas fa-clipboard"></i>
@@ -709,7 +735,15 @@
                     // Check if the countdown is over
                     if (distance <= 0) {
                         clearInterval(timer);
-                        countdownElement.textContent = 'Countdown is over!';
+                        countdownElement.textContent = 'Countdown is over! Account Number Expired';
+                        let bankName = document.getElementById('bankName');
+
+                        let bankAccount = document.getElementById('bankAccount');
+
+                        let bankAccountNumber = document.getElementById('bankAccountNumber');
+                        bankName.innerText = "N/A";
+                        bankAccount.innerText = "N/A";
+                        bankAccountNumber.innerText = "N/A";
                         return;
                     }
 

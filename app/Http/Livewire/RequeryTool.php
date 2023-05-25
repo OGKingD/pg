@@ -106,10 +106,15 @@ class RequeryTool extends Component
                         $this->message = "Transaction  : $trnx cannot be processed, " . $flutterwave['message'];
                         $this->messageType = "danger";
                     }
-                    if (isset($flutterwave['data']['status'])){
-                        if ( strtoupper($flutterwave['data']['status']) === "SUCCESSFUL"){
-                            $transactionExists->update(["flutterwave_ref" => $flutterwave['data']['id']]);
-                            Http::withoutVerifying()->post("https://gateway.saanapay.ng/api/webhook/flutterwave", $flutterwave);
+                    $payload = $flutterwave['data'];
+                    if (isset($payload['status'])){
+                        if ( strtoupper($payload['status']) === "SUCCESSFUL"){
+                            $this->transactionDetails = $flutterwave;
+                            $this->transactionDetails["transaction_ref"] = $payload['tx_ref'];
+                            $this->transactionDetails["amount"] = $payload['charged_amount'];
+                            $this->transactionDetails["date"] = $payload['created_at'];
+                            $this->transactionDetails["remarks"] = $payload['status'];
+
                         }
                     }
 

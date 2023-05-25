@@ -48,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
            Route::get('webhooks',[\App\Http\Controllers\WebhookController::class,'index'])->name('webhooks');
            Route::get("requestlogs",\App\Http\Livewire\RequestLogs::class)->name('request-logs');
            Route::get('requery_tool', \App\Http\Livewire\RequeryTool::class )->name('requery-tool');
+           Route::get('payment_resolution',\App\Http\Livewire\PaymentResolution::class)->name('payment_resolution');
 
        });
 
