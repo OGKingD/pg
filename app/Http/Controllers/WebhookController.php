@@ -45,7 +45,7 @@ class WebhookController extends Controller
             $statusCode = 406;
 
             if (isset($data['id'])) {
-                $flutterwaveId = $data['id'];
+                $flutterwaveId = $data['tx_ref'];
                 $settlementId = $flutterwaveId;
                 if (isset($data['fullname']) && !isset($data['full_name'])) {
                     $data['full_name'] = $data['fullname'];
@@ -53,13 +53,13 @@ class WebhookController extends Controller
 
                 // check if id exist on flutter and reference belonngs to saana;
                 $flwave = new Flutterwave(config('flutterwave.secret_key'));
-                $fromFlutterwave = $flwave->verifyTransaction($flutterwaveId);
+                $fromFlutterwave = $flwave->verifyTansactionByRef($flutterwaveId);
                 info("Transaction Verified :",$fromFlutterwave);
                 $responseMessage = "Transaction Not Found on Flutterwave!";
 
                 /** @var array $flwavePayload */
                 $flwavePayload = $fromFlutterwave['data'];
-                if (isset($flwavePayload['id'])) {
+                if (isset($flwavePayload['tx_ref'])) {
 
                     $responseMessage = "Processing";
                     $payment_provider_message = $flwavePayload['flw_ref'] . " " . $flwavePayload['processor_response'];
@@ -69,7 +69,7 @@ class WebhookController extends Controller
 
                     //check if transaction Exists on Saanapay
                     /** @var Transaction $transactionExists */
-                    $transactionExists = Transaction::where("flutterwave_ref", $flwavePayload['id'])->first();
+                    $transactionExists = Transaction::where("spay_ref", $flwavePayload['tx_ref'])->first();
 
                     if (is_null($transactionExists)){
 
@@ -111,6 +111,7 @@ class WebhookController extends Controller
                                 $details = array_merge($flwavePayload['customer'], [
                                     "narration" => $flwavePayload['narration'],
                                     "tx_ref" => $flwavePayload['tx_ref'],
+                                    "id" => $flwavePayload['id'],
                                     "ip" => $flwavePayload['ip'],
                                     "payment_type" => $flwavePayload['payment_type']
                                 ]);
@@ -119,6 +120,9 @@ class WebhookController extends Controller
 
                                     $responseMessage = "successful";
                                     $requestSuccessful = true;
+                                    $transactionExists->update([
+                                        "flutterwave_ref" => $flwavePayload['id']
+                                    ]);
 
                                     DB::transaction(function () use ($details, $gateway_id, $payment_provider_message, $transactionExists, $wallet, $user, $company) {
 
