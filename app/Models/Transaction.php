@@ -391,7 +391,7 @@ class Transaction extends Model
         $body = [];
 
         if ($type === "default"){
-            $this->grandTotalSummation($summationArray, $grandTotalArray);
+            $grandTotalArray = $this->grandTotalSummation($summationArray, $grandTotalArray);
 
             $merchant = "";
             if ($currentMerchant !== $result->user_id){
@@ -522,7 +522,7 @@ class Transaction extends Model
             ];
             fputcsv($file, $body);
 
-            $this->grandTotalSummation($summationArray, $grandTotalArray);
+            $grandTotalArray = $this->grandTotalSummation($summationArray, $grandTotalArray);
             $body2 = [
                 'GRAND TOTAL',
                 '',
@@ -686,7 +686,7 @@ class Transaction extends Model
      * @param array $summationArray
      * @param $grandTotalArray
      */
-    public function grandTotalSummation(array $summationArray, $grandTotalArray): void
+    public function grandTotalSummation(array $summationArray, $grandTotalArray)
     {
         $grandTotalArray["successful_bills"] += $summationArray["successful_bills"];
         $grandTotalArray["pending_bills"] += $summationArray["pending_bills"];
@@ -694,5 +694,6 @@ class Transaction extends Model
         $grandTotalArray["total_successful_fees"] += $summationArray["total_successful_fees"];
         $grandTotalArray["total_successful_amount"] += $summationArray["total_successful_amount"];
         $grandTotalArray["total_successful"] += $summationArray["total_successful"];
+        return $grandTotalArray;
     }
 }
