@@ -42,9 +42,11 @@
 
                                                                 <option value="">Choose Provider</option>
 
+                                                                <option value="flutterwave">FLUTTERWAVE
+                                                                </option>
                                                                 <option value="providus">PROVIDUS
                                                                 </option>
-                                                                <option value="flutterwave">FLUTTERWAVE
+                                                                <option value="9psb">9PSB
                                                                 </option>
 
                                                             </select>
@@ -142,6 +144,14 @@
                             @endif
                             @if(strtoupper($messageType) === "INFO")
                                 <div class="alert alert-info alert-dismissible text-white " role="alert">
+                                    {{$message}}
+                                    <button type="button" class="btn-close text-lg py-3 opacity-10" data-bs-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            @endif
+                            @if(strtoupper($messageType) === "WARNING")
+                                <div class="alert alert-warning alert-dismissible text-white " role="alert">
                                     {{$message}}
                                     <button type="button" class="btn-close text-lg py-3 opacity-10" data-bs-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">×</span>

@@ -42,9 +42,11 @@
 
                                                                 <option value="">Choose Provider</option>
 
-                                                                <option value="1">Card
+                                                                <option value="1">FLUTTERWAVE
                                                                 </option>
-                                                                <option value="2">Bank Transfer
+                                                                <option value="2">PROVIDUS
+                                                                </option>
+                                                                <option value="3">9PSB
                                                                 </option>
 
                                                             </select>

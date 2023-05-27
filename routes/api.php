@@ -38,5 +38,6 @@ Route::middleware(['terminate'])->group(function () {
     Route::prefix("webhook")->group(function (){
         Route::post('flutterwave',[WebhookController::class,'flutterwave'])->name('webhook.flutterwave');
         Route::post('providus',[WebhookController::class,'providusSettlement']);
+        Route::post('ninepsbvirtual',[WebhookController::class,'ninePsbSettlement'])->name('webhook.nine-psb-settlement');
     });
 });

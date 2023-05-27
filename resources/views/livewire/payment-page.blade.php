@@ -498,19 +498,19 @@
                                 <div class="col-10 mx-auto card  word-break ">
                                     <div class="card-body pt-4 text-start ">
                                         @if(!empty($virtualAccDetails))
-                                            <p class="fs-4  mb-0 mt-1 mb-2 ">
+                                            <p class="fs-4 mb-2 ">
                                                 <b>Bank Name:   </b>
-                                                <span id="bankName" class="fs-5"> {{$virtualAccDetails['bankName']}} </span>
+                                                <span id="bankName" class="fs-5 text-bold"> {{$virtualAccDetails['bankName']}} </span>
                                             </p>
-                                            <p class="fs-4  mb-0 mt-1 mb-2 ">
+                                            <p class="fs-4  mt-1 mb-2 ">
                                                 <b>Account Number:   </b>
-                                                <span id="bankAccountNumber" class="fs-5">  {{$virtualAccDetails['accountNumber']}} </span>
+                                                <span id="bankAccountNumber" class="fs-5 text-bold">  {{$virtualAccDetails['accountNumber']}} </span>
                                             </p>
-                                            <p class="fs-4  mb-0 mt-1 mb-2 ">
+                                            <p class="fs-4  mt-1 mb-2 ">
                                                 <b>Account Name:   </b>
-                                                <span id="bankAccount" class="fs-5">  {{$virtualAccDetails['accountName']}} </span>
+                                                <span id="bankAccount" class="fs-5 text-bold" >  {{$virtualAccDetails['accountName']}} </span>
                                             </p>
-                                            <p class="fs-4  mb-0 mt-1 mb-2 ">
+                                            <p class="fs-4  mt-1 mb-2 ">
                                                 <b>Amount Payable:   </b>
                                                 <span class="text-success  text-bold fs-5">
                                                     NGN {{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}
@@ -525,10 +525,10 @@
                                             <div class="">
                                                 <span><b class="bg-info text-white">NOTE:</b></span>
                                                 <ul>
-                                                    <li> <b class="text-danger">Always ensure the Account name matches before making a transfer </b> </li>
-                                                    <li> <b class="text-danger">This is a one-off account number, do not save or re-use it</b> </li>
-                                                    <li> <b class="text-danger"> Due to delays on the banking networks, please allow time for our bank to acknowledge receipt. </b> </li>
-                                                    <li> <b class="text-danger">Ensure you complete your transfer within the period displayed by the timer below </b> </li>
+                                                    <li class="mt-3 mb-2"> <b class="text-danger">Always ensure the Account name matches before making a transfer </b> </li>
+                                                    <li class="mt-3 mb-2"> <b class="text-danger">This is a one-off account number, do not save or re-use it</b> </li>
+                                                    <li class="mt-3 mb-2"> <b class="text-danger"> Due to delays on the banking networks, please wait 15 minutes for our bank to acknowledge receipt. </b> </li>
+                                                    <li class="mt-3 mb-2"> <b class="text-danger">Ensure you complete your transfer within the period displayed by the timer below </b> </li>
 
                                                 </ul>
                                             </div>
@@ -735,7 +735,7 @@
                     // Check if the countdown is over
                     if (distance <= 0) {
                         clearInterval(timer);
-                        countdownElement.textContent = 'Countdown is over! Account Number Expired';
+                        countdownElement.textContent = 'Countdown is over! Account Number Expired, Please Reload Page';
                         let bankName = document.getElementById('bankName');
 
                         let bankAccount = document.getElementById('bankAccount');
@@ -754,10 +754,8 @@
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
                     // Format the remaining time as a string
-                    const countdownString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-
                     // Update the countdown element with the remaining time
-                    countdownElement.textContent = countdownString;
+                    countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
                 }
 
                 // Initial update to prevent delay
