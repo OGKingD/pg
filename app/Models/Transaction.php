@@ -201,22 +201,32 @@ class Transaction extends Model
         $result = $this->summaryReportQuery($groupBy, $file, $builder);
         $sql = $result['query'];
         $gateways = $result['gateways'];
-        $csvHeaders = $result['csvHeaders'];
 
-        $this->writeSummaryReport($groupBy,$sql,$payload,$file,$csvHeaders,$gateways);
+        $this->writeSummaryReport($groupBy,$sql,$payload,$file,$gateways);
 
         fclose($file);
 
     }
 
-    public function writeSummaryReport($type,$query,$payload,$file,$csvHeaders, $gateways)
+    public function writeSummaryReport($type,$query,$payload,$file, $gateways)
     {
-        queryWithDateRange($payload, $query)->chunk(100,function ($results) use ($file,$type,$csvHeaders,$gateways){
+
+        queryWithDateRange($payload, $query)->chunk(100,function ($results) use ($file,$type,$gateways){
             $currentMerchant = 0;
-            foreach ($results as $result) {
-                $currentMerchant = $this->generateContentForReport($type, $result, $file,$csvHeaders, $gateways, $currentMerchant);
+            $summationArray = [
+                "successful_bills" => 0,"pending_bills" => 0,"failed_bills" => 0,"total_successful_fees" => 0,"total_successful_amount" => 0,
+                "total_successful" => 0,
+            ];
+            $grandTotalArray = [
+                "successful_bills" => 0,"pending_bills" => 0,"failed_bills" => 0,"total_successful_fees" => 0,"total_successful_amount" => 0,
+                "total_successful" => 0,
+            ];
+            $noOfIterations = count($results);
+            foreach ($results as $key => $result) {
+                [ $currentMerchant,$summationArray ] = $this->generateContentForReport($type, $result, $file, $gateways,$summationArray,$grandTotalArray, $currentMerchant, $key, $noOfIterations);
             }
         });
+
 
     }
 
@@ -375,21 +385,53 @@ class Transaction extends Model
      * @param  Transaction$result
      * @param resource $file
      */
-    public function generateContentForReport($type, Transaction $result, $file,$csvHeaders, $gateways, $currentMerchant)
+    public function generateContentForReport($type, Transaction $result, $file, $gateways, $summationArray, $grandTotalArray, $currentMerchant, $counter, $noOfIterations)
     {
         $username = isset($result->user) ? $result->user->first_name . " " . $result->user->last_name : "N/A";
         $body = [];
 
         if ($type === "default"){
+            $this->grandTotalSummation($summationArray, $grandTotalArray);
+
             $merchant = "";
             if ($currentMerchant !== $result->user_id){
                 $merchant = $username;
+
+                $body = [
+                    'TOTAL',
+                    '',
+                    '',
+                    number_format($summationArray['successful_bills']),
+                    number_format($summationArray['pending_bills']),
+                    number_format($summationArray['failed_bills']),
+                    0,
+                    0,
+                    number_format($summationArray['total_successful_fees']),
+                    0,
+                    number_format($summationArray['total_successful_amount']),
+                    number_format($summationArray['total_successful']),
+                    0,
+                    number_format($summationArray['total_successful_amount']),
+                ];
+                if ($currentMerchant !== 0){
+                    fputcsv($file, $body);
+                    fputcsv($file,['','', '', '', '', '', 0, 0, '', 0, '', '', 0, '',]);
+
+                }
+
+                //reset footer;
+                $summationArray = [
+                    "successful_bills" => 0,"pending_bills" => 0,"failed_bills" => 0,"total_successful_fees" => 0,"total_successful_amount" => 0,
+                    "total_successful" => 0,
+                ];
+
             }
 
             $currentMerchant = $result->user_id;
             $channel = "N/A";
             $gatewayName = "N/A";
-           if (isset($result->gateway)){
+
+            if (isset($result->gateway)){
                $channel =  strtolower(str_replace(" ", "_", $result->gateway->name));
                $gatewayName = $result->gateway->name;
            }
@@ -413,6 +455,12 @@ class Transaction extends Model
 
             ];
 
+           $summationArray["successful_bills"] += $result->{$channel."_successful_bills"};
+           $summationArray["pending_bills"] += $result->{$channel."_pending_bills"};
+           $summationArray["failed_bills"] += $result->{$channel."_failed_bills"};
+           $summationArray["total_successful_fees"] += $result->{$channel."_total_successful_fees"};
+           $summationArray["total_successful_amount"] += $result->{$channel."_total_successful_amount"};
+           $summationArray["total_successful"] += $result->{$channel."_total_successful"};
 
         }
 
@@ -455,7 +503,49 @@ class Transaction extends Model
 
         //Set the Content;
         fputcsv($file, $body);
-        return $currentMerchant;
+        if ($counter === $noOfIterations - 1){
+            $body = [
+                'TOTAL',
+                '',
+                '',
+                number_format($summationArray['successful_bills']),
+                number_format($summationArray['pending_bills']),
+                number_format($summationArray['failed_bills']),
+                0,
+                0,
+                number_format($summationArray['total_successful_fees']),
+                0,
+                number_format($summationArray['total_successful_amount']),
+                number_format($summationArray['total_successful']),
+                0,
+                number_format($summationArray['total_successful_amount']),
+            ];
+            fputcsv($file, $body);
+
+            $this->grandTotalSummation($summationArray, $grandTotalArray);
+            $body2 = [
+                'GRAND TOTAL',
+                '',
+                '',
+                number_format($grandTotalArray['successful_bills']),
+                number_format($grandTotalArray['pending_bills']),
+                number_format($grandTotalArray['failed_bills']),
+                0,
+                0,
+                number_format($grandTotalArray['total_successful_fees']),
+                0,
+                number_format($grandTotalArray['total_successful_amount']),
+                number_format($grandTotalArray['total_successful']),
+                0,
+                number_format($grandTotalArray['total_successful_amount']),
+            ];
+            fputcsv($file,['','', '', '', '', '', 0, 0, '', 0, '', '', 0, '',]);
+            fputcsv($file, $body2);
+
+
+        }
+
+        return [$currentMerchant,$summationArray];
     }
 
     /**
@@ -590,5 +680,19 @@ class Transaction extends Model
             selectRaw("SUM(CASE WHEN status = 'failed' AND gateway_id = $gateway->id  THEN total end) as {$channel}_total_failed");
         }
         return array($csvHeaders, $builder);
+    }
+
+    /**
+     * @param array $summationArray
+     * @param $grandTotalArray
+     */
+    public function grandTotalSummation(array $summationArray, $grandTotalArray): void
+    {
+        $grandTotalArray["successful_bills"] += $summationArray["successful_bills"];
+        $grandTotalArray["pending_bills"] += $summationArray["pending_bills"];
+        $grandTotalArray["failed_bills"] += $summationArray["failed_bills"];
+        $grandTotalArray["total_successful_fees"] += $summationArray["total_successful_fees"];
+        $grandTotalArray["total_successful_amount"] += $summationArray["total_successful_amount"];
+        $grandTotalArray["total_successful"] += $summationArray["total_successful"];
     }
 }
