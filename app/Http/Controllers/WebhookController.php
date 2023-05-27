@@ -45,7 +45,7 @@ class WebhookController extends Controller
             $statusCode = 406;
 
             if (isset($data['id'])) {
-                $flutterwaveId = $data['id'];
+                $flutterwaveId = $data['tx_ref'];
                 $settlementId = $flutterwaveId;
                 if (isset($data['fullname']) && !isset($data['full_name'])) {
                     $data['full_name'] = $data['fullname'];
@@ -53,13 +53,13 @@ class WebhookController extends Controller
 
                 // check if id exist on flutter and reference belonngs to saana;
                 $flwave = new Flutterwave(config('flutterwave.secret_key'));
-                $fromFlutterwave = $flwave->verifyTransaction($flutterwaveId);
+                $fromFlutterwave = $flwave->verifyTansactionByRef($flutterwaveId);
                 info("Transaction Verified :",$fromFlutterwave);
                 $responseMessage = "Transaction Not Found on Flutterwave!";
 
                 /** @var array $flwavePayload */
                 $flwavePayload = $fromFlutterwave['data'];
-                if (isset($flwavePayload['id'])) {
+                if (isset($flwavePayload['tx_ref'])) {
 
                     $responseMessage = "Processing";
                     $payment_provider_message = $flwavePayload['flw_ref'] . " " . $flwavePayload['processor_response'];
@@ -69,7 +69,7 @@ class WebhookController extends Controller
 
                     //check if transaction Exists on Saanapay
                     /** @var Transaction $transactionExists */
-                    $transactionExists = Transaction::where("flutterwave_ref", $flwavePayload['id'])->first();
+                    $transactionExists = Transaction::where("spay_ref", $flwavePayload['tx_ref'])->first();
 
                     if (is_null($transactionExists)){
 
@@ -111,6 +111,7 @@ class WebhookController extends Controller
                                 $details = array_merge($flwavePayload['customer'], [
                                     "narration" => $flwavePayload['narration'],
                                     "tx_ref" => $flwavePayload['tx_ref'],
+                                    "id" => $flwavePayload['id'],
                                     "ip" => $flwavePayload['ip'],
                                     "payment_type" => $flwavePayload['payment_type']
                                 ]);
@@ -119,6 +120,9 @@ class WebhookController extends Controller
 
                                     $responseMessage = "successful";
                                     $requestSuccessful = true;
+                                    $transactionExists->update([
+                                        "flutterwave_ref" => $flwavePayload['id']
+                                    ]);
 
                                     DB::transaction(function () use ($details, $gateway_id, $payment_provider_message, $transactionExists, $wallet, $user, $company) {
 
@@ -358,14 +362,13 @@ class WebhookController extends Controller
         $userRef = "";
 
 
-        info("request from {$request->ip()} is ", $data);
+        info("9PSB request from {$request->ip()} is ", $data);
 
         try {
-            if (isset($settlementId)) {
+            if (isset($sessionId)) {
                 // query for the status of the transaction to really be sure that the payment was made
-                $transaction_status = (object)$ninePsb->transactionStatusDynamicAccount($settlementId);
-                info("call 9PSB to get transaction $settlementId status.", (array)$transaction_status);
-                $processTransaction = false;
+                $transaction_status = (object)$ninePsb->transactionStatusDynamicAccount($sessionId);
+                info("call 9PSB to get transaction $sessionId status.", (array)$transaction_status);
 
                 if ($transaction_status->status){
                     $gateway = Gateway::where('name', "Bank Transfer")->get()->pluck("id", "name");
@@ -421,26 +424,20 @@ class WebhookController extends Controller
                             if ($transaction_status->payment === "successful") { //make sure amount equal to or greater than transaction amount;
                                 if ($transaction_status->data['order']['amount'] >= $spTransaction->total) {
 
-                                    $details = [
-                                        "initiationTranRef" => $transaction_status->data["transaction"]['linkingreference'],
-                                        //    "sourceAccountNumber" => $transaction_status->sourceAccountNumber,
-                                        //    "sourceBankName" => $transaction_status->sourceBankName,
-                                        "settlementId" => $settlementId,
-                                        "sessionId" => $sessionId,
-                                    ];
+                                    $details = $transaction_status->data['customer']['account'];
 
                                     //update transaction
                                     $responseMessage = "successful";
                                     $requestSuccessful = true;
 
-                                    DB::transaction(function () use ($details, $gateway_id, $transaction_status, $spTransaction, $wallet, $user, $company) {
+                                    DB::transaction(function () use ($details, $gateway_id, $transaction_status, $spTransaction, $wallet, $user, $company, $settlementId) {
                                         //update transaction fee and total;
                                         $spTransaction->update([
                                             'total' => $transaction_status->data['order']['amount'],
                                             'fee' => $transaction_status->data['order']['amount'] - $spTransaction->amount,
-                                            'bank_transfer_ref' => $transaction_status->data['transaction']['linkingreference']
+                                            'bank_transfer_ref' => $settlementId
                                         ]);
-                                        $spTransaction->handleSuccessfulPayment($spTransaction, $gateway_id, $transaction_status->tranRemarks, $details, $wallet, $user, $company);
+                                        $spTransaction->handleSuccessfulPayment($spTransaction, $gateway_id, $transaction_status->message, $details, $wallet, $user, $company);
 
                                     });
 
@@ -466,7 +463,7 @@ class WebhookController extends Controller
             }
             logger("Webhook Response for $request->settlementId",[
                 "requestSuccessful"=> $requestSuccessful,
-                "settlementId"=> $request->settlementId,
+                "settlementId"=> $settlementId,
                 "responseMessage"=> $responseMessage,
                 "responseCode"=> $responseCode
             ]);

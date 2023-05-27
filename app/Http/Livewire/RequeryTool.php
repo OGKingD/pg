@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Lib\Services\Flutterwave;
+use App\Lib\Services\NinePSB;
 use App\Lib\Services\Providus;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Http;
@@ -72,6 +73,49 @@ class RequeryTool extends Component
             }
 
         }
+        if ($provider === "9PSB") {
+            //check to see if transaction is not already successful;
+            $transactionExists = Transaction::firstWhere('bank_transfer_ref', $trnx);
+
+            if ($transactionExists && $transactionExists->status === "successful") {
+                $processTransaction = false;
+                $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
+                $this->messageType = "info";
+            }
+
+            if ($processTransaction) {
+                //call providus to get transaction details;
+                /** @var object $providus */
+                $ninePsb = (new NinePSB())->transactionStatusDynamicAccount($trnx);
+
+                if ($ninePsb['status']) {
+                    //check for PENDING;
+                    $paymentStatus = strtoupper($ninePsb['payment']);
+
+                    if ($paymentStatus === "PENDING"){
+                        $this->message = "Transaction  : $trnx cannot be processed, {$ninePsb['message']}";
+                        $this->messageType = "warning";
+                    }
+
+                   if ($paymentStatus !==  "PENDING"){
+                       $this->transactionDetails = [
+                           "transaction_ref" => $ninePsb['data']['transaction']['linkingreference'],
+                           "amount" => $ninePsb['data']['order']['amount'],
+                           "date" => $ninePsb['data']['transaction']['date'],
+                           "remarks" => $ninePsb['message'],
+                       ];
+                       $this->transactionDetails = array_merge($this->transactionDetails,$ninePsb['data']);
+
+                   }
+
+                }
+                if (!$ninePsb['status']) {
+                    $this->message = "Transaction  : $trnx cannot be processed, {$ninePsb['message']}";
+                    $this->messageType = "danger";
+                }
+            }
+
+        }
         if ($provider === "FLUTTERWAVE") {
 
             //check to see if transaction is not already successful;
@@ -106,10 +150,15 @@ class RequeryTool extends Component
                         $this->message = "Transaction  : $trnx cannot be processed, " . $flutterwave['message'];
                         $this->messageType = "danger";
                     }
-                    if (isset($flutterwave['data']['status'])){
-                        if ( strtoupper($flutterwave['data']['status']) === "SUCCESSFUL"){
-                            $transactionExists->update(["flutterwave_ref" => $flutterwave['data']['id']]);
-                            Http::withoutVerifying()->post("https://gateway.saanapay.ng/api/webhook/flutterwave", $flutterwave);
+                    $payload = $flutterwave['data'];
+                    if (isset($payload['status'])){
+                        if ( strtoupper($payload['status']) === "SUCCESSFUL"){
+                            $this->transactionDetails = $flutterwave;
+                            $this->transactionDetails["transaction_ref"] = $payload['tx_ref'];
+                            $this->transactionDetails["amount"] = $payload['charged_amount'];
+                            $this->transactionDetails["date"] = $payload['created_at'];
+                            $this->transactionDetails["remarks"] = $payload['status'];
+
                         }
                     }
 
@@ -150,10 +199,20 @@ class RequeryTool extends Component
             }
         }
 
+        if ( $provider === "9PSB"){
+            //call repush API;
+            Http::withoutVerifying()->post(route('webhook.nine-psb-settlement'), $this->transactionDetails)->json();
+
+            $this->message = "Transaction  $this->transaction_ref Pushed for requery!";
+            $this->messageType = "success";
+            $this->dispatchBrowserEvent('alertBox', ['type' => 'success', 'message' => $this->message]);
+
+        }
+
         if ($provider === "FLUTTERWAVE"){
 
             //push to webhook;
-            $response = Http::withoutVerifying()->post(route('webhook.flutterwave'), $this->transactionDetails)->json();
+            Http::withoutVerifying()->post(route('webhook.flutterwave'), $this->transactionDetails)->json();
 
 
             $this->message = "Transaction  $this->transaction_ref Pushed for requery!";

@@ -10,7 +10,7 @@
                                 <div class="card-header border-0">
                                     <div class="row align-items-center">
                                         <div class="col text-center">
-                                            <h3 class="mb-0"><i class="fa fa-recycle"></i> Requery Tool</h3>
+                                            <h3 class="mb-0"><i class="fa fa-recycle"></i> Resolution Tool</h3>
                                         </div>
 
                                     </div>
@@ -24,8 +24,8 @@
                                             <div class="row">
                                                 <div class="col-lg-4 col-md-4">
                                                     <div class="form-group">
-                                                        <label for="provider" class=" col-form-label text-md-right">
-                                                            {{ __('Payment Provider') }}
+                                                        <label for="channel" class=" col-form-label text-md-right">
+                                                            {{ __('Payment Channel') }}
                                                         </label>
 
                                                         <div class="input-group mb-3">
@@ -36,17 +36,17 @@
                                                             </div>
 
 
-                                                            <select id="provider" title="Choose a Status" wire:model="provider"
+                                                            <select id="channel" title="Choose a Status" wire:model="channel"
                                                                     data-style="btn border" class=" form-control"
-                                                                    name="provider" required>
+                                                                    name="channel" required>
 
                                                                 <option value="">Choose Provider</option>
 
-                                                                <option value="flutterwave">FLUTTERWAVE
+                                                                <option value="1">FLUTTERWAVE
                                                                 </option>
-                                                                <option value="providus">PROVIDUS
+                                                                <option value="2">PROVIDUS
                                                                 </option>
-                                                                <option value="9psb">9PSB
+                                                                <option value="3">9PSB
                                                                 </option>
 
                                                             </select>
@@ -95,37 +95,14 @@
 
                             </div>
 
-
-
-                            @if($transactionDetails)
-                                <table class="table table-hover" style=" white-space: break-spaces !important;">
-                                    <thead>
-                                    <tr class="table-info">
-                                        <th>Transaction Ref</th>
-                                        <th>Amount</th>
-                                        <th style="white-space: break-spaces !important;">Remarks</th>
-                                        <th>Date</th>
-                                        <th></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>{{$transactionDetails['transaction_ref']}}</td>
-                                        <td>{{$transactionDetails['amount']}}</td>
-                                        <td>{{$transactionDetails['remarks']}}</td>
-                                        <td>{{$transactionDetails['date']}}</td>
-                                        <td>
-
-                                            <button  class="btn btn-success btn-sm" onclick="showProcessing('Initializing {{$transaction_ref}}',this)" wire:click="requery"> Requery </button>
-                                        </td>
-
-                                    </tr>
-
-                                    </tbody>
-                                </table>
-
+                            @if(strtoupper($messageType) === "WARNING")
+                                <div class="alert alert-warning alert-dismissible text-black " role="alert">
+                                    {!! $message !!}
+                                    <button type="button" class="btn-close text-lg py-3 opacity-10" data-bs-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
                             @endif
-
                             @if(strtoupper($messageType) === "DANGER")
                                 <div class="alert alert-danger alert-dismissible text-white " role="alert">
                                     {{$message}}
@@ -144,14 +121,6 @@
                             @endif
                             @if(strtoupper($messageType) === "INFO")
                                 <div class="alert alert-info alert-dismissible text-white " role="alert">
-                                    {{$message}}
-                                    <button type="button" class="btn-close text-lg py-3 opacity-10" data-bs-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            @endif
-                            @if(strtoupper($messageType) === "WARNING")
-                                <div class="alert alert-warning alert-dismissible text-white " role="alert">
                                     {{$message}}
                                     <button type="button" class="btn-close text-lg py-3 opacity-10" data-bs-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">×</span>
@@ -178,9 +147,9 @@
 
             function showProcessing(message,element) {
                 if ($(element).attr('id') === "getTransaction"){
-                    //check to make sure ref and provider is selected
-                    if ( $("#provider").val() === ""){
-                        salert("Warning", "Please Choose A Provider",'warning');
+                    //check to make sure ref and channel is selected
+                    if ( $("#channel").val() === ""){
+                        salert("Warning", "Please Choose A Channel",'warning');
                         return;
                     }
                     if ($("#transaction_ref").val() === ""){
@@ -197,3 +166,5 @@
 
 
 </div>
+
+

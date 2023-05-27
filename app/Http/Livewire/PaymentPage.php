@@ -152,7 +152,7 @@ class PaymentPage extends Component
         try {
             $status = false;
             $accountName = "";
-            $generateDynamic = "";
+            $generateDynamic = true;
             $this->setActiveTab('banktransfer');
             $transferProvider = strtoupper(Settings::firstWhere("name", 'bank_transfer_provider')->value);
             $result = null;//check table to see if virtual Account Exists;
@@ -188,12 +188,13 @@ class PaymentPage extends Component
                     $gateway_id = $gateway["Bank Transfer"];
                     $transactionTotal = $this->invoice->transaction->computeChargeAndTotal($gateway_id);
 
-                    $result = (new NinePSB())->reserveDynamicAccount($this->invoice->invoice_no, $transactionTotal['total']);
+                    $result = (object)(new NinePSB())->reserveDynamicAccount($this->invoice->invoice_no, $transactionTotal['total']);
+                    $result->requestSuccessful = false;
 
-                    if ($result['status']) {
-                        $result = (object)$result['data'];
+                    if ($result->status) {
+                        $result = (object)$result->data;
                         $result->requestSuccessful = true;
-                        $accountName = "9PSB";
+                        $accountName = "9 Payment Service Bank (9PSB)";
 
                     }
                 }
@@ -215,7 +216,7 @@ class PaymentPage extends Component
                     );
 
                 }
-                $this->virtualAccDetails = ["status" => $status, "accountNumber" => $result->account_number, "accountName" => $result->account_name, "bankName" => $accountName, "endtime" => Carbon::parse()->addHours(1) ];
+                $this->virtualAccDetails = ["status" => $status, "accountNumber" => $result->account_number ?? "N/A", "accountName" => $result->account_name ?? "N/A", "bankName" => $accountName, "endtime" => Carbon::parse()->addHours(1) ];
 
             }
         } catch (Exception $e) {

@@ -237,9 +237,9 @@
                                             <span class="input-group-text">
                                                     <i class="fa fa-calendar-alt" style="font-size: 15px;"></i>
                                                 </span>
-                                            <input id="created_at" type="date" placeholder="yyyy-mm-dd"
-                                                   class="datechk form-control @error('created_at') is-invalid @enderror"
-                                                   name="created_at" value="{{$payment_created_at}}"
+                                            <input id="updated_at" type="date" placeholder="yyyy-mm-dd"
+                                                   class="datechk form-control @error('updated_at') is-invalid @enderror"
+                                                   name="updated_at"
                                             >
                                         </div>
                                     </div>
@@ -256,7 +256,7 @@
                                             </span>
                                             <input id="created_at" type="date" placeholder="yyyy-mm-dd"
                                                    class="datechk form-control @error('created_at') is-invalid @enderror"
-                                                   name="end_date" value="{{$payment_end_date}}"
+                                                   name="end_date"
                                             >
                                         </div>
                                     </div>
