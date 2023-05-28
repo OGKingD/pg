@@ -391,7 +391,6 @@ class Transaction extends Model
         $body = [];
 
         if ($type === "default"){
-            $grandTotalArray = $this->grandTotalSummation($summationArray, $grandTotalArray);
 
             $merchant = "";
             if ($currentMerchant !== $result->user_id){
@@ -418,6 +417,7 @@ class Transaction extends Model
                     fputcsv($file,['','', '', '', '', '', 0, 0, '', 0, '', '', 0, '',]);
 
                 }
+                $grandTotalArray = $this->grandTotalSummation($summationArray, $grandTotalArray);
 
                 //reset footer;
                 $summationArray = [
