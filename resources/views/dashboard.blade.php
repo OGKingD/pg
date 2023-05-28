@@ -210,7 +210,7 @@
                             <div class="col-md-6 mb-md-2 ">
                                 <div class="card">
                                     <div class="card-body text-center">
-                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$google_pay_transactions_count}}">{{$google_pay_transactions_count}}</span> <span
+                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$googlepay_transactions_count}}">{{$$googlepay_transactions_count}}</span> <span
                                                 class="text-lg ms-n2">°</span></h1>
                                         <h6 class="mb-0 font-weight-bolder">GooglePay</h6>
 
@@ -220,7 +220,7 @@
                             <div class="col-md-6 mb-md-2 ">
                                 <div class="card">
                                     <div class="card-body text-center">
-                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$apple_pay_transactions_count}}">{{$apple_pay_transactions_count}}</span> <span
+                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$applepay_transactions_count}}">{{$applepay_transactions_count}}</span> <span
                                                 class="text-lg ms-n2">°</span></h1>
                                         <h6 class="mb-0 font-weight-bolder">Applepay</h6>
 
