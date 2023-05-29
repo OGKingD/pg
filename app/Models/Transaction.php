@@ -417,7 +417,7 @@ class Transaction extends Model
                 ];
                 if ($currentMerchant !== 0){
                     fputcsv($file, $body);
-                    fputcsv($file,['','', '', '', '', '', 0, 0, '', 0, '', '', 0, '',]);
+                    fputcsv($file,['','', '', '', '', '', '', '', '', '', '', '', '', '',]);
 
                 }
                 $grandTotalArray = $this->grandTotalSummation($summationArray, $grandTotalArray);
@@ -542,7 +542,7 @@ class Transaction extends Model
                 0,
                 number_format($grandTotalArray['total_amount']),
             ];
-            fputcsv($file,['','', '', '', '', '', 0, 0, '', 0, '', '', 0, '',]);
+            fputcsv($file,['','', '', '', '', '', '', '', '', '', '', '', '', '',]);
             fputcsv($file, $body2);
 
 
