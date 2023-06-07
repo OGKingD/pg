@@ -5,17 +5,12 @@ namespace App\Http\Livewire;
 use App\Jobs\GenerateCsvReport;
 use App\Models\Gateway;
 use App\Models\Transaction;
-use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class TransactionsPage extends Component
 {
     public $user;
-    /**
-     * @var object|null
-     */
-    public $transactions;
     /**
      * @var mixed
      */
@@ -33,6 +28,11 @@ class TransactionsPage extends Component
 
     public $payment_end_date;
     public $gateways;
+    public $data;
+    public $layout;
+    private $builder;
+    public $isAdmin;
+    public $userId;
 
     protected $listeners = ["exportCsv", "downloadReport", "searchTransactions"];
 
@@ -40,19 +40,37 @@ class TransactionsPage extends Component
 
     protected $paginationTheme = 'bootstrap';
 
-    public function mount()
+    public function render()
     {
-        $this->gateways = Gateway::select(['name','id'])->get();
+
+        if (!$this->isAdmin) {
+            //add user_id;
+            $this->searchQuery['user_id'] = $this->userId;
+            $this->builder = Transaction::reportQuery($this->searchQuery);
+            $this->layout = 'layouts.merchant_dashboardapp';
+
+        }
+        if ($this->isAdmin) {
+            $this->builder = Transaction::reportQuery($this->searchQuery);
+            $this->layout = 'layouts.admin.admin_dashboardapp';
+        }
+        $this->dispatchBrowserEvent("searchComplete");
+        $this->data['transactionCount'] = $this->builder->count();
+        $this->data['transactions'] =$this->builder->paginate(10);
+
+        return view('livewire.transactions-page', $this->data)->extends($this->layout, ["title" => "Transactions "]);
+
 
     }
 
-    public function render()
+    public function mount()
     {
         //check if is admin return admin layout else return default;
+        $this->gateways = Gateway::select(['name','id'])->get();
         $this->user = auth()->user();
-        $userId = $this->user->id;
-        $isAdmin = $this->user->type < 5;
-        $data['isAdmin'] = $isAdmin;
+        $this->userId = $this->user->id;
+        $this->isAdmin = $this->user->type < 5;
+        $data['isAdmin'] = $this->isAdmin;
 
         /** @var Transaction $builder */
         //check if report exists for download;
@@ -75,32 +93,14 @@ class TransactionsPage extends Component
 
 
         //get all transaction pagingated with simplePaginate;
-        $perPage = 10;
 
 
         //check if it is from summary report;
         if (array_key_exists("group_by", $this->searchQuery)) {
             $this->searchQuery = [];
         }
-        if (!$isAdmin) {
-            //add user_id;
-            $this->searchQuery['user_id'] = $userId;
-            $builder = Transaction::reportQuery($this->searchQuery);
-            $layout = 'layouts.merchant_dashboardapp';
+        $this->data = $data;
 
-        }
-        if ($isAdmin) {
-            $builder = Transaction::reportQuery($this->searchQuery);
-            $layout = 'layouts.admin.admin_dashboardapp';
-        }
-
-        $data['transactionsCollection'] = $builder->latest()->paginate($perPage);
-        $data['transactionCount'] = $data['transactionsCollection']->total();
-        $this->dispatchBrowserEvent("searchComplete");
-
-        $this->transactions = $data['transactionsCollection']->items();
-
-        return view('livewire.transactions-page', $data)->extends($layout, ["title" => "Transactions "]);
     }
 
     /**
@@ -156,18 +156,13 @@ class TransactionsPage extends Component
      */
     public function exportCsv($queryString): void
     {
-        $status = false;
-        /** @var User $user */
-        $user = auth()->user();
 
-        if (isset($this->transactions)) {
-            //collect Query and pass to Job to generate CSV Report;
-            $csvHeader = ["Merchant Ref", "Gateway", 'Amount', 'Fee', 'Total', 'Description', 'Status', 'Flag', 'Date'];
+        //collect Query and pass to Job to generate CSV Report;
+        $csvHeader = ["Merchant Ref", "Gateway", 'Amount', 'Fee', 'Total', 'Description', 'Status', 'Flag', 'Date'];
 
-            GenerateCsvReport::dispatch(Transaction::class, $queryString, $csvHeader, $user);
-            $status = true;
-        }
-        $this->dispatchBrowserEvent("generatingReport", ["status" => $status]);
+        GenerateCsvReport::dispatch(Transaction::class, $queryString, $csvHeader, $this->user);
+
+        $this->dispatchBrowserEvent("generatingReport", ["status" => true]);
 
     }
 

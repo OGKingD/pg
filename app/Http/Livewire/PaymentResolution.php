@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Lib\Services\Flutterwave;
+use App\Lib\Services\NinePSB;
 use App\Lib\Services\Providus;
 use App\Models\DynamicAccount;
 use App\Models\Transaction;
@@ -119,6 +120,106 @@ class PaymentResolution extends Component
             }
 
         }
+
+        if ((int)$this->channel === 3){
+            //bank_transfer
+            //check from 9PSB
+            //does not exist on provider;
+
+            $ninePsb = (new NinePSB)->transactionStatusDynamicAccount($this->transaction_ref);
+
+
+            if ($ninePsb['status']){
+                //check if externalREf exists and reququery;
+                if (isset($ninePsb['data']['transaction']['externalreference'])){
+                    //confirm status with sessionId;
+                    $ninePsb = (new NinePSB)->transactionStatusDynamicAccount($ninePsb['data']['transaction']['externalreference']);
+
+                }
+
+                if ($ninePsb['payment'] === "successful"){
+                    //check if it exist in dynamic Accounts;
+                    $ref = $ninePsb['data']['transaction']['linkingreference'] ?? $this->transaction_ref;
+                    $dynAccResult = DynamicAccount::with(['invoice'])->where('initiationTranRef', $ref)->get();
+
+                    $this->message = "Payment $ref Successful! Check webhook logs if transaction has been pushed! or if Payment has been completed for the invoice!";
+
+                    if (count($dynAccResult)){
+                        $this->message .= '
+                    <div class="table-responsive">
+                    <table id="entries" class="table mb-0">
+                        <thead>
+                        <tr>
+                            <th>InvoiceNO</th>
+                            <th>InitiationRef</th>
+                            <th>AccountNumber</th>
+                            <th>Status</th>
+                            <th>Payment Channel</th>
+                            <th>Customer Email</th>
+                            <th>Customer Name</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+        ';
+
+                        foreach ($dynAccResult as $item) {
+
+                            $this->message .= ' <tr>
+            <td>
+                '.$item->invoice_no.'
+            </td>
+            <td>
+                '.$item->initiationTranRef.'
+            </td>
+            <td>
+                '.$item->account_number.'
+            </td>
+            <td>
+                '.$item->invoice->status.'
+            </td>
+            <td>
+                '.$item->invoice->gateway->name.'
+            </td>
+             <td>
+                '.$item->invoice->customer_email.'
+            </td>
+             <td>
+                '.$item->invoice->customer_name.'
+            </td>
+
+        </tr>
+        ';
+                        }
+                        $this->message .= '</tbody>
+                                </table>
+                            </div>
+';
+                    }
+
+                    if (!count($dynAccResult)){
+                        $this->message .= "Initiation Ref $ref not Found in Dynamic Accounts, Customer might have initiated another payment or chosen another Channel.";
+
+                    }
+
+                    $this->messageType = "success";
+                }
+
+                if ($ninePsb['payment'] === "pending"){
+                    $this->message = "Transaction  $this->transaction_ref is pending! ";
+                    $this->messageType = "warning";
+                }
+
+                if ($ninePsb['payment'] === "failed"){
+                    $this->message = "Transaction  $this->transaction_ref Failed! ";
+                    $this->messageType = "danger";
+                }
+                $this->message .= "\n". json_encode($ninePsb);
+
+            }
+
+
+        }
+
         $this->dispatchBrowserEvent('closeAlert');
 
 

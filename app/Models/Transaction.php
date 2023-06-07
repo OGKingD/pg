@@ -38,7 +38,7 @@ class Transaction extends Model
                     number_format($result->fee, 2),
                     number_format($result->amount, 2),
                     number_format($result->total, 2),
-                    $result->details["name"]?? "N/A",
+                    $result->invoice->customer_name ?? "N/A",
                     $result->invoice->customer_email ?? "N/A",
                     $result->flag,
                     $result->updated_at,
