@@ -73,6 +73,40 @@ class RequeryTool extends Component
             }
 
         }
+        if ($provider === "PROVIDUSOLD") {
+
+            //call providus to get transaction details;
+            /** @var object $providus */
+            $providus = (new Providus)->verifyTransactionOldPtpp($trnx);
+
+            if (isset($providus)) {
+
+                //check if transaction exists;
+                if (!empty($providus->settlementId)) {
+
+                    //check if initiationTranRef is missing;
+                    if (empty($providus->initiationTranRef)) {
+                        $this->message = "Transaction with settlementId : $providus->settlementId cannot be processed, initiationTranRef is Missing. Dynamic Account Expired when Payment was made.";
+                        $this->messageType = "danger";
+                    }
+                    if (!empty($providus->initiationTranRef)) {
+                        $this->transactionDetails = [
+                            "transaction_ref" => $providus->settlementId,
+                            "amount" => $providus->transactionAmount,
+                            "date" => $providus->settlementDateTime,
+                            "remarks" => $providus->tranRemarks,
+                        ];
+                    }
+                }
+                if (empty($providus->settlementId)) {
+                    $this->message = "Transaction  : $trnx cannot be processed, $providus->tranRemarks";
+                    $this->messageType = "danger";
+                }
+
+            }
+
+        }
+
         if ($provider === "9PSB") {
             //check to see if transaction is not already successful;
             $transactionExists = Transaction::firstWhere('bank_transfer_ref', $trnx);
@@ -99,7 +133,7 @@ class RequeryTool extends Component
 
                    if ($paymentStatus !==  "PENDING"){
                        $this->transactionDetails = [
-                           "transaction_ref" => $ninePsb['data']['transaction']['linkingreference'],
+                           "transaction_ref" => $ninePsb['data']['transaction']['linkingreference'] ?? $trnx,
                            "amount" => $ninePsb['data']['order']['amount'],
                            "date" => $ninePsb['data']['transaction']['date'],
                            "remarks" => $ninePsb['message'],
@@ -181,10 +215,15 @@ class RequeryTool extends Component
     {
         $provider = strtoupper($this->provider);;
         $this->dispatchBrowserEvent('closeAlert');
-        if ( $provider === "PROVIDUS"){
+        if ( str_contains($provider,"PROVIDUS")){
             //call repush API;
             /** @var object $result */
-            $result = (new Providus())->repushNotification($this->transaction_ref);
+            if ($provider === "PROVIDUS"){
+                $result = (new Providus())->repushNotification($this->transaction_ref);
+            }
+            if ($provider === "PROVIDUSOLD"){
+                $result = (new Providus())->repushNotificationOldPtpp($this->transaction_ref);
+            }
             if ($result->requestSuccessful){
                 $this->message = "Transaction  $this->transaction_ref $result->responseMessage!";
                 $this->messageType = "success";

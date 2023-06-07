@@ -18,7 +18,7 @@
             <!-- Tab panes -->
             <div class="tab-content">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-body" id="transactionsCountDashboard">
 
                         <div class="row ">
                             <div class="text-center col-md-6">
@@ -302,7 +302,7 @@
                             <div class="col text-right">
                                 <div class="d-flex justify-content-end">
                                     <button type="submit" class="btn btn-success mx-3"> Search</button>
-                                    <button class="btn btn-danger mx-3" onclick="document.getElementById('transactionSearchBox').reset(); event.preventDefault()"> Reset</button>
+                                    <button class="btn btn-danger mx-3" onclick="resetPage()"> Reset</button>
                                 </div>
                             </div>
                         </fieldset>
@@ -471,7 +471,7 @@
 
                         @endforelse
 
-                        {{ $transactionsCollection->links() }}
+                        {{ $transactions->withQueryString()->links() }}
                         </tbody>
                     </table>
                 </div>
@@ -503,6 +503,13 @@
         @endif
 
         <script>
+            function resetPage() {
+                event.preventDefault();
+                $(':input','#transactionSearchBox')
+                    .not(':button, :submit, :reset, :hidden')
+                    .val('');
+            }
+
             function searchTransactions(element) {
                 event.preventDefault();
                 const formData = new FormData(element);
@@ -550,6 +557,7 @@
             function toggleEssentialReportFilters(type) {
                 const elements = document.querySelectorAll('.non_essential_summary_filter');
                 if (type === "summary"){
+                    document.getElementById('transactionsCountDashboard').setAttribute('hidden',true);
                     document.getElementById('group_by').value = "default";
 
                     document.getElementById('groupByFilter').hidden = false;
@@ -559,6 +567,8 @@
                     });
                 }
                 if (type === "detailed"){
+                    document.getElementById('transactionsCountDashboard').hidden = false;
+
                     document.getElementById('group_by').value = "";
 
                     document.getElementById('groupByFilter').hidden = true;

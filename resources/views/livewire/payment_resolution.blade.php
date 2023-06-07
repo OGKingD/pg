@@ -105,7 +105,7 @@
                             @endif
                             @if(strtoupper($messageType) === "DANGER")
                                 <div class="alert alert-danger alert-dismissible text-white " role="alert">
-                                    {{$message}}
+                                    {!! $message !!}
                                     <button type="button" class="btn-close text-lg py-3 opacity-10" data-bs-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">×</span>
                                     </button>
@@ -113,7 +113,7 @@
                             @endif
                             @if(strtoupper($messageType) === "SUCCESS")
                                 <div class="alert alert-success alert-dismissible text-white " role="alert">
-                                    {{$message}}
+                                    {!! $message !!}
                                     <button type="button" class="btn-close text-lg py-3 opacity-10" data-bs-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">×</span>
                                     </button>
@@ -121,7 +121,7 @@
                             @endif
                             @if(strtoupper($messageType) === "INFO")
                                 <div class="alert alert-info alert-dismissible text-white " role="alert">
-                                    {{$message}}
+                                    {!! $message !!}
                                     <button type="button" class="btn-close text-lg py-3 opacity-10" data-bs-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">×</span>
                                     </button>

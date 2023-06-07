@@ -46,6 +46,8 @@
                                                                 </option>
                                                                 <option value="providus">PROVIDUS
                                                                 </option>
+                                                                <option value="providusOLD">OLD PTPP
+                                                                </option>
                                                                 <option value="9psb">9PSB
                                                                 </option>
 
@@ -103,7 +105,7 @@
                                     <tr class="table-info">
                                         <th>Transaction Ref</th>
                                         <th>Amount</th>
-                                        <th style="white-space: break-spaces !important;">Remarks</th>
+                                        <th>Remarks</th>
                                         <th>Date</th>
                                         <th></th>
                                     </tr>
@@ -112,7 +114,7 @@
                                     <tr>
                                         <td>{{$transactionDetails['transaction_ref']}}</td>
                                         <td>{{$transactionDetails['amount']}}</td>
-                                        <td>{{$transactionDetails['remarks']}}</td>
+                                        <td style="word-break: break-word !important; ">{{$transactionDetails['remarks']}}</td>
                                         <td>{{$transactionDetails['date']}}</td>
                                         <td>
 

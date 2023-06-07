@@ -21,6 +21,8 @@ class Providus
         $this->rest_url = config('providus.rest_url');
         $this->client_secret = config('providus.client_secret');
         $this->client_id = config('providus.client_id');
+        $this->client_secret_old_ptpp = config('providus.client_secret_old_ptpp');
+        $this->client_id_old_ptpp = config('providus.client_id_old_ptpp');
         $this->password = config('providus.password');
         $this->username = config('providus.username');
     }
@@ -56,6 +58,27 @@ class Providus
         }
 
     }
+    public function repushNotificationOldPtpp($trnx)
+    {
+        try {
+            //if $trnx length > 25 that means it's session Id
+            if (strlen($trnx)>25) {
+                $data = ['session_id' => $trnx];
+            } else {
+                $data = ["settlement_id" => $trnx];
+            }
+            $this->client_id = $this->client_id_old_ptpp;
+            $this->client_secret = $this->client_secret_old_ptpp;
+
+
+            $response = $this->getWithHeaders()->post($this->base_url."PiP_RepushTransaction_SettlementId",$data);
+            return json_decode($response->body(), false, 512, JSON_THROW_ON_ERROR);
+
+        }catch (\Exception $exception){
+            return $exception->getMessage();
+        }
+
+    }
 
     public function verifyTransaction($trnx)
     {
@@ -70,6 +93,28 @@ class Providus
             }
             $response = $this->getWithHeaders()->get($url,$data);
             return json_decode($response->body());
+        }catch (\Exception $exception){
+            return $exception->getMessage();
+        }
+
+    }
+
+    public function verifyTransactionOldPtpp($trnx)
+    {
+        try {
+            //if $trnx length > 25 that means it's session Id
+            if (strlen($trnx)>25) {
+                $url = $this->base_url."PiPverifyTransaction_sessionid";
+                $data = ['session_id' => $trnx];
+            } else {
+                $url = $this->base_url."PiPverifyTransaction_settlementid";
+                $data = ["settlement_id" => $trnx];
+            }
+            $this->client_id = $this->client_id_old_ptpp;
+            $this->client_secret = $this->client_secret_old_ptpp;
+
+            $response = $this->getWithHeaders()->get($url,$data);
+            return json_decode($response->body(), false);
         }catch (\Exception $exception){
             return $exception->getMessage();
         }
