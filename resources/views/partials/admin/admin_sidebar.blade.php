@@ -102,6 +102,16 @@
                                 <span class="nav-link-text ms-1">Requery Tool</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link @if(request()->path() === "refund_tool") active @endif"
+                               href="{{route('refund-tool')}}">
+                                <div
+                                    class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                                    <i class="fas fa-recycle @if(request()->path() === "refund_tool") text-white @else text-dark @endif"></i>
+                                </div>
+                                <span class="nav-link-text ms-1">Refund Tool</span>
+                            </a>
+                        </li>
                     </ul>
                     <hr class="horizontal dark mt-0">
 

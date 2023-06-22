@@ -80,6 +80,45 @@ class Providus
 
     }
 
+    public function refundTransaction($trnx)
+    {
+        try {
+            //if $trnx length > 25 that means it's session Id
+            if (strlen($trnx)>25) {
+                $data = ['session_id' => $trnx];
+            } else {
+                $data = ["settlement_id" => $trnx];
+            }
+            $response = $this->getWithHeaders()->post($this->base_url."PiPreturnTransaction",$data);
+            return json_decode($response->body(), false, 512, JSON_THROW_ON_ERROR);
+
+        }catch (\Exception $exception){
+            return $exception->getMessage();
+        }
+
+    }
+
+    public function refundTransactionOldPtpp($trnx)
+    {
+        try {
+            //if $trnx length > 25 that means it's session Id
+            if (strlen($trnx)>25) {
+                $data = ['session_id' => $trnx];
+            } else {
+                $data = ["settlement_id" => $trnx];
+            }
+            $this->client_id = $this->client_id_old_ptpp;
+            $this->client_secret = $this->client_secret_old_ptpp;
+
+            $response = $this->getWithHeaders()->post($this->base_url."PiPreturnTransaction",$data);
+            return json_decode($response->body(), false, 512, JSON_THROW_ON_ERROR);
+
+        }catch (\Exception $exception){
+            return $exception->getMessage();
+        }
+
+    }
+
     public function verifyTransaction($trnx)
     {
         try {

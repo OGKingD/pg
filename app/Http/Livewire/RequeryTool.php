@@ -19,6 +19,7 @@ class RequeryTool extends Component
 
     public function render()
     {
+        $this->dispatchBrowserEvent('resetPage');
         return view('livewire.requery-tool',['messageType'=> $this->messageType])->extends('layouts.admin.admin_dashboardapp', ['title' => 'Requery Tool']);;
     }
 
@@ -224,18 +225,7 @@ class RequeryTool extends Component
             if ($provider === "PROVIDUSOLD"){
                 $result = (new Providus())->repushNotificationOldPtpp($this->transaction_ref);
             }
-            if ($result->requestSuccessful){
-                $this->message = "Transaction  $this->transaction_ref $result->responseMessage!";
-                $this->messageType = "success";
-                $this->dispatchBrowserEvent('alertBox', ['type' => 'success', 'message' => $this->message]);
-
-            }
-            if (!$result->requestSuccessful){
-                $this->message = "Transaction  $this->transaction_ref $result->responseMessage!";
-                $this->messageType = "danger";
-                $this->dispatchBrowserEvent('alertBox', ['type' => 'danger', 'message' => $this->message]);
-
-            }
+            $this->formatProvidusResponse($result);
         }
 
         if ( $provider === "9PSB"){
@@ -264,5 +254,42 @@ class RequeryTool extends Component
 
 
 
+    }
+
+    public function refund()
+    {
+        $provider = strtoupper($this->provider);;
+        $this->dispatchBrowserEvent('closeAlert');
+        if ( str_contains($provider,"PROVIDUS")){
+            //call repush API;
+            /** @var object $result */
+            if ($provider === "PROVIDUS"){
+                $result = (new Providus())->refundTransaction($this->transaction_ref);
+            }
+            if ($provider === "PROVIDUSOLD"){
+                $result = (new Providus())->refundTransactionOldPtpp($this->transaction_ref);
+            }
+            $this->formatProvidusResponse($result);
+        }
+
+    }
+
+    /**
+     * @param $result
+     */
+    protected function formatProvidusResponse($result): void
+    {
+        if ($result->requestSuccessful) {
+            $this->message = "Transaction  $this->transaction_ref $result->responseMessage!";
+            $this->messageType = "success";
+            $this->dispatchBrowserEvent('alertBox', ['type' => 'success', 'message' => $this->message]);
+
+        }
+        if (!$result->requestSuccessful) {
+            $this->message = "Transaction  $this->transaction_ref $result->responseMessage!";
+            $this->messageType = "danger";
+            $this->dispatchBrowserEvent('alertBox', ['type' => 'danger', 'message' => $this->message]);
+
+        }
     }
 }
