@@ -6,7 +6,7 @@
                 <div class="container mt--6">
                     <div class="row">
                         <div class="col-xl-12">
-                            <div class="card">
+                            <div id="requery_tool" class="card">
                                 <div class="card-header border-0">
                                     <div class="row align-items-center">
                                         <div class="col text-center">
@@ -93,10 +93,96 @@
 
                                 </div>
 
-
-
                             </div>
 
+                            <div id="refund_tool" class="card">
+                                <div class="card-header border-0">
+                                    <div class="row align-items-center">
+                                        <div class="col text-center">
+                                            <h3 class="mb-0"><i class="fa fa-recycle"></i> Refund Tool</h3>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <form action="" wire:submit.prevent="getTransactionDetails" >
+                                        @csrf
+                                        <fieldset>
+
+
+                                            <div class="row">
+                                                <div class="col-lg-4 col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="provider" class=" col-form-label text-md-right">
+                                                            {{ __('Payment Provider') }}
+                                                        </label>
+
+                                                        <div class="input-group mb-3">
+                                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa fa-university py-1" style="font-size: 18px;"></i>
+                                                </span>
+                                                            </div>
+
+
+                                                            <select id="provider" title="Choose a Status" wire:model="provider"
+                                                                    data-style="btn border" class=" form-control"
+                                                                    name="provider" required>
+
+                                                                <option value="">Choose Provider</option>
+
+                                                                <option value="flutterwave">FLUTTERWAVE
+                                                                </option>
+                                                                <option value="providus">PROVIDUS
+                                                                </option>
+                                                                <option value="providusOLD">OLD PTPP
+                                                                </option>
+                                                                <option value="9psb">9PSB
+                                                                </option>
+
+                                                            </select>
+
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="transaction_ref" class=" col-form-label text-md-right">
+                                                            {{ __('Transaction Number') }}
+                                                        </label>
+
+                                                        <div class="input-group mb-3">
+                                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa fa-keyboard py-1" style="font-size: 18px;"></i>
+                                                </span>
+                                                            </div>
+
+                                                            <input type="text" name="transaction_ref" id="transaction_ref" class="form-control" wire:model="transaction_ref" required>
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+
+                                            <div class="col text-right">
+                                                <button type="submit" class="btn btn-success" onclick="showProcessing(null,this)" id="getTransaction"> Get Transaction</button>
+                                            </div>
+
+                                        </fieldset>
+                                    </form>
+
+                                    <hr>
+
+                                </div>
+
+                            </div>
 
 
                             @if($transactionDetails)
@@ -116,9 +202,11 @@
                                         <td>{{$transactionDetails['amount']}}</td>
                                         <td style="word-break: break-word !important; ">{{$transactionDetails['remarks']}}</td>
                                         <td>{{$transactionDetails['date']}}</td>
-                                        <td>
-
-                                            <button  class="btn btn-success btn-sm" onclick="showProcessing('Initializing {{$transaction_ref}}',this)" wire:click="requery"> Requery </button>
+                                        <td id="requeryButton">
+                                            <button  class="btn btn-success btn-sm" onclick="showProcessing('Initializing {{$transaction_ref}}',this)" wire:click="requery" > Requery </button>
+                                        </td>
+                                        <td id="refundButton">
+                                            <button  class="btn btn-danger btn-sm" onclick="showProcessing('Initializing {{$transaction_ref}}',this)" wire:click="refund" > Refund </button>
                                         </td>
 
                                     </tr>
@@ -193,6 +281,28 @@
 
                 sprocessing(message ??"Fetching Transaction" + "!")
             }
+            addEventListener('resetPage',function () {
+                reset();
+            });
+            function reset() {
+                console.log(window.location);
+                if (window.location.pathname === "/refund_tool") {
+                    document.getElementById('requery_tool').style.display = "none";
+                    document.getElementById('refund_tool').style.display = "block";
+                    document.getElementById('requeryButton').style.display = "none";
+                    document.getElementById('refundButton').style.display = "block";
+                }
+                if (window.location.pathname === "/requery_tool") {
+                    document.getElementById('requery_tool').style.display = "block";
+                    document.getElementById('refund_tool').style.display = "none";
+                    document.getElementById('requeryButton').style.display = "block";
+                    document.getElementById('refundButton').style.display = "none";
+                }
+            }
+
+            reset();
+
+
 
         </script>
     @endsection
