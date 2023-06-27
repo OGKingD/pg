@@ -35,7 +35,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('invoice',[\App\Http\Controllers\InvoiceController::class,'index'])->name('invoice.listing');
         Route::get('transactions',\App\Http\Livewire\TransactionsPage::class)->name('transactions');
         Route::get('payment_links', \App\Http\Livewire\PaymentLinks::class)->name('payment_links');
-        Route::get('download/{filename}/{path}',[\App\Http\Controllers\DownloadsController::class, 'download'])->name("download_report");
+        Route::get('download/{filename}/{path}',[\App\Http\Controllers\DirectoryListingController::class, 'download'])->name("download");
 
 
         //all admin route here;
@@ -50,6 +50,8 @@ Route::middleware(['auth'])->group(function () {
            Route::get('requery_tool', \App\Http\Livewire\RequeryTool::class )->name('requery-tool');
            Route::get('refund_tool', \App\Http\Livewire\RequeryTool::class )->name('refund-tool');
            Route::get('payment_resolution',\App\Http\Livewire\PaymentResolution::class)->name('payment_resolution');
+           Route::get('logs',[\App\Http\Controllers\DirectoryListingController::class,'index'])->name('logs');
+           Route::get('delete/{filename}/{path}',[\App\Http\Controllers\DirectoryListingController::class, 'deleteFile']);
 
        });
 

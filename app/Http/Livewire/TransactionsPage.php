@@ -80,13 +80,13 @@ class TransactionsPage extends Component
         if ($reportExists) {
             $data['filename'] = $filename;
             $data['reportExists'] = true;
-            $data['reportDownloadLink'] = "download/$filename/logs";
+            $data['reportDownloadLink'] = "download/$filename/logs?deleteFile=true";
 
         }
         if ($summaryReportExists) {
             $data['summary_filename'] = $filename2;
             $data['summaryReportExists'] = true;
-            $data['summaryReportDownloadLink'] = "download/$filename2/logs";
+            $data['summaryReportDownloadLink'] = "download/$filename2/logs?deleteFile=true";
 
         }
 
