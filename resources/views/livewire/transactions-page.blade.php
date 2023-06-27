@@ -537,7 +537,6 @@
             }
 
             function generateCsvReport() {
-
                 sprocessing("Generating Report");
                 Livewire.emit("exportCsv", @this.searchQuery);
             }
@@ -549,7 +548,7 @@
                     salert("Generating Report", "Cannot Generate Report! No data Available", "warning")
                 }
                 if (response.status === true) {
-                    salert("Generating Report", "You'll be notified once Report is Generated", "info")
+                    salert("Generating Report!", "A banner would be displayed once Report is Generated! Or Reload this page in a few minutes", "info", true)
                 }
 
             });

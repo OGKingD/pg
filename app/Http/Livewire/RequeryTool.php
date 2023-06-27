@@ -260,16 +260,19 @@ class RequeryTool extends Component
     {
         $provider = strtoupper($this->provider);;
         $this->dispatchBrowserEvent('closeAlert');
-        if ( str_contains($provider,"PROVIDUS")){
-            //call repush API;
-            /** @var object $result */
-            if ($provider === "PROVIDUS"){
-                $result = (new Providus())->refundTransaction($this->transaction_ref);
+        //before implementing spatie check userid as crude way
+        if (in_array(request()->user()->id,[1,4,12])){
+            if (str_contains($provider, "PROVIDUS")) {
+                //call repush API;
+                /** @var object $result */
+                if ($provider === "PROVIDUS") {
+                    $result = (new Providus())->refundTransaction($this->transaction_ref);
+                }
+                if ($provider === "PROVIDUSOLD") {
+                    $result = (new Providus())->refundTransactionOldPtpp($this->transaction_ref);
+                }
+                $this->formatProvidusResponse($result);
             }
-            if ($provider === "PROVIDUSOLD"){
-                $result = (new Providus())->refundTransactionOldPtpp($this->transaction_ref);
-            }
-            $this->formatProvidusResponse($result);
         }
 
     }
