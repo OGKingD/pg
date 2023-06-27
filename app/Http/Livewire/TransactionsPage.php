@@ -54,7 +54,6 @@ class TransactionsPage extends Component
             $this->builder = Transaction::reportQuery($this->searchQuery);
             $this->layout = 'layouts.admin.admin_dashboardapp';
         }
-        $this->dispatchBrowserEvent("searchComplete");
         $this->data['transactionCount'] = $this->builder->count();
         $this->data['transactions'] =$this->builder->paginate(10);
 
@@ -132,6 +131,7 @@ class TransactionsPage extends Component
         if (!empty($searchParams['group_by'])) {
             $this->summaryTransactions();
         }
+        $this->dispatchBrowserEvent("searchComplete");
 
 
     }
