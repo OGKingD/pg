@@ -117,6 +117,14 @@
 
                 </div>
             </li>
+            <li class="nav-item">
+                <a class="nav-link @if(request()->path() === "logs") active @endif" href="{{route('logs')}}" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center d-flex align-items-center justify-content-center  me-2">
+                        <i class="fas fa-receipt @if(request()->path() === "logs") text-white @else text-dark @endif"></i>
+                    </div>
+                    <span class="nav-link-text ms-1"> Log Files</span>
+                </a>
+            </li>
 
 
 
