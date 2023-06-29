@@ -125,9 +125,9 @@
                                                             </div>
 
 
-                                                            <select id="provider" title="Choose a Status" wire:model="provider"
+                                                            <select id="refundProvider" onchange="setBypassProvider()" title="Choose a Status" wire:model="provider"
                                                                     data-style="btn border" class=" form-control"
-                                                                    name="provider" required>
+                                                                    name="provider"  required>
 
                                                                 <option value="">Choose Provider</option>
 
@@ -285,12 +285,13 @@
                 reset();
             });
             function reset() {
-                console.log(window.location);
                 if (window.location.pathname === "/refund_tool") {
                     document.getElementById('requery_tool').style.display = "none";
                     document.getElementById('refund_tool').style.display = "block";
-                    document.getElementById('requeryButton').style.display = "none";
-                    document.getElementById('refundButton').style.display = "block";
+                    if (document.getElementById('requeryButton') != null){
+                        document.getElementById('requeryButton').style.display = "none";
+                        document.getElementById('refundButton').style.display = "block";
+                    }
                 }
                 if (window.location.pathname === "/requery_tool") {
                     document.getElementById('requery_tool').style.display = "block";
@@ -302,7 +303,14 @@
 
             reset();
 
-
+            function setBypassProvider() {
+                let refundProvider =
+                    document.getElementById('refundProvider').value;
+                if (["providus","providusOLD"].includes(refundProvider)){
+                    console.log(refundProvider);
+                    Livewire.emit("byPassProvidusRef");
+                }
+            }
 
         </script>
     @endsection
