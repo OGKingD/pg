@@ -70,7 +70,7 @@ addEventListener('alertBox',function () {
         sprocessing(message ?? "Fetching Transaction")
     }
     if (type === "success"){
-        salert("Success", message ?? "Transaction Fetched!",'success')
+        salert("Success", message ?? "Transaction Fetched!",'success',true)
     }
     if (type === "info"){
         salert("Info",message,'success')

@@ -16,6 +16,8 @@ class RequeryTool extends Component
     public $transactionDetails = [];
     public $message = false;
     private $messageType;
+    public $byPassInitiationRef;
+    protected $listeners = ['byPassProvidusRef'];
 
     public function render()
     {
@@ -24,6 +26,11 @@ class RequeryTool extends Component
     }
 
 
+    public function byPassProvidusRef()
+    {
+        $this->byPassInitiationRef = true;
+
+    }
     public function getTransactionDetails(): void
     {
         $this->messageType = false;
@@ -52,11 +59,7 @@ class RequeryTool extends Component
                     if (!empty($providus->settlementId)) {
 
                         //check if initiationTranRef is missing;
-                        if (empty($providus->initiationTranRef)) {
-                            $this->message = "Transaction with settlementId : $providus->settlementId cannot be processed, initiationTranRef is Missing. Dynamic Account Expired when Payment was made.";
-                            $this->messageType = "danger";
-                        }
-                        if (!empty($providus->initiationTranRef)) {
+                        if ($this->byPassInitiationRef){
                             $this->transactionDetails = [
                                 "transaction_ref" => $providus->settlementId,
                                 "amount" => $providus->transactionAmount,
@@ -64,6 +67,21 @@ class RequeryTool extends Component
                                 "remarks" => $providus->tranRemarks,
                             ];
                         }
+                        if (!$this->byPassInitiationRef){
+                            if (empty($providus->initiationTranRef)) {
+                                $this->message = "Transaction with settlementId : $providus->settlementId cannot be processed, initiationTranRef is Missing. Dynamic Account Expired when Payment was made.";
+                                $this->messageType = "danger";
+                            }
+                            if (!empty($providus->initiationTranRef)) {
+                                $this->transactionDetails = [
+                                    "transaction_ref" => $providus->settlementId,
+                                    "amount" => $providus->transactionAmount,
+                                    "date" => $providus->settlementDateTime,
+                                    "remarks" => $providus->tranRemarks,
+                                ];
+                            }
+                        }
+
                     }
                     if (empty($providus->settlementId)) {
                         $this->message = "Transaction  : $trnx cannot be processed, $providus->tranRemarks";
