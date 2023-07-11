@@ -1,4 +1,4 @@
-function salert(title, text, icon,showConfirmButton = false, allowOutsideClick = false,allowEnterKey = false, allowEscapeKey = false) {
+function salert(title, text, icon,showConfirmButton = false, allowOutsideClick = true,allowEnterKey = false, allowEscapeKey = false) {
     Swal.fire({
         title: title,
         text: text,

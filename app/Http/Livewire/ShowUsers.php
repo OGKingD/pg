@@ -54,7 +54,7 @@ class ShowUsers extends Component
                 "charge" => $merchantGateways[$gateway->id]['charge'] ?? 0,
                 "name" => $merchantGateways[$gateway->id]['name'] ?? $gateway->name,
                 'charge_factor' => $merchantGateways[$gateway->id]['charge_type'] ?? 0,
-                'status' =>   (isset($merchantGateways[$gateway->id]["status"])) ? 1 : 0
+                'status' =>   ($merchantGateways[$gateway->id]["status"]) ? 1 : 0
             ];
         }
         $this->merchantGateways = $config_details;

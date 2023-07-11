@@ -48,7 +48,9 @@ class CashAtBankController extends Controller
             $transaction->handleSuccessfulPayment($transaction, $gateway->id, '', [], $wallet, $user, $company);
             $transaction->update([
                 "total" => $transactionChargeAndTotal['total'],
-                "fee" => $transactionChargeAndTotal['charge']
+                "fee" => $transactionChargeAndTotal['charge'],
+                'provider' => "UI MicroFinance"
+
             ]);
 
             return response()->json([

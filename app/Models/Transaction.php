@@ -34,6 +34,7 @@ class Transaction extends Model
                     $result->merchant_transaction_ref,
                     $result->status,
                     $result->gateway->name ?? "N/A",
+                    $result->provider ?? "N/A",
                     $result->type,
                     number_format($result->fee, 2),
                     number_format($result->amount, 2),
@@ -63,6 +64,8 @@ class Transaction extends Model
             'merchant_transaction_ref',
             'flutterwave_ref',
             'bank_transfer_ref',
+            'remita_ref',
+            'provider',
             'gateway_id',
             'transactions.user_id',
             'transactions.invoice_no',
@@ -274,6 +277,7 @@ class Transaction extends Model
                 /** @var Invoice $invoice */
                 $invoice = $transaction->invoice;
                 $details = array_merge($transaction->details, $details);
+                logger(json_encode($details));
                 $transaction->update([
                     "status" => "successful",
                     "gateway_id" => $gateway_id,
@@ -373,10 +377,11 @@ class Transaction extends Model
      */
     public function transactionToPayload(): array
     {
-        $payload = $this->only(["gateway","transaction_ref", "merchant_transaction_ref", "invoice_no", "gateway_id", "amount", "fee", "total", "description", "status", "flag", "currency","details", "updated_at"]);
+        $payload = $this->only(["gateway","transaction_ref", "merchant_transaction_ref", "invoice_no", "gateway_id", "amount", "description", "status", "flag", "currency","details", "updated_at"]);
         $payload['customer_name'] = $payload['details']['name'] ?? null;
         $payload['customer_email'] = $payload['details']['email'] ?? null;
         $payload["channel"] = $payload['gateway']['name'] ?? "N/A";
+        $payload["total"] = $payload['amount'];
         $payload['updated_at'] = str_replace("T"," ",Carbon::parse($payload['updated_at'])->toDateTimeLocalString());
         $payload['created_at'] = str_replace("T"," ",Carbon::parse($payload['updated_at'])->toDateTimeLocalString());
         unset($payload['gateway_id'], $payload['gateway'], $payload['details']);
