@@ -90,13 +90,14 @@ class PaymentPage extends Component
             //Get Merchant Charge;
             $amount = $this->merchantGateways[$this->activeTab]['invoiceTotal'];
 
-
-            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no, $this->invoice->customer_email,$this->invoice->name);
+            $remitaServiceId = $this->getRemitaServiceTypeId($this->invoice->transaction);
+            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no, $this->invoice->customer_email,$this->invoice->name, $remitaServiceId);
             $parsedResult = $response;
             if (str_contains($parsedResult, "jsonp")) {
                 $status = true;
                 $parsedResult = json_decode(trim($response, 'jsonp ( )'), false, 512, JSON_THROW_ON_ERROR);
             }
+            logger("Remita Response: ".json_encode($parsedResult));
             //insert RRR into rrr table;
             RRR::create([
                 'rrr' => $parsedResult->RRR,
@@ -186,7 +187,9 @@ class PaymentPage extends Component
                 if ($transferProvider === "9PSB") {
                     $gateway = Gateway::where('name', "Bank Transfer")->get()->pluck("id", "name");
                     $gateway_id = $gateway["Bank Transfer"];
-                    $transactionTotal = $this->invoice->transaction->computeChargeAndTotal($gateway_id);
+                    /** @var Transaction $transaction */
+                    $transaction = $this->invoice->transaction;
+                    $transactionTotal = $transaction->computeChargeAndTotal($gateway_id);
 
                     $result = (object)(new NinePSB())->reserveDynamicAccount($this->invoice->invoice_no, $transactionTotal['total']);
                     $result->requestSuccessful = false;
@@ -515,5 +518,33 @@ class PaymentPage extends Component
 
 
         $this->dispatchBrowserEvent('paymentCompleted', $details);
+    }
+
+    public function getRemitaServiceTypeId(Transaction $transaction )
+    {
+        $user = $transaction->user;
+        $serviceId = config('remita.service_type_id');
+
+        $type = strtolower(str_replace(" ", "", $transaction->type));
+        if ($user->id === 3) {
+            if ( str_contains($type,"tuition") || str_contains($type,"school") ){
+                $serviceId = "10298195252";
+            }
+
+            if ( str_contains($type,"application") ){
+                $serviceId = "1972701988";
+            }
+
+            if ( str_contains($type,"transcript") ){
+                $serviceId = "1971283835";
+            }
+
+            if ( str_contains($type,"acceptance") ){
+                $serviceId = "1971104380";
+            }
+
+        }
+        return $serviceId;
+
     }
 }

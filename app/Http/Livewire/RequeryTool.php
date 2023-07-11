@@ -40,63 +40,23 @@ class RequeryTool extends Component
         $provider = strtoupper($this->provider);
         $trnx = trim($this->transaction_ref);
 
-        if ($provider === "PROVIDUS") {
-            //check to see if transaction is not already successful;
-            $transactionExists = Transaction::firstWhere('bank_transfer_ref', $trnx);
-            if ($transactionExists && $transactionExists->status === "successful") {
-                $processTransaction = false;
-                $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
-                $this->messageType = "info";
-            }
-
-            if ($processTransaction) {
-                //call providus to get transaction details;
-                /** @var object $providus */
-                $providus = (new Providus)->verifyTransaction($trnx);
-                if (isset($providus)) {
-
-                    //check if transaction exists;
-                    if (!empty($providus->settlementId)) {
-
-                        //check if initiationTranRef is missing;
-                        if ($this->byPassInitiationRef){
-                            $this->transactionDetails = [
-                                "transaction_ref" => $providus->settlementId,
-                                "amount" => $providus->transactionAmount,
-                                "date" => $providus->settlementDateTime,
-                                "remarks" => $providus->tranRemarks,
-                            ];
-                        }
-                        if (!$this->byPassInitiationRef){
-                            if (empty($providus->initiationTranRef)) {
-                                $this->message = "Transaction with settlementId : $providus->settlementId cannot be processed, initiationTranRef is Missing. Dynamic Account Expired when Payment was made.";
-                                $this->messageType = "danger";
-                            }
-                            if (!empty($providus->initiationTranRef)) {
-                                $this->transactionDetails = [
-                                    "transaction_ref" => $providus->settlementId,
-                                    "amount" => $providus->transactionAmount,
-                                    "date" => $providus->settlementDateTime,
-                                    "remarks" => $providus->tranRemarks,
-                                ];
-                            }
-                        }
-
-                    }
-                    if (empty($providus->settlementId)) {
-                        $this->message = "Transaction  : $trnx cannot be processed, $providus->tranRemarks";
-                        $this->messageType = "danger";
-                    }
-
-                }
-            }
-
-        }
-        if ($provider === "PROVIDUSOLD") {
+        if ( in_array($provider,['PROVIDUSOLD', 'PROVIDUS'])) {
 
             //call providus to get transaction details;
             /** @var object $providus */
-            $providus = (new Providus)->verifyTransactionOldPtpp($trnx);
+            if ($provider === "PROVIDUSOLD"){
+                $providus = (new Providus)->verifyTransactionOldPtpp($trnx);
+            }
+            if ($provider === "PROVIDUS"){
+                //check to see if transaction is not already successful;
+                $transactionExists = Transaction::firstWhere('bank_transfer_ref', $trnx);
+                if ($transactionExists && $transactionExists->status === "successful") {
+                    $processTransaction = false;
+                    $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
+                    $this->messageType = "info";
+                }
+                $providus = (new Providus)->verifyTransaction($trnx);
+            }
 
             if (isset($providus)) {
 
@@ -104,11 +64,7 @@ class RequeryTool extends Component
                 if (!empty($providus->settlementId)) {
 
                     //check if initiationTranRef is missing;
-                    if (empty($providus->initiationTranRef)) {
-                        $this->message = "Transaction with settlementId : $providus->settlementId cannot be processed, initiationTranRef is Missing. Dynamic Account Expired when Payment was made.";
-                        $this->messageType = "danger";
-                    }
-                    if (!empty($providus->initiationTranRef)) {
+                    if ($this->byPassInitiationRef){
                         $this->transactionDetails = [
                             "transaction_ref" => $providus->settlementId,
                             "amount" => $providus->transactionAmount,
@@ -116,6 +72,21 @@ class RequeryTool extends Component
                             "remarks" => $providus->tranRemarks,
                         ];
                     }
+                    if (!$this->byPassInitiationRef){
+                        if (empty($providus->initiationTranRef)) {
+                            $this->message = "Transaction with settlementId : $providus->settlementId cannot be processed, initiationTranRef is Missing. Dynamic Account Expired when Payment was made.";
+                            $this->messageType = "danger";
+                        }
+                        if (!empty($providus->initiationTranRef)) {
+                            $this->transactionDetails = [
+                                "transaction_ref" => $providus->settlementId,
+                                "amount" => $providus->transactionAmount,
+                                "date" => $providus->settlementDateTime,
+                                "remarks" => $providus->tranRemarks,
+                            ];
+                        }
+                    }
+
                 }
                 if (empty($providus->settlementId)) {
                     $this->message = "Transaction  : $trnx cannot be processed, $providus->tranRemarks";

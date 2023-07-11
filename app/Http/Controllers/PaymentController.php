@@ -82,8 +82,13 @@ class PaymentController extends Controller
         $freshArr = [];
 
         if ($merchantGateways) {
-            array_walk($merchantGateways, static function ($item, $key) use (&$freshArr, $invoice) {
+            array_walk($merchantGateways, function ($item, $key) use (&$freshArr, $invoice) {
                 if ($item['status']){
+                    if (strtolower($item['name']) === "card"){
+                        if ($invoice->user_id === 3){
+                            $item = $this->setCardMerchantCharge($invoice,$item);
+                        }
+                    }
                     $item['gateway_id'] = $key;
                     $item["invoiceCharge"] = $item['charge_factor'] ?  ($item['charge'] / 100) * $invoice->amount : $item['charge'];
                     $item["invoiceTotal"] = $invoice->amount + $item['invoiceCharge'];
@@ -95,6 +100,39 @@ class PaymentController extends Controller
         }
 
         return $freshArr;
+    }
+
+    public function setCardMerchantCharge(Invoice $invoice,$item)
+    {
+        $transaction = $invoice->transaction;
+        //Tuition fees - 50 - 500,000 - flat rate 350
+        //Application fees - 18000 - 25000 - % 1.5
+        //Transcript fees - 700 - 25000 %1.5
+        //Acceptance fees - 22000 % 1.5
+        //Check if it's UI merchant;
+        $type = strtolower(str_replace(" ", "", $transaction->type));
+
+        if ( str_contains($type,"tuition") || str_contains($type,"school") ){
+            $item['charge_factor'] = 0;
+            $item['charge'] = 350;
+        }
+
+        if ( str_contains($type,"application") ){
+            $item['charge_factor'] = 0;
+            $item['charge'] = 350;
+        }
+
+        if ( str_contains($type,"transcript") ){
+            $item['charge_factor'] = 0;
+            $item['charge'] = 350;
+        }
+
+        if ( str_contains($type,"acceptance") ){
+            $item['charge_factor'] = 0;
+            $item['charge'] = 350;
+        }
+        return $item;
+
     }
 
     public function receipt($id)
@@ -112,10 +150,10 @@ class PaymentController extends Controller
             $data['transaction'] = $transaction;
             $data['redirect']  = false;
 
-            if (isset($transaction['details']['redirect_url'])){
+            if (isset($transaction->redirect_url)){
                 $data['redirect'] = true;
                 $urlQuery = $transaction->transactionToPayload();
-                $url = $transaction['details']['redirect_url'];
+                $url = $transaction->redirect_url;
                 $data['redirect_url']  = $url ."?" . http_build_query($urlQuery);
             }
 
@@ -134,7 +172,7 @@ class PaymentController extends Controller
             "amount" => ["required", "numeric", "min:100"],
             "email" => "required",
             "quantity" => ["required", "numeric", "min:1"],
-            'request_id' => ["required", "min:8"],
+            'request_id' => ["required", "min:5"],
             "redirect_url" => ["sometimes", "url"]
 
         ], $request->all());
@@ -150,11 +188,15 @@ class PaymentController extends Controller
         //check if invoice Exists;
         $transaction = Transaction::firstWhere('merchant_transaction_ref',$request_id);
         if ($transaction){
+            //check for UI merchant and apply custom rule;
+            if ($user->id === 3){
+               return  $this->UIpaymentRule($transaction);
+            }
+            $error = [
+                "request_id" => ["Payment Request already Exists, Please Use a Unique Request ID!"],
+            ];
+            return response()->json(errorResponseJson('Payment Request Failed',$error),404);
 
-            return response()->json(['status' => false,  "data" => [
-                "url" => route('payment-page',['id' => $transaction->invoice_no])
-            ]
-            ]);
         }
 
         DB::transaction(function () use ($request,$request_id, $user, &$data) {
@@ -187,7 +229,8 @@ class PaymentController extends Controller
                 "amount" => $amount,
                 "total" => $amount,
                 'details' => $trn_details,
-                "flag" => "debit"
+                "flag" => "debit",
+                "redirect_url" => $redirect_url
             ]);
             $data = new InvoiceCollection($invoiceAdded);
         });
@@ -195,6 +238,69 @@ class PaymentController extends Controller
         $request->attributes->set('paymentRequest', true);
 
         return response()->json(['status' => true, "message" => "Payment Request Successful", "data" => $data,]);
+
+    }
+
+    public function updatePaymentRequest(Request $request)
+    {
+        $request->validate([
+            "name" => "required",
+            "amount" => ["required", "numeric", "min:100"],
+            "email" => "required",
+            'request_id' => ["required", "min:5"],
+            "redirect_url" => ["sometimes", "url"]
+
+        ], $request->all());
+
+
+        /** @var User $user */
+        $user = $request->user();
+
+        //request passed create Invoice and return link;
+        $data = "";
+        $request_id = $request->request_id;
+
+        //check if invoice Exists;
+        /** @var Transaction $transaction */
+        $transaction = Transaction::firstWhere('merchant_transaction_ref',$request_id);
+        $message = ['status' => false, "message" => "Payment Request Not Found", "data" => $data,];
+
+        if ($transaction){
+            $tStatus = strtoupper($transaction->status);
+            $message = ['status' => false, "message" => "Payment Request already $tStatus", "data" => $data,];
+
+            //only allow update on pending transactions
+            if ($tStatus === "PENDING"){
+                DB::transaction(function () use ($request,$transaction, $user, &$data) {
+                    //update invoice;
+
+                    /** @var Invoice $invoice */
+                    $invoice = $transaction->invoice;
+                    $invoice->update([
+                        'customer_email' => $request->email,
+                        'customer_name' => $request->full_name,
+                        'due_date' => Carbon::now()->addDays(7),
+                        'amount' => $request->amount,
+                        'name' => $request->name,
+                    ]);
+
+                    //update transaction;
+                    $transaction->update([
+                        "amount" => $request->amount,
+                    ]);
+                    //set flag to indicate it's a paymentRequest;
+                    $request->attributes->set('paymentRequest', true);
+                    $data = new InvoiceCollection($invoice);
+                });
+                $message = ['status' => true, "message" => "Payment Request Updated", "data" => $data,];
+
+
+            }
+
+        }
+
+
+        return response()->json($message);
 
     }
 
@@ -294,5 +400,24 @@ class PaymentController extends Controller
 
     }
 
+    public function UIpaymentRule(Transaction $transaction)
+    {
+        $status = strtoupper($transaction->status);
+
+        if ($status === "FAILED"){
+            //change transaction to pending
+            logger("Changing transaction {$transaction->merchant_transaction_ref} from $status to PENDING ");
+            $transaction->update([
+                "status" => "pending"
+            ]);
+            //change invoice to pending
+            $transaction->invoice->update(['status' => 'pending']);
+        }
+        return response()->json(['status' => false, "data" => [
+            "url" => route('payment-page', ['id' => $transaction->invoice_no])
+        ]
+        ]);
+
+    }
 
 }

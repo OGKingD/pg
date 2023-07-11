@@ -27,6 +27,7 @@ Route::middleware(['terminate'])->group(function () {
         //Payment Request Routes!
         Route::prefix('payments')->group(function () {
             Route::post('create',[PaymentController::class,"createPaymentRequest"]);
+            Route::post('update',[PaymentController::class,"updatePaymentRequest"]);
             Route::get('validate', [PaymentController::class, 'details']);
             Route::get('details/{id}',[\App\Http\Controllers\CashAtBankController::class,'show']);
             Route::post('pay',[\App\Http\Controllers\CashAtBankController::class, 'store']);
@@ -38,6 +39,7 @@ Route::middleware(['terminate'])->group(function () {
     Route::prefix("webhook")->group(function (){
         Route::post('flutterwave',[WebhookController::class,'flutterwave'])->name('webhook.flutterwave');
         Route::post('providus',[WebhookController::class,'providusSettlement']);
+        Route::post('remita',[WebhookController::class,'remitaSettlement']);
         Route::post('ninepsbvirtual',[WebhookController::class,'ninePsbSettlement'])->name('webhook.nine-psb-settlement');
     });
 });

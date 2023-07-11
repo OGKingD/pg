@@ -51,7 +51,7 @@ class TransactionsPage extends Component
 
         }
         if ($this->isAdmin) {
-            $this->builder = Transaction::reportQuery($this->searchQuery);
+            $this->builder = Transaction::reportQuery($this->searchQuery)->latest();
             $this->layout = 'layouts.admin.admin_dashboardapp';
         }
         $this->data['transactionCount'] = $this->builder->count();

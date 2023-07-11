@@ -12,6 +12,6 @@ class RRR extends Model
 
     public function invoice()
     {
-        return $this->belongsTo(Invoice::class);
+        return $this->belongsTo(Invoice::class,'invoice_no','invoice_no');
     }
 }

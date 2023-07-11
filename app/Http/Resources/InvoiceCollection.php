@@ -21,16 +21,16 @@ class InvoiceCollection extends JsonResource
             return $this->paymentRequest($request);
         }
         return [
-            "merchant_transaction_ref" => $this->merchant_transaction_ref,
+            "merchant_transaction_ref" => $this->resource->transaction->merchant_transaction_ref,
             "invoice_no" => $this->invoice_no,
             "amount" => $this->amount,
-            "fee" => $this->fee,
-            "total" => $this->total,
-            "description" => $this->description,
+            "fee" => $this->resource->transaction->fee,
+            "total" => $this->resource->transaction->total,
+            "description" => $this->resource->transaction->description,
             "status" => $this->status,
-            "channel" => $this->gateway->name,
-            "flag" => $this->flag,
-            "currency" => $this->currency,
+            "channel" => $this->resource->transaction->gateway->name ?? "N/A",
+            "flag" => $this->resource->transaction->flag,
+            "currency" => $this->resource->transaction->currency,
             "date" => $this->updated_at,
         ];
 

@@ -18,15 +18,18 @@
                         </li>
                     @endif
 
-                    @if(isset($merchantGateways['remita']))
-                        <li onclick="sprocessing('Please Wait!')" class="nav-item" wire:click="setActiveTab('remita')" >
-                            <a  class="nav-link mt-5 @if($activeTab === "remita") active @endif" data-bs-toggle="pill"
-                               href="#remita">
-                                <i class="fas fa-school ">
-                                    &nbsp; Remita
-                                </i>
-                            </a>
-                        </li>
+                    @if(str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)),"transcript"))
+                        @if(isset($merchantGateways['remita']))
+                                <li onclick="sprocessing('Please Wait!')" class="nav-item" wire:click="setActiveTab('remita')" >
+                                    <a  class="nav-link mt-5 @if($activeTab === "remita") active @endif" data-bs-toggle="pill"
+                                        href="#remita">
+                                        <i class="fas fa-school ">
+                                            &nbsp; Remita
+                                        </i>
+                                    </a>
+                                </li>
+
+                            @endif
                     @endif
 
 
