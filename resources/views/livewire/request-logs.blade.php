@@ -145,9 +145,16 @@
                                                     <td>{{$requestlog['request_id']}}</td>
                                                     <td>{{$requestlog['user_id']}}</td>
                                                     <td>{{$requestlog['url']}}</td>
-                                                    <td>{{$requestlog['payload']}}</td>
                                                     <td>
-                                                        @foreach(json_decode($requestlog['response'], false, 512, JSON_THROW_ON_ERROR) as $key => $resp)
+                                                        @foreach($requestlog['payload'] as $key => $resp)
+                                                            {{ ++$key . ": ".json_encode($resp, JSON_THROW_ON_ERROR)}}
+                                                            <br>
+
+                                                        @endforeach
+                                                    </td>
+                                                    <td>
+                                                        @foreach($requestlog['response'] as $key => $resp)
+
                                                             {{++$key . ": ".json_encode($resp, JSON_THROW_ON_ERROR)}}
                                                             <br>
                                                         @endforeach
@@ -160,9 +167,7 @@
                                                 <tr>
                                                     <td colspan="7">
                                                         <div class="container p-3 my-3  ">
-                                                            <h1 class="display-4 text-info text-center ">No Webhooks(s)
-                                                                found
-                                                                !</h1>
+                                                            <h1 class="display-4 text-info text-center ">No API Request(s) found !</h1>
                                                         </div>
                                                     </td>
                                                 </tr>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Lib\Services\Flutterwave;
 use App\Lib\Services\NinePSB;
 use App\Lib\Services\Providus;
+use App\Lib\Services\Remita;
 use App\Models\DynamicAccount;
 use App\Models\Gateway;
 use App\Models\Transaction;
@@ -355,6 +356,7 @@ class WebhookController extends Controller
 
         $requestSuccessful = false;
         $responseCode = "02";
+        $statusCode = 200;
         $responseMessage = "";
         $data = $request->all();
         $settlementId = $request['transaction']['linkingreference'] ?? null;
@@ -399,7 +401,6 @@ class WebhookController extends Controller
                         $userRef = $user->id;
                         $company = company();
                         $wallet = $user->wallet;
-                        $statusCode = 200;
                         $transactionExists->update([
                             'session_id' => $sessionId,
                             'settlement_id' =>  $settlementId,
@@ -419,10 +420,14 @@ class WebhookController extends Controller
 
                                 $responseMessage = "Amount Paid less than Transaction Amount";
                             }
+                            if ($transaction_status->data['order']['amount'] > $spTransaction->total ){
+
+                                $responseMessage = "Amount Paid Greater than Transaction Amount";
+                            }
 
 
                             if ($transaction_status->payment === "successful") { //make sure amount equal to or greater than transaction amount;
-                                if ($transaction_status->data['order']['amount'] >= $spTransaction->total) {
+                                if ($transaction_status->data['order']['amount'] = $spTransaction->total) {
 
                                     $details = $transaction_status->data['customer']['account'];
 
@@ -435,7 +440,8 @@ class WebhookController extends Controller
                                         $spTransaction->update([
                                             'total' => $transaction_status->data['order']['amount'],
                                             'fee' => $transaction_status->data['order']['amount'] - $spTransaction->amount,
-                                            'bank_transfer_ref' => $settlementId
+                                            'bank_transfer_ref' => $settlementId,
+                                            'provider' => "9PSB"
                                         ]);
                                         $spTransaction->handleSuccessfulPayment($spTransaction, $gateway_id, $transaction_status->message, $details, $wallet, $user, $company);
 
@@ -444,23 +450,18 @@ class WebhookController extends Controller
                                 }
                             }
 
-                            //update transaction;
-
                         }
-
-                        $webhookResponse = [
-                            "status_code" => $statusCode,
-                            "message" => $responseMessage
-                        ];
-
-
-                        $webhooks->logWebhook($settlementId,$userRef,$data,$webhookResponse);
 
                     }
                 }
 
-
             }
+            $webhookResponse = [
+                "status_code" => $statusCode,
+                "message" => $responseMessage
+            ];
+
+            $webhooks->logWebhook($settlementId,$userRef,$data,$webhookResponse);
             logger("Webhook Response for $request->settlementId",[
                 "requestSuccessful"=> $requestSuccessful,
                 "settlementId"=> $settlementId,
@@ -493,6 +494,23 @@ class WebhookController extends Controller
                 "responseMessage" => $responseMessage,
                 "responseCode"=> $responseCode
             ], $statusCode);
+        }
+
+
+    }
+
+    public function remitaSettlement(Request $request, Remita $remita, Webhooks $webhooks)
+    {
+
+        $data = $request->all();
+        info("REMITA request from {$request->ip()} is ", $data);
+        if (count($data)){
+            $rrr = $data[0]['rrr'];
+            if ( isset($rrr)){
+                //call Remita to confirm status of RRR;
+                $response = $remita->rrrStatus($rrr);
+                dd($response);
+            }
         }
 
 

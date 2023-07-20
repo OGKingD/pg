@@ -167,28 +167,25 @@ class RequeryTool extends Component
             if (!$byTranxRef){
                 $flutterwave = (new Flutterwave(config('flutterwave.secret_key')))->verifyTransaction($trnx);
             }
-            if ($processTransaction) {
-                if (isset($flutterwave)) {
 
-                    if ($flutterwave['status'] === "error") {
-                        $this->message = "Transaction  : $trnx cannot be processed, " . $flutterwave['message'];
-                        $this->messageType = "danger";
-                    }
-                    $payload = $flutterwave['data'];
-                    if (isset($payload['status'])){
-                        if ( strtoupper($payload['status']) === "SUCCESSFUL"){
-                            $this->transactionDetails = $flutterwave;
-                            $this->transactionDetails["transaction_ref"] = $payload['tx_ref'];
-                            $this->transactionDetails["amount"] = $payload['charged_amount'];
-                            $this->transactionDetails["date"] = $payload['created_at'];
-                            $this->transactionDetails["remarks"] = $payload['status'];
+            if ($processTransaction && isset($flutterwave['data'])) {
+                $payload = $flutterwave['data'];
+                $status = strtoupper($payload['status']);
 
-                        }
-                    }
-
-
+                if ($status=== "FAILED") {
+                    $this->message = "Transaction  : $trnx cannot be processed, " .$payload['narration']. $payload['status'];
+                    $this->messageType = "danger";
                 }
 
+                if ( $status === "SUCCESSFUL"){
+
+                    $this->transactionDetails = $flutterwave;
+                    $this->transactionDetails["transaction_ref"] = $payload['tx_ref'];
+                    $this->transactionDetails["amount"] = $payload['charged_amount'];
+                    $this->transactionDetails["date"] = $payload['created_at'];
+                    $this->transactionDetails["remarks"] = $payload['status'];
+
+                }
             }
         }
 

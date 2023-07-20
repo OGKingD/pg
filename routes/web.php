@@ -52,6 +52,7 @@ Route::middleware(['auth'])->group(function () {
            Route::get('payment_resolution',\App\Http\Livewire\PaymentResolution::class)->name('payment_resolution');
            Route::get('logs',[\App\Http\Controllers\DirectoryListingController::class,'index'])->name('logs');
            Route::get('delete/{filename}/{path}',[\App\Http\Controllers\DirectoryListingController::class, 'deleteFile']);
+           Route::get('monitor/transactionsummary',\App\Http\Livewire\TransactionSummary::class);
 
        });
 

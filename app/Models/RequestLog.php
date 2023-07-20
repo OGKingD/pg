@@ -5,7 +5,7 @@ namespace App\Models;
 
 class RequestLog extends Model
 {
-
+protected $casts = ['response' => 'json', 'payload' => 'json'];
     public static function logRequest($trnxRef, $url, $merchant_id, $payload, $request_response): void
     {
         $request = self::firstOrCreate(
@@ -16,16 +16,22 @@ class RequestLog extends Model
         );
 
         //Get the payload;
+        $json_decode = json_decode($request_response, false, 512, JSON_THROW_ON_ERROR);
+        $request_response = $json_decode->data ?? $json_decode;
         if (is_null($request->response)) {
             // first time call; insert new response;
             $resp = [$request_response];
-        } else {
+            $payloadDump = [$payload];
+        }
+        if (!is_null($request->response)){
 
             $resp = $request->response;
+            $payloadDump = $request->payload;
 
             if (is_array($resp) && count($resp)) {
                 //add response to existing response;
                 $resp[] = $request_response;
+                $payloadDump[] = $payload;
             }
 
         }
@@ -33,7 +39,7 @@ class RequestLog extends Model
         $request->update([
             "response" => $resp,
             "url" => $url,
-            "payload" => $payload,
+            "payload" => $payloadDump,
         ]);
 
     }
