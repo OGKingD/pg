@@ -253,8 +253,6 @@ class PaymentController extends Controller
         ], $request->all());
 
 
-        /** @var User $user */
-        $user = $request->user();
 
         //request passed create Invoice and return link;
         $data = "";
@@ -271,7 +269,7 @@ class PaymentController extends Controller
 
             //only allow update on pending transactions
             if ($tStatus === "PENDING"){
-                DB::transaction(function () use ($request,$transaction, $user, &$data) {
+                DB::transaction(function () use ($request,$transaction, &$data) {
                     //update invoice;
 
                     /** @var Invoice $invoice */

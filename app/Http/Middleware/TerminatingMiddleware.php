@@ -46,16 +46,16 @@ class TerminatingMiddleware
                 $payload = json_encode($request->all(), JSON_THROW_ON_ERROR);
                 $url = $request->path();
                 $method = $request->method();
-                $request_response = json_encode($response->content(), JSON_THROW_ON_ERROR);
+                $request_response = $response->content();
                 $merchant_id = $request->user()->id ?? null;
-                $request_id = $request->request_id ?? null;
+                $request_id = $request->request_id ?? $request->transaction ?? null;
                 $created_at = $request->get('created_at');
                 $created_at_withMilliseconds = $request->get('created_atwithMilliseconds');
                 $updated_at = Carbon::now();
                 $updated_at_withMilliseconds = $updated_at->format("Y-m-d H:i:s:u A");
                 $response_time = Carbon::parse($updated_at)->diffInMilliseconds($created_at);
                 Log::channel('merchant_request_log')->info("$trnxRef,$merchant_id,$request_id,$method,$url,$payload,$request_response,{$response->status()},$created_at_withMilliseconds,$updated_at_withMilliseconds,$response_time ");
-                RequestLog::logRequest($request_id??$trnxRef,$url,$merchant_id, $request->all(), json_decode($request_response, false, 512, JSON_THROW_ON_ERROR));
+                RequestLog::logRequest($request_id??$trnxRef,$url,$merchant_id, $request->all(), $request_response);
 
             }
         }

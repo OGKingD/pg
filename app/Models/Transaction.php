@@ -18,7 +18,7 @@ class Transaction extends Model
     public  function generateCsvReport(array $payload, array $csvHeaders)
     {
         $file = fopen(storage_path("logs/{$payload['filename']}"), "wb");
-        $query = self::reportQuery($payload)->orderBy('user_id','desc');
+        $query = self::reportQuery($payload)->orderBy('user_id','desc')->orderBy('updated_at');
         //5,6,7
         $totalFee= $totalAmount = $totalSum =0;
         $query->chunk(3000, function ($results) use ($file, $csvHeaders, &$totalFee, &$totalAmount, &$totalSum) {
@@ -673,21 +673,27 @@ class Transaction extends Model
             selectRaw("COUNT(CASE WHEN status = 'failed' AND gateway_id = $gateway->id THEN 1 end) as {$channel}_failed_bills")->
 
             //sum amount
-            selectRaw("SUM(amount) as {$channel}_total_amount")->
+//            selectRaw("SUM(amount) as {$channel}_total_amount")->
+            selectRaw("SUM(CASE WHEN gateway_id = $gateway->id  THEN amount end) as {$channel}_total_amount")->
+
 
 //            selectRaw("SUM(CASE WHEN status = 'successful' AND gateway_id = $gateway->id  THEN amount end) as {$channel}_total_successful_amount")->
 //            selectRaw("SUM(CASE WHEN status = 'pending' AND gateway_id = $gateway->id  THEN amount end) as {$channel}_total_pending_amount")->
 //            selectRaw("SUM(CASE WHEN status = 'failed' AND gateway_id = $gateway->id  THEN amount end) as {$channel}_total_failed_amount")->
 
             //sum fee
-            selectRaw("SUM(fee) as {$channel}_total_fees")->
+//            selectRaw("SUM(fee) as {$channel}_total_fees")->
+            selectRaw("SUM(CASE WHEN gateway_id = $gateway->id  THEN fee end) as {$channel}_total_fees")->
+
 
 //            selectRaw("SUM(CASE WHEN status = 'successful' AND gateway_id = $gateway->id  THEN fee end) as {$channel}_total_successful_fees")->
 //            selectRaw("SUM(CASE WHEN status = 'pending' AND gateway_id = $gateway->id  THEN fee end) as {$channel}_total_pending_fees")->
 //            selectRaw("SUM(CASE WHEN status = 'failed' AND gateway_id = $gateway->id  THEN fee end) as {$channel}_total_failed_fees")->
 
             //sum total
-            selectRaw("SUM(total) as {$channel}_total");
+//            selectRaw("SUM(total) as {$channel}_total");
+            selectRaw("SUM(CASE WHEN gateway_id = $gateway->id  THEN total end) as {$channel}_total");
+
 
 //            selectRaw("SUM(CASE WHEN status = 'successful' AND gateway_id = $gateway->id  THEN total end) as {$channel}_total_successful")->
 //            selectRaw("SUM(CASE WHEN status = 'pending' AND gateway_id = $gateway->id  THEN total end) as {$channel}_total_pending")->

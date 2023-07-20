@@ -2,6 +2,36 @@
     <div class="d-sm-flex justify-content-between">
 
         <div>
+            @if(isset($reportExists))
+                <a href="#">
+                    <div class="alert alert-info alert-dismissible fade show" role="alert" style="font-size: 25px"
+                         onclick=" downloadReport('reportGeneratedAlert','{{$reportDownloadLink}}')" id="reportGeneratedAlert">
+                        <span class="alert-text">
+                            <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
+                            <strong>Info! </strong>Report Generated! click me to download
+                        </span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                </a>
+            @endif
+            @if(isset($summaryReportExists))
+                <a href="#">
+                    <div class="alert alert-info alert-dismissible fade show" role="alert" style="font-size: 25px"
+                         onclick=" downloadReport('reportGeneratedAlert','{{$summaryReportDownloadLink}}')" id="reportGeneratedAlert">
+                        <span class="alert-text">
+                            <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
+                            <strong>Info! </strong>Summary Report Generated! click me to download
+                        </span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                </a>
+            @endif
             <div class="page-header   position-relative m-3 border-radius-xl">
                 <img src="{{asset('assets/img/shapes/waves-white.svg')}}" alt="pattern-lines"
                      class="position-absolute opacity-6 start-0 top-0 w-100">
@@ -325,36 +355,7 @@
             <span class="btn-inner--text">Export CSV</span>
         </button>
     </div>
-    @if(isset($reportExists))
-        <a href="#">
-            <div class="alert alert-info alert-dismissible fade show" role="alert" style="font-size: 25px"
-                 onclick=" downloadReport('reportGeneratedAlert','{{$reportDownloadLink}}')" id="reportGeneratedAlert">
-                        <span class="alert-text">
-                            <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
-                            <strong>Info! </strong>Report Generated! click me to download
-                        </span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
 
-        </a>
-    @endif
-    @if(isset($summaryReportExists))
-        <a href="#">
-            <div class="alert alert-info alert-dismissible fade show" role="alert" style="font-size: 25px"
-                 onclick=" downloadReport('reportGeneratedAlert','{{$summaryReportDownloadLink}}')" id="reportGeneratedAlert">
-                        <span class="alert-text">
-                            <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
-                            <strong>Info! </strong>Summary Report Generated! click me to download
-                        </span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-        </a>
-    @endif
     <div class="row min-vh-90">
         <div class="card table-responsive">
             <div class="dataTable-wrapper dataTable-loading sortable  fixed-columns">
@@ -419,8 +420,9 @@
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter">Date</a>
                             </th>
-                            <th>
-
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
+                                <a href="#" class="dataTable-sorter"></a>
                             </th>
 
 
@@ -563,7 +565,7 @@
                     salert("Generating Report", "Cannot Generate Report! No data Available", "warning")
                 }
                 if (response.status === true) {
-                    salert("Generating Report!", "A banner would be displayed once Report is Generated! Or Reload this page in a few minutes", "info", true)
+                    salert("Generating Report!", "Reload this page in a few minutes! A banner would be displayed once Report is Generated!", "info", true)
                 }
 
             });

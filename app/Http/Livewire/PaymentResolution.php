@@ -142,7 +142,20 @@ class PaymentResolution extends Component
                     $ref = $ninePsb['data']['transaction']['linkingreference'] ?? $this->transaction_ref;
                     $dynAccResult = DynamicAccount::with(['invoice'])->where('initiationTranRef', $ref)->get();
 
-                    $this->message = "Payment $ref Successful! Check webhook logs if transaction has been pushed! or if Payment has been completed for the invoice!";
+                    $this->message = "<i>Payment $ref is Successful! Check for the status of that transaction/invoice on . </i>.
+                    <ul>
+                       <li>If transaction is successful, customer completed with another payment channel. </li>
+                       <li>If transaction is pending Check webhook logs if transaction has been pushed!.
+                          <ul>
+                            <li>If transaction not found in webhook logs kindly use the repush tool.</li>
+                          </ul>
+
+                       </li>
+                       <li> If transaction is found in webhook logs...
+                       </li>
+
+
+                    </ul>";
 
                     if (count($dynAccResult)){
                         $this->message .= '
@@ -197,7 +210,7 @@ class PaymentResolution extends Component
                     }
 
                     if (!count($dynAccResult)){
-                        $this->message .= "Initiation Ref $ref not Found in Dynamic Accounts, Customer might have initiated another payment or chosen another Channel.";
+                        $this->message .= "<h5>Initiation Ref $ref not Found in Dynamic Accounts, Customer might have initiated another payment causing Initiation Ref to differ.</h5>";
 
                     }
 
@@ -213,7 +226,7 @@ class PaymentResolution extends Component
                     $this->message = "Transaction  $this->transaction_ref Failed! ";
                     $this->messageType = "danger";
                 }
-                $this->message .= "\n". json_encode($ninePsb);
+                $this->message .= "\n". json_encode($ninePsb, JSON_THROW_ON_ERROR);
 
             }
 
