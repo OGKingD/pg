@@ -89,15 +89,35 @@ class PaymentPage extends Component
         } else {
             //Get Merchant Charge;
             $amount = $this->merchantGateways[$this->activeTab]['invoiceTotal'];
+            $charge = $this->merchantGateways[$this->activeTab]['invoiceCharge'];
+            $lineItems = [
+                [
+                    "lineItemsId" => "itemid1",
+                    "beneficiaryName" => "University of Ibadan TSA Collections Account",
+                    "beneficiaryAccount" => "3000050704",
+                    "bankCode" => "000",
+                    "beneficiaryAmount" => $amount-$charge,
+                    "deductFeeFrom" => "0"
+                ],
+                [
+                    "lineItemsId" => "itemid1",
+                    "beneficiaryName" => "Saanapay Collection Account",
+                    "beneficiaryAccount" => "9020006763",
+                    "bankCode" => "070",
+                    "beneficiaryAmount" => $charge,
+                    "deductFeeFrom" => "1"
+                ]
+            ];
+
 
             $remitaServiceId = $this->getRemitaServiceTypeId($this->invoice->transaction);
-            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no, $this->invoice->customer_email,$this->invoice->name, $remitaServiceId);
+            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no, $this->invoice->customer_email,$this->invoice->name, $remitaServiceId,$lineItems);
             $parsedResult = $response;
             if (str_contains($parsedResult, "jsonp")) {
                 $status = true;
                 $parsedResult = json_decode(trim($response, 'jsonp ( )'), false, 512, JSON_THROW_ON_ERROR);
             }
-            logger("Remita Response: ".json_encode($parsedResult));
+            logger("Remita Response: ". json_encode($parsedResult, JSON_THROW_ON_ERROR));
             //insert RRR into rrr table;
             RRR::create([
                 'rrr' => $parsedResult->RRR,

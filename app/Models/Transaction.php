@@ -277,7 +277,7 @@ class Transaction extends Model
                 /** @var Invoice $invoice */
                 $invoice = $transaction->invoice;
                 $details = array_merge($transaction->details, $details);
-                logger(json_encode($details));
+
                 $transaction->update([
                     "status" => "successful",
                     "gateway_id" => $gateway_id,

@@ -190,7 +190,7 @@ class PaymentController extends Controller
         if ($transaction){
             //check for UI merchant and apply custom rule;
             if ($user->id === 3){
-               return  $this->UIpaymentRule($transaction);
+               return  $this->UIpaymentRule($transaction,$request);
             }
             $error = [
                 "request_id" => ["Payment Request already Exists, Please Use a Unique Request ID!"],
@@ -285,6 +285,7 @@ class PaymentController extends Controller
                     //update transaction;
                     $transaction->update([
                         "amount" => $request->amount,
+                        "total" => $request->amount
                     ]);
                     //set flag to indicate it's a paymentRequest;
                     $request->attributes->set('paymentRequest', true);
@@ -308,7 +309,6 @@ class PaymentController extends Controller
      */
     public function validateCardPayment($id, Request $request)
     {
-        info("Paylod sent to Redirect URL for INVOICE $id is : ", $request->all());
         $payload = $request->get('response');
         /** @var object $data */
         $data = json_decode($payload, false, 512, JSON_THROW_ON_ERROR);
@@ -337,7 +337,7 @@ class PaymentController extends Controller
                 }
 
                 /** @var Gateway $gateway */
-                $gateway = Gateway::select('id', 'name')->where('name', "Card")->first();
+                $gateway = Gateway::select(['id', 'name'])->where('name', "Card")->first();
 
 
                 $payment_provider_message = $flwavePayload['flw_ref'] . " " . $flwavePayload['processor_response'];
@@ -398,7 +398,7 @@ class PaymentController extends Controller
 
     }
 
-    public function UIpaymentRule(Transaction $transaction)
+    public function UIpaymentRule(Transaction $transaction,$request)
     {
         $status = strtoupper($transaction->status);
 
@@ -411,7 +411,33 @@ class PaymentController extends Controller
             //change invoice to pending
             $transaction->invoice->update(['status' => 'pending']);
         }
-        return response()->json(['status' => false, "data" => [
+        //check if amount differs and update
+        //only allow update on pending transactions
+        DB::transaction(function () use ($request, $transaction) {
+            //update invoice;
+
+            /** @var Invoice $invoice */
+            $invoice = $transaction->invoice;
+            $invoice->update([
+                'amount' => $request->amount,
+                'customer_email' => $request->email,
+                'customer_name' => $request->full_name,
+                'due_date' => Carbon::now()->addDays(7),
+                'name' => $request->name,
+            ]);
+
+            //update transaction;
+            $transaction->update([
+                "amount" => $request->amount,
+                "type" => $request->service_type,
+                "total" => $request->amount,
+                "redirect_url" => $request->redirect_url
+            ]);
+
+        });
+        $isSuccessful = true;
+        $message = "Payment Request Updated";
+        return response()->json(['status' => $isSuccessful, "message" => $message, "data" => [
             "url" => route('payment-page', ['id' => $transaction->invoice_no])
         ]
         ]);

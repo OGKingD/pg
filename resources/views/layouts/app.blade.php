@@ -11,11 +11,11 @@
         @yield('content')
 
     </div>
+    @include('partials.admin.admin_footer')
 
 </main>
 
 
 @yield('scripts')
-@include('partials.admin.admin_footer')
 
 </body>

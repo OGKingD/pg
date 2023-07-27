@@ -8,6 +8,8 @@ use App\Lib\Services\Providus;
 use App\Lib\Services\Remita;
 use App\Models\DynamicAccount;
 use App\Models\Gateway;
+use App\Models\Invoice;
+use App\Models\RRR;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
@@ -504,15 +506,92 @@ class WebhookController extends Controller
 
         $data = $request->all();
         info("REMITA request from {$request->ip()} is ", $data);
+        $statusCode = 400;
+        $responseMessage = $settlementId = $userRef =  "";
+        $requestSuccessful = true;
         if (count($data)){
             $rrr = $data[0]['rrr'];
+            $responseMessage = "RRR not Attached";
             if ( isset($rrr)){
+                $settlementId = $rrr;
                 //call Remita to confirm status of RRR;
                 $response = $remita->rrrStatus($rrr);
-                dd($response);
+                $responseMessage = "Could Not Confirm $rrr Status from Remita";
+                if ($response['status']){
+                    $statusCode =  200;
+                    $details = $response['data'];
+                    $rrr = $details['RRR'];
+                    $responseMessage = "(RRR) $rrr Transaction Not Found on Gateway!";
+                    //check if RRR exist on our side
+                    $rrrExists  = RRR::firstWhere('rrr',$rrr);
+
+                    if (!$rrrExists){
+                        //push to OLD PTPP;
+                        $response = \Http::post("https://ptpp.saanapay.ng/PaymentGateway/Payment/RemitaWebHook",$request->all());
+                        $responseMessage = "Pushed Payload to OLD PTPP -->". json_encode($response->json(), JSON_THROW_ON_ERROR);
+
+                    }
+                    if ($rrrExists){
+                        //check the status of the invoice;
+                        /** @var Invoice $invoice */
+                        $invoice = $rrrExists->invoice;
+                        /** @var Transaction $transaction */
+                        $transaction = $invoice->transaction;
+                        $responseMessage = "Duplicate Transaction";
+                        if ($transaction->status === "pending"){
+                            $statusCode = 200;
+                            $gateway = Gateway::where('name', "Remita")->get()->pluck("id", "name");
+                            $gateway_id = $gateway["Remita"];
+                            $transactionTotal = $transaction->computeChargeAndTotal($gateway_id);
+                            $transaction->total = $transactionTotal['total'];
+                            $transaction->fee = $transactionTotal['charge'];
+                            if ($details['amount'] < $transaction->total ){
+                                $responseMessage = "Amount Paid less than Transaction Amount";
+                                $requestSuccessful = false;
+                            }
+                            if ($details['amount'] > $transaction->total ){
+                                $requestSuccessful = false;
+                                $responseMessage = "Amount Paid Greater than Transaction Amount";
+                            }
+                            if ($requestSuccessful){
+                                $user = $transaction->user;
+                                $userRef = $user->id;
+                                $company = company();
+                                $wallet = $user->wallet;
+
+                                DB::transaction(static function () use ($details, $gateway_id, $transaction, $wallet, $user, $company, $settlementId) {
+                                    //update transaction fee and total;
+                                    $transaction->update([
+                                        'total' => $transaction->total,
+                                        'fee' => $transaction->fee,
+                                        'remita_ref' => $details['RRR'],
+                                        'provider' => "REMITA"
+                                    ]);
+                                    $transaction->handleSuccessfulPayment($transaction, $gateway_id, $details['message'], $details, $wallet, $user, $company);
+
+                                });
+
+                            }
+                        }
+
+                    }
+                }
             }
         }
 
+        $webhookResponse = [
+            "status_code" => $statusCode,
+            "message" => $responseMessage
+        ];
+        logger("Webhook Response for $settlementId",[
+            "requestSuccessful"=> $requestSuccessful,
+            "settlementId"=> $settlementId,
+            "responseMessage"=> $responseMessage,
+            "responseCode"=> $statusCode
+        ]);
+        $webhooks->logWebhook($settlementId,$userRef,$data,$webhookResponse);
 
+
+        return "OK";
     }
 }
