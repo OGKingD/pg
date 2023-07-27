@@ -1,79 +1,71 @@
-<div class="container-fluid py-4 ">
-    <div>
-
-        <div class="page-header   position-relative m-3 border-radius-xl">
-            <img src="{{asset('assets/img/shapes/waves-white.svg')}}" alt="pattern-lines"
-                 class="position-absolute opacity-6 start-0 top-0 w-100">
-
-        </div>
-
-
-
-        <!-- Tab panes -->
-        <div class="card">
-            <div class="card-body" id="transactionsCountDashboard">
-
-                <div class="row ">
-                    <div class="text-center col-md-6">
-                        <h6 class="card-header">TOTAL TRANSACTIONS </h6>
-                        <h2>{{$transactionCount}}</h2>
-{{--                        <div class="col text-right">--}}
-{{--                            <div class="d-flex justify-content-center">--}}
-{{--                                <button class="btn btn-info mx-3" onclick="summarizeTransaction()"> Live Refresh</button>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-
-                    </div>
-                    <div class="col-md-6">
-                        <form role="form"  id="transactionSearchBox" onsubmit="event.preventDefault(); summarizeTransaction(); ">
-                            @csrf
-                            <fieldset class="py-md-4">
-                                <div class="">
-                                    <div class="form-group">
-                                        <label for="created_at" class="col-form-label text-md-right">
-                                            {{__("Start Date")}}
-                                        </label>
-                                        <div class="input-group input-group-merge input-group-alternative mb-3">
-                                            <span class="input-group-text">
-                                                    <i class="fa fa-calendar-alt" style="font-size: 15px;"></i>
-                                                </span>
-                                            <input id="updated_at" type="date" placeholder="yyyy-mm-dd" wire:model.defer="startDate"
-                                                   class="datechk form-control @error('updated_at') is-invalid @enderror"
-                                                   name="updated_at"
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div class="col text-right">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="submit" class="btn btn-success mx-3" wire:change="summarizeTransactions"> Search</button>
-                                        <button class="btn btn-danger mx-3" onclick="resetPage()"> Reset</button>
-                                    </div>
-                                </div>
-                            </fieldset>
-
-
-
-                        </form>
-
-                    </div>
-
-                </div>
-
-
-
-            </div>
-        </div>
-        <hr>
-
+<div class="container-fluid pb-4 ">
+    <div class=" border-radius-xl">
+        <img src="{{asset('assets/img/shapes/waves-white.svg')}}" alt="pattern-lines"
+             class="position-absolute opacity-6 start-0 top-0 w-100">
 
     </div>
 
 
 
-    <div class="row min-vh-90">
+    <!-- Tab panes -->
+    <div class="card">
+        <div class="card-body" id="transactionsCountDashboard">
+
+            <div class="row ">
+                <div class="text-center col-md-6">
+                    <h6 class="card-header">TOTAL TRANSACTIONS </h6>
+                    <h2>{{$transactionCount}}</h2>
+                    {{--                        <div class="col text-right">--}}
+                    {{--                            <div class="d-flex justify-content-center">--}}
+                    {{--                                <button class="btn btn-info mx-3" onclick="summarizeTransaction()"> Live Refresh</button>--}}
+                    {{--                            </div>--}}
+                    {{--                        </div>--}}
+
+                </div>
+                <div class="col-md-6">
+                    <form role="form"  id="transactionSearchBox" onsubmit="event.preventDefault(); summarizeTransaction(); ">
+                        @csrf
+                        <fieldset class="">
+                            <div class="">
+                                <div class="form-group">
+                                    <label for="created_at" class="col-form-label text-md-right">
+                                        {{__("Start Date")}}
+                                    </label>
+                                    <div class="input-group input-group-merge input-group-alternative mb-3">
+                                            <span class="input-group-text">
+                                                    <i class="fa fa-calendar-alt" style="font-size: 15px;"></i>
+                                                </span>
+                                        <input id="updated_at" type="date" placeholder="yyyy-mm-dd" wire:model.defer="startDate"
+                                               class="datechk form-control @error('updated_at') is-invalid @enderror"
+                                               name="updated_at"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col text-right">
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-success mx-3" wire:change="summarizeTransactions"> Search</button>
+                                    <button class="btn btn-danger mx-3" onclick="resetPage()"> Reset</button>
+                                </div>
+                            </div>
+                        </fieldset>
+
+
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <hr>
+
+
+    <div class="row min-vh-80">
         <div class="card table-responsive" wire:poll.keep-alive.{{$pollingTime}}="summarizeTransactions">
             <div class="dataTable-wrapper dataTable-loading sortable  fixed-columns">
                 <div class="dataTable-container">
@@ -82,19 +74,19 @@
                         <tr>
 
 
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                            <th class="text-uppercase text-secondary  font-weight-bolder "
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter">Merchant Name</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                            <th class="text-uppercase text-secondary  font-weight-bolder "
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter"> Service Name </a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                            <th class="text-uppercase text-secondary  font-weight-bolder "
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter">Gateway</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                            <th class="text-uppercase text-secondary  font-weight-bolder "
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter">Total Transactions</a>
                             </th>
@@ -154,13 +146,13 @@
 
 
                                 <tr>
-                                    <td class="text-sm font-weight-normal">{{$val->user->first_name." ".$val->user->last_name }}</td>
-                                    <td class="text-sm font-weight-normal">{{ $val->type }}</td>
-                                    <td class="text-sm font-weight-normal">{{ $val->gateway->name??  "N/A"}}</td>
-                                    <td class="text-sm font-weight-normal">{{ $tTotal}}</td>
-                                    <td class="bg-success text-white">  {{number_format($val->{$channel."_successful_bills"})}}</td>
-                                    <td class="bg-warning text-white">  {{number_format($val->{$channel."_pending_bills"})}}</td>
-                                    <td class="bg-danger text-white">  {{number_format($val->{$channel."_failed_bills"})}}</td>
+                                    <td class=" font-weight-700">{{$val->user->first_name." ".$val->user->last_name }}</td>
+                                    <td class=" font-weight-700">{{ $val->type }}</td>
+                                    <td class=" font-weight-700">{{ $val->gateway->name??  "N/A"}}</td>
+                                    <td class=" font-weight-700">{{ $tTotal}}</td>
+                                    <td class="bg-success text-white font-weight-700">  {{number_format($val->{$channel."_successful_bills"})}}</td>
+                                    <td class="bg-warning text-white font-weight-700">  {{number_format($val->{$channel."_pending_bills"})}}</td>
+                                    <td class="bg-danger text-white font-weight-700">  {{number_format($val->{$channel."_failed_bills"})}}</td>
 
 
                                 </tr>
@@ -204,6 +196,9 @@
 
     @section('scripts')
         <style>
+            .table{
+                color: black;
+            }
             .nav.nav-pills .nav-link.active {
                 background-color: #2ccae3;
                 color: white;

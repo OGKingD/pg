@@ -55,7 +55,7 @@ class TransactionsPage extends Component
             $this->layout = 'layouts.admin.admin_dashboardapp';
         }
         $this->data['transactionCount'] = $this->builder->count();
-        $this->data['transactions'] =$this->builder->paginate(10);
+        $this->data['transactions'] =$this->builder->latest('updated_at')->paginate(10);
 
         return view('livewire.transactions-page', $this->data)->extends($this->layout, ["title" => "Transactions "]);
 

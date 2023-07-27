@@ -8,44 +8,69 @@ use Illuminate\Support\Facades\Http;
 
 class Remita
 {
-    public function remitaGenerateRRR($amount,$trn_ref,$customerEmail)
+    /**
+     * @var \Illuminate\Config\Repository|\Illuminate\Contracts\Foundation\Application|mixed
+     */
+    private $merchantId;
+
+    public function __construct()
     {
-        $lineitemAmount1 = (40/100 * $amount) ;
-        $lineitemAmount2 =  $amount - $lineitemAmount1;
+        $this->merchantId = config('remita.merchant_id');
+
+    }
+
+    public function remitaGenerateRRR($amount,$trn_ref,$customerEmail,$description,$serviceId,$lineItems)
+    {
+
         $payload = [
-            'amount' => 10000,
-            'orderId' => time(),
-            'serviceTypeId' => "4430731",
-            'payerName' => "Remita Payment $trn_ref",
+            'amount' => $amount,
+            'orderId' => $trn_ref."_".time(),
+            'serviceTypeId' => $serviceId,
+            'payerName' => $trn_ref,
             'payerEmail' => $customerEmail,
             'payerPhone' => "NA",
-            'description' => time(),
-            'lineItems' => [
-                [
-                    "lineItemsId"=>"itemid1",
-                    "beneficiaryName"=>"Alozie Michael",
-                    "beneficiaryAccount"=>"6020067886",
-                    "bankCode"=>"058",
-                    "beneficiaryAmount"=>3000,
-                    "deductFeeFrom"=>"0"
-                ],
-                [
-                    "lineItemsId"=>"itemid1",
-                    "beneficiaryName"=>"Alozie Michael",
-                    "beneficiaryAccount"=>"6020067886",
-                    "bankCode"=>"058",
-                    "beneficiaryAmount"=>7000,
-                    "deductFeeFrom"=>"1"
-                ]
-            ],
+            'description' => $description,
+            'lineItems' => $lineItems,
         ];
 
-        $merchantId = config('remita.merchant_id');
-        $apiHash =hash('sha512', $merchantId . $payload['serviceTypeId'] . $payload['orderId'] . $payload['amount'] . config('remita.api_key'));
-        $response = Http::withHeaders(['Authorization' => "remitaConsumerKey=$merchantId,remitaConsumerToken=$apiHash"])->post(config('remita.base_url') . '/echannelsvc/merchant/api/paymentinit', $payload);
+        $apiHash =hash('sha512', $this->merchantId . $payload['serviceTypeId'] . $payload['orderId'] . $payload['amount'] . config('remita.api_key'));
+        $response = $this->getWithHeaders($this->merchantId,$apiHash)->post(config('remita.base_url') . '/echannelsvc/merchant/api/paymentinit', $payload);
 
         return $response->body();
 
+    }
+
+    public function rrrStatus($rrr)
+    {
+
+        $apiHash =hash('sha512', $rrr  . config('remita.api_key'). $this->merchantId);
+        $response = $this->getWithHeaders($this->merchantId,$apiHash)->get(config('remita.base_url')."/echannelsvc/$this->merchantId/$rrr/$apiHash/status.reg")->json();
+        $result = [
+            "status" => false,
+            "message" => $response['message'] ?? null,
+        ];
+
+        if (isset($response['status']) && in_array($response['status'], ['00', '01'], false)) {
+            $result['status']  = true;
+            $result['data'] = $response;
+            $result['message'] = $response['message'];
+        }
+
+        return $result;
+
+    }
+
+    /**
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
+    public function getWithHeaders($merchantId,$apiHash): \Illuminate\Http\Client\PendingRequest
+    {
+
+        return Http::withHeaders([
+            'Authorization' => "remitaConsumerKey=$merchantId,remitaConsumerToken=$apiHash",
+            "Accept" => "application/json",
+            "Content-Type" => "application/json",
+        ])->withoutVerifying();
     }
 
 

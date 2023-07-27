@@ -457,9 +457,9 @@
                                 <td class="text-sm font-weight-normal">{{ $val->type }}</td>
                                 <td class="text-sm font-weight-normal">{{ $val->gateway->name??  "N/A"}}</td>
                                 <td class="text-sm font-weight-normal">{{ $val->provider ??  "N/A"}}</td>
-                                <td> &#{{nairaSymbol()}} {{number_format($val->amount,'2','.','')}}</td>
-                                <td>&#{{nairaSymbol()}} {{number_format($val->fee,'2','.','')}}</td>
-                                <td>&#{{nairaSymbol()}} {{number_format($val->total,'2','.','')}}</td>
+                                <td> &#{{nairaSymbol()}} {{number_format($val->amount,'2','.',',')}}</td>
+                                <td>&#{{nairaSymbol()}} {{number_format($val->fee,'2','.',',')}}</td>
+                                <td>&#{{nairaSymbol()}} {{number_format($val->total,'2','.',',')}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->invoice->customer_email ?? "N/A"}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->invoice->customer_name ?? "N/A"}}</td>
                                 <td class="text-sm font-weight-normal">{{$val->status}}</td>
