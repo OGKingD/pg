@@ -33,8 +33,14 @@ class WebhookController extends Controller
         return view('admin.webhooks', compact("webhooks",'perPage','transactionCount'));
     }
 
+    public function flwavePercent(Request $request, Webhooks $webhooks)
+    {
+        return $this->flutterwave($request, $webhooks, true);
 
-    public function flutterwave(Request $request, Webhooks $webhooks)
+    }
+
+
+    public function flutterwave(Request $request, Webhooks $webhooks, $flwavePercent =false)
     {
         $requestSuccessful = false;
         $settlementId = false;
@@ -55,7 +61,10 @@ class WebhookController extends Controller
                 }
 
                 // check if id exist on flutter and reference belonngs to saana;
-                $flwave = new Flutterwave(config('flutterwave.secret_key'));
+                $flwave = getFlwave(false);
+                if ($flwavePercent){
+                    $flwave = getFlwave(true);
+                }
                 $fromFlutterwave = $flwave->verifyTansactionByRef($flutterwaveId);
                 info("Transaction Verified :",$fromFlutterwave);
                 $responseMessage = "Transaction Not Found on Flutterwave!";

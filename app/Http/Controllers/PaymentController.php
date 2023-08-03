@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\InvoiceCollection;
-use App\Lib\Services\Flutterwave;
 use App\Models\Gateway;
 use App\Models\Invoice;
 use App\Models\Transaction;
@@ -13,7 +12,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class PaymentController extends Controller
 {
@@ -120,16 +118,19 @@ class PaymentController extends Controller
         if ( str_contains($type,"application") ){
             $item['charge_factor'] = 0;
             $item['charge'] = 350;
+//            $item['flwave_percent'] = true;
         }
 
         if ( str_contains($type,"transcript") ){
             $item['charge_factor'] = 0;
             $item['charge'] = 350;
+//            $item['flwave_percent'] = true;
         }
 
         if ( str_contains($type,"acceptance") ){
             $item['charge_factor'] = 0;
             $item['charge'] = 350;
+//            $item['flwave_percent'] = true;
         }
         return $item;
 
@@ -323,7 +324,12 @@ class PaymentController extends Controller
             //make sure invoice status is not successful;
             if (strtoupper($invoice->status) !== self::successful) {
                 //call flutterwave to validate transaction;
-                $flwave = new Flutterwave(config('flutterwave.secret_key'));
+                $provider = strtoupper($transaction->provider);
+                $flwave = getFlwave(false);
+                if ($provider === "FLWAVEPERCENT"){
+                    $flwave = getFlwave(true);
+                }
+
                 $fromFlutterwave = $flwave->verifyTransaction($flutterwaveId);
                 info("Transaction Verified :", $fromFlutterwave);
 
@@ -402,6 +408,9 @@ class PaymentController extends Controller
     {
         $status = strtoupper($transaction->status);
 
+        $isSuccessful = false;
+        $message = "Transaction Already Processed";
+
         if ($status === "FAILED"){
             //change transaction to pending
             logger("Changing transaction {$transaction->merchant_transaction_ref} from $status to PENDING ");
@@ -413,30 +422,32 @@ class PaymentController extends Controller
         }
         //check if amount differs and update
         //only allow update on pending transactions
-        DB::transaction(function () use ($request, $transaction) {
-            //update invoice;
+        if ($status === "PENDING"){
+            DB::transaction(function () use ($request, $transaction) {
+                //update invoice;
 
-            /** @var Invoice $invoice */
-            $invoice = $transaction->invoice;
-            $invoice->update([
-                'amount' => $request->amount,
-                'customer_email' => $request->email,
-                'customer_name' => $request->full_name,
-                'due_date' => Carbon::now()->addDays(7),
-                'name' => $request->name,
-            ]);
+                /** @var Invoice $invoice */
+                $invoice = $transaction->invoice;
+                $invoice->update([
+                    'amount' => $request->amount,
+                    'customer_email' => $request->email,
+                    'customer_name' => $request->full_name,
+                    'due_date' => Carbon::now()->addDays(7),
+                    'name' => $request->name,
+                ]);
 
-            //update transaction;
-            $transaction->update([
-                "amount" => $request->amount,
-                "type" => $request->service_type,
-                "total" => $request->amount,
-                "redirect_url" => $request->redirect_url
-            ]);
+                //update transaction;
+                $transaction->update([
+                    "amount" => $request->amount,
+                    "type" => $request->service_type,
+                    "total" => $request->amount + $transaction->fee,
+                    "redirect_url" => $request->redirect_url
+                ]);
 
-        });
-        $isSuccessful = true;
-        $message = "Payment Request Updated";
+            });
+            $isSuccessful = true;
+            $message = "Payment Request Updated";
+        }
         return response()->json(['status' => $isSuccessful, "message" => $message, "data" => [
             "url" => route('payment-page', ['id' => $transaction->invoice_no])
         ]
