@@ -42,26 +42,12 @@ class PaymentPage extends Component
     public $transaction;
 
     protected $listeners = ['generateRRR', 'processCardTransaction',
-        'cardAuthorizationWithPin', 'cardAuthorizationWithOtp','cardAuthorizationWithAvs',
+        'cardAuthorizationWithPin', 'cardAuthorizationWithOtp', 'cardAuthorizationWithAvs',
         'generateVirtualAccountNumber', 'payWith',];
 
     public function render()
     {
-        $this->dispatchBrowserEvent('alertBox', ['type' => 'processing','message' =>'Please Wait!']);
         $this->setActiveTab($this->activeTab);
-
-        if (isset($this->invoice->transaction)){
-
-//            $this->invoice->transaction->update(
-//                [
-//                    'gateway_id' => $this->merchantGateways[$this->activeTab]['gateway_id'],
-//                    'amount' => $this->merchantGateways[$this->activeTab]['invoiceTotal'] - $this->merchantGateways[$this->activeTab]['invoiceCharge'],
-//                    'fee' => $this->merchantGateways[$this->activeTab]['invoiceCharge'],
-//                    'total' => $this->merchantGateways[$this->activeTab]['invoiceTotal'],
-//                ]
-//            );
-        }
-        $this->dispatchBrowserEvent('closeAlert');
 
         return view('livewire.payment-page');
     }
@@ -96,11 +82,11 @@ class PaymentPage extends Component
                     "beneficiaryName" => "University of Ibadan TSA Collections Account",
                     "beneficiaryAccount" => "3000050704",
                     "bankCode" => "000",
-                    "beneficiaryAmount" => $amount-$charge,
+                    "beneficiaryAmount" => $amount - $charge,
                     "deductFeeFrom" => "0"
                 ],
                 [
-                    "lineItemsId" => "itemid1",
+                    "lineItemsId" => "itemid2",
                     "beneficiaryName" => "Saanapay Collection Account",
                     "beneficiaryAccount" => "9020006763",
                     "bankCode" => "070",
@@ -111,13 +97,13 @@ class PaymentPage extends Component
 
 
             $remitaServiceId = $this->getRemitaServiceTypeId($this->invoice->transaction);
-            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no, $this->invoice->customer_email,$this->invoice->name, $remitaServiceId,$lineItems);
+            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no, $this->invoice->customer_email, $this->invoice->name, $remitaServiceId, $lineItems);
             $parsedResult = $response;
             if (str_contains($parsedResult, "jsonp")) {
                 $status = true;
                 $parsedResult = json_decode(trim($response, 'jsonp ( )'), false, 512, JSON_THROW_ON_ERROR);
             }
-            logger("Remita Response: ". json_encode($parsedResult, JSON_THROW_ON_ERROR));
+            logger("Remita Response: " . json_encode($parsedResult, JSON_THROW_ON_ERROR));
             //insert RRR into rrr table;
             RRR::create([
                 'rrr' => $parsedResult->RRR,
@@ -139,6 +125,7 @@ class PaymentPage extends Component
         $this->activeTab = $tab;
 
     }
+
     /**
      * @param $channel
      * @throws \JsonException
@@ -181,13 +168,13 @@ class PaymentPage extends Component
             if ($virtualAcc) {
                 $status = true;
                 //check if virtual Account has expired;
-                if (Carbon::parse()->diffInHours($virtualAcc->updated_at)>= 1){
+                if (Carbon::parse()->diffInHours($virtualAcc->updated_at) >= 1) {
                     //regenerate another account;
                     $generateDynamic = true;
                 }
-                if (Carbon::parse()->diffInHours($virtualAcc->updated_at) < 1){
+                if (Carbon::parse()->diffInHours($virtualAcc->updated_at) < 1) {
                     $generateDynamic = false;
-                    $this->virtualAccDetails = ["status" => $status, "accountNumber" => $virtualAcc->account_number, "accountName" => $virtualAcc->account_name, "bankName" => $virtualAcc->bank_name , "endtime" => Carbon::parse($virtualAcc->updated_at)->addHours(1)];
+                    $this->virtualAccDetails = ["status" => $status, "accountNumber" => $virtualAcc->account_number, "accountName" => $virtualAcc->account_name, "bankName" => $virtualAcc->bank_name, "endtime" => Carbon::parse($virtualAcc->updated_at)->addHours(1)];
 
                 }
 
@@ -239,7 +226,7 @@ class PaymentPage extends Component
                     );
 
                 }
-                $this->virtualAccDetails = ["status" => $status, "accountNumber" => $result->account_number ?? "N/A", "accountName" => $result->account_name ?? "N/A", "bankName" => $accountName, "endtime" => Carbon::parse()->addHours(1) ];
+                $this->virtualAccDetails = ["status" => $status, "accountNumber" => $result->account_number ?? "N/A", "accountName" => $result->account_name ?? "N/A", "bankName" => $accountName, "endtime" => Carbon::parse()->addHours(1)];
 
             }
         } catch (Exception $e) {
@@ -287,8 +274,13 @@ class PaymentPage extends Component
 
 
         if ($validator->fails()) {
+            $messages = $validator->messages()->all();
+            $error = "";
+            foreach ($messages as $message) {
+                $error.=  "$message \n";
+            }
 
-            $details = ['status' => false, 'errors' => $validator->messages()];
+            $details = ['status' => false, 'errors' => $error];
             $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
             return;
 
@@ -299,37 +291,35 @@ class PaymentPage extends Component
             [$flwave, $response] = $this->flwChargeCard();
 
             $trnxId = $flwave->getTxRef();
+            $tranxAtrributes = [
+                "spay_ref" => $trnxId,
+                'gateway_id' => $this->merchantGateways[$this->activeTab]['gateway_id'],
+                'amount' => $this->merchantGateways[$this->activeTab]['invoiceTotal'] - $this->merchantGateways[$this->activeTab]['invoiceCharge'],
+                'fee' => $this->merchantGateways[$this->activeTab]['invoiceCharge'],
+                'total' => $this->merchantGateways[$this->activeTab]['invoiceTotal'],
+                'provider' => isset($this->merchantGateways['card']['flwave_percent']) ?'FLWAVEPERCENT' :'FLWAVEFLAT'
+            ];
 
             if (!isset($this->transaction)) {
                 //create transaction;
                 $orderedUuid = Str::orderedUuid();
-                $this->user->transaction()->create(
-                    [
-                        'transaction_ref' => $orderedUuid,
-                        'invoice_no' => $this->invoice->invoice_no,
-                        'merchant_transaction_ref' => $orderedUuid,
-                        'spay_ref' => $trnxId,
-                        'gateway_id' => $this->merchantGateways[$this->activeTab]['gateway_id'],
-                        'amount' => $this->merchantGateways[$this->activeTab]['invoiceTotal'] - $this->merchantGateways[$this->activeTab]['invoiceCharge'],
-                        'fee' => $this->merchantGateways[$this->activeTab]['invoiceCharge'],
-                        'total' => $this->merchantGateways[$this->activeTab]['invoiceTotal'],
-                        'status' => 'pending',
-                        'flag' => 'debit',
+                $tranxAtrributes = array_merge($tranxAtrributes, [
+                    'transaction_ref' => $orderedUuid,
+                    'invoice_no' => $this->invoice->invoice_no,
+                    'merchant_transaction_ref' => $orderedUuid,
+                    'status' => 'pending',
+                    'flag' => 'debit',
 
-                    ]
+                ]);
+                $this->user->transaction()->create(
+                    $tranxAtrributes
                 );
             }
 
             //Update Transaction;
             if (isset($this->transaction)) {
                 $this->transaction->update(
-                    [
-                        "spay_ref" => $trnxId,
-                        'gateway_id' => $this->merchantGateways[$this->activeTab]['gateway_id'],
-                        'amount' => $this->merchantGateways[$this->activeTab]['invoiceTotal'] - $this->merchantGateways[$this->activeTab]['invoiceCharge'],
-                        'fee' => $this->merchantGateways[$this->activeTab]['invoiceCharge'],
-                        'total' => $this->merchantGateways[$this->activeTab]['invoiceTotal'],
-                    ]
+                    $tranxAtrributes
                 );
             }
             //check for the authorization
@@ -370,13 +360,13 @@ class PaymentPage extends Component
 
     /**
      * @return array
+     * @throws Exception
      */
     public function flwChargeCard(): array
     {
         $this->user = $this->invoice->user;
         $this->transaction = $this->invoice->transaction;
-
-        $flwave = new Flutterwave(config('flutterwave.secret_key'));
+        $flwave = getFlwave(isset($this->merchantGateways['card']['flwave_percent']));
         $flwave->setTxRef("SPAY{$this->invoice->invoice_no}");
         $response = $flwave->cardCharge($this->cardDetails);
         return array($flwave, $response);
@@ -419,7 +409,7 @@ class PaymentPage extends Component
     {
 
         try {
-            $flwave = new Flutterwave(config('flutterwave.secret_key'));
+            $flwave = getFlwave(isset($this->merchantGateways['card']['flwave_percent']));
             $response = $flwave->validateTransaction($this->cc_Otp, $this->cardDetails['flw_ref'], 'card');
             $this->verifyFlwaveResponse($response);
         } catch (Exception $e) {
@@ -431,10 +421,11 @@ class PaymentPage extends Component
         }
 
     }
+
     public function cardAuthorizationWithAvs()
     {
         try {
-            $flwave = new Flutterwave(config('flutterwave.secret_key'));
+            $flwave = getFlwave(isset($this->merchantGateways['card']['flwave_percent']));
             $response = $flwave->cardCharge($this->cardDetails);
             $this->verifyFlwaveResponse($response);
         } catch (Exception $e) {
@@ -451,7 +442,7 @@ class PaymentPage extends Component
 
         try {
             $this->setActiveTab(strtolower($processor));
-            $flwave = new Flutterwave(config('flutterwave.secret_key'));
+            $flwave = getFlwave(isset($this->merchantGateways['card']['flwave_percent']));
             $tx_ref = $flwave->getTxRef();
             $amount = $this->merchantGateways[$this->activeTab]['invoiceTotal'];
             $payload = [
@@ -477,7 +468,7 @@ class PaymentPage extends Component
             // {"status":"error","message":"Merchant is not enabled for ApplePay collections.","data":null}
 
 
-            } catch (Exception $e) {
+        } catch (Exception $e) {
             logger("An Error Occurred while trying to charge$processor Payment : \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
             $details = ['status' => false, 'errors' => $e->getMessage()];
         }
@@ -508,7 +499,7 @@ class PaymentPage extends Component
         $user = $this->user;
         $wallet = $user->wallet;
         $transaction = $this->transaction;
-        info("Response for " . $this->cardDetails['flw_ref']. json_encode($response));
+        info("Response for " . $this->cardDetails['flw_ref'] . json_encode($response, JSON_THROW_ON_ERROR));
 
         $details = ['status' => true, 'flag' => 'processing'];
         if (isset($response['data'])) {
@@ -540,26 +531,26 @@ class PaymentPage extends Component
         $this->dispatchBrowserEvent('paymentCompleted', $details);
     }
 
-    public function getRemitaServiceTypeId(Transaction $transaction )
+    public function getRemitaServiceTypeId(Transaction $transaction)
     {
         $user = $transaction->user;
         $serviceId = config('remita.service_type_id');
 
         $type = strtolower(str_replace(" ", "", $transaction->type));
         if ($user->id === 3) {
-            if ( str_contains($type,"tuition") || str_contains($type,"school") ){
+            if (str_contains($type, "tuition") || str_contains($type, "school")) {
                 $serviceId = "10298195252";
             }
 
-            if ( str_contains($type,"application") ){
+            if (str_contains($type, "application")) {
                 $serviceId = "1972701988";
             }
 
-            if ( str_contains($type,"transcript") ){
-                $serviceId = "1971283835";
+            if (str_contains($type, "undergraduatetranscript")) {
+                $serviceId = "744536409";
             }
 
-            if ( str_contains($type,"acceptance") ){
+            if (str_contains($type, "acceptance")) {
                 $serviceId = "1971104380";
             }
 

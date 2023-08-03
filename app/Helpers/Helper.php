@@ -1,5 +1,6 @@
 <?php
 
+use App\Lib\Services\Flutterwave;
 use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Mail;
@@ -114,4 +115,20 @@ function queryWithDateRange($query, $builder)
     }
     return $builder;
 
+}
+
+
+/**
+ * @param bool $percent
+ * @return Flutterwave
+ */
+function getFlwave(bool $percent = false): Flutterwave
+{
+    if ($percent) {
+        config()->set('flutterwave.encryption_key', config('flutterwave.percent_encryption_key'));
+        config()->set('flutterwave.secret_key', config('flutterwave.percent_secret_key'));
+        config()->set('flutterwave.public_key', config('flutterwave.percent_public_key'));
+    }
+
+    return new Flutterwave(config('flutterwave.secret_key'));
 }
