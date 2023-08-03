@@ -171,9 +171,9 @@ class PaymentController extends Controller
         $request->validate([
             "name" => "required",
             "amount" => ["required", "numeric", "min:100"],
-            "email" => "required",
+            "email" => ["required",'email:rfc,dns'],
             "quantity" => ["required", "numeric", "min:1"],
-            'request_id' => ["required", "min:5"],
+            'request_id' => ["required", "min:5","max:32"],
             "redirect_url" => ["sometimes", "url"]
 
         ], $request->all());
@@ -385,7 +385,7 @@ class PaymentController extends Controller
     {
         $userId = $request->user()->id;
         $request->validate([
-            'request_id' => ["required", "min:8"],
+            'request_id' => ["required", "min:5"],
         ], $request->all());
         /** @var Transaction $transaction */
         $transaction = Transaction::firstWhere([
