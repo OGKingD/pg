@@ -87,9 +87,10 @@ function company()
 
 }
 
-function errorResponseJson($message, $payload): array
+function errorResponseJson($message, $payload,$status=false): array
 {
     return [
+        "status" => $status,
         "message" => "$message",
         "errors" => $payload
     ];

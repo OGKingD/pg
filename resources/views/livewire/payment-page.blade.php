@@ -24,7 +24,7 @@
                     @endif
 
 
-                    @if(! str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)),"undergraduatetranscript"))
+{{--                    @if(! str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)),"undergraduatetranscript"))--}}
                         @if(isset($merchantGateways['card']))
                             <li  class="nav-item">
                                 <a  class="nav-link @if($activeTab === "card") active @endif mt-5 " data-bs-toggle="pill"
@@ -81,7 +81,7 @@
                                     </a>
                                 </li>
                             @endif
-                    @endif
+{{--                    @endif--}}
                 </ul>
             </div>
 
@@ -188,7 +188,7 @@
 
                 @endif
 
-                @if(! str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)),"undergraduatetranscript"))
+{{--                @if(! str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)),"undergraduatetranscript"))--}}
                         @if(isset($merchantGateways['card']))
                             <div id="card" class="container tab-pane @if($activeTab === "card") active @endif"><br>
                                 <div class=" mt-3">
@@ -635,7 +635,7 @@
 
                             </div>
                         @endif
-                @endif
+{{--                @endif--}}
             </div>
         </div>
         <div class="justify-content-center">
@@ -678,7 +678,7 @@
 
                 } else {
 
-                    salert('Please Try Again Later!', 'Error!', 'error');
+                    salert('Please Try Again Later!', 'Error!'+ result.errors, 'error');
 
 
                 }

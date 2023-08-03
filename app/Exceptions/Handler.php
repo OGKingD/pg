@@ -76,6 +76,7 @@ class Handler extends ExceptionHandler
             return $this->shouldReturnJson($request, $e)
                 ? response()->json(
                     [
+                        'status' => false,
                         'message' => $e->getMessage(),
                         'errors' =>
                             ['Authorization' =>
@@ -86,7 +87,10 @@ class Handler extends ExceptionHandler
         }
 
         if ($e instanceof ValidationException) {
-            return $this->convertValidationExceptionToResponse($e, $request);
+
+            return $this->shouldReturnJson($request,$e) ?
+                errorResponseJson($e->getMessage(),$e->errors(),false)
+               : $this->convertValidationExceptionToResponse($e, $request);
         }
         $statusCode = 500;
         if (method_exists($e,"getStatusCode")){

@@ -105,13 +105,17 @@ class PaymentPage extends Component
             }
             logger("Remita Response: " . json_encode($parsedResult, JSON_THROW_ON_ERROR));
             //insert RRR into rrr table;
-            RRR::create([
-                'rrr' => $parsedResult->RRR,
-                'invoice_no' => $this->invoice->invoice_no,
-            ]);
-            $remitaUrl = config('remita.redirect_url') . "/remita/onepage/biller/$parsedResult->RRR/payment.spa";
+            $this->remitaDetails = ["status" => false, 'RRR' => "N/A", 'url' => "N/A", "errors" => " Remita Service Currently Unavailable, Please contact Support@saanapay.ng for assistance!."];
 
-            $this->remitaDetails = ["status" => $status, 'RRR' => $parsedResult->RRR, 'url' => $remitaUrl];
+            if (isset($parsedResult->RRR)){
+                RRR::create([
+                    'rrr' => $parsedResult->RRR,
+                    'invoice_no' => $this->invoice->invoice_no,
+                ]);
+                $remitaUrl = config('remita.redirect_url') . "/remita/onepage/biller/$parsedResult->RRR/payment.spa";
+                $this->remitaDetails = ["status" => $status, 'RRR' => $parsedResult->RRR, 'url' => $remitaUrl];
+
+            }
 
         }
 
