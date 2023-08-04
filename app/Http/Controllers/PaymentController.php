@@ -171,7 +171,7 @@ class PaymentController extends Controller
         $request->validate([
             "name" => "required",
             "amount" => ["required", "numeric", "min:100"],
-            "email" => ["required",'email:rfc,dns'],
+            "email" => ["required",'email:rfc'],
             "quantity" => ["required", "numeric", "min:1"],
             'request_id' => ["required", "min:5","max:32"],
             "redirect_url" => ["sometimes", "url"]

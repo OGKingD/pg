@@ -47,7 +47,7 @@ class PaymentPage extends Component
 
     public function render()
     {
-        $this->setActiveTab($this->activeTab);
+//        $this->setActiveTab($this->activeTab);
 
         return view('livewire.payment-page');
     }
@@ -126,7 +126,9 @@ class PaymentPage extends Component
 
     public function setActiveTab($tab): void
     {
+        $this->dispatchBrowserEvent('alertBox', ['type' => 'processing','message' =>'Please Wait!']);
         $this->activeTab = $tab;
+        $this->dispatchBrowserEvent('closeAlert');
 
     }
 

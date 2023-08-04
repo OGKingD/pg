@@ -24,11 +24,11 @@
                     @endif
 
 
-{{--                    @if(! str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)),"undergraduatetranscript"))--}}
+                    @if(! str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)),"undergraduatetranscript"))
                         @if(isset($merchantGateways['card']))
-                            <li  class="nav-item">
+                            <li  wire:click="setActiveTab('card') " class="nav-item">
                                 <a  class="nav-link @if($activeTab === "card") active @endif mt-5 " data-bs-toggle="pill"
-                                    href="#card" wire:click="setActiveTab('card') " >
+                                    href="#card"  >
                                     <i class="fa-solid fa-credit-card ">
                                         &nbsp; Card
                                     </i>
@@ -81,7 +81,7 @@
                                     </a>
                                 </li>
                             @endif
-{{--                    @endif--}}
+                    @endif
                 </ul>
             </div>
 
@@ -188,7 +188,7 @@
 
                 @endif
 
-{{--                @if(! str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)),"undergraduatetranscript"))--}}
+                @if(! str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)),"undergraduatetranscript"))
                         @if(isset($merchantGateways['card']))
                             <div id="card" class="container tab-pane @if($activeTab === "card") active @endif"><br>
                                 <div class=" mt-3">
@@ -635,7 +635,7 @@
 
                             </div>
                         @endif
-{{--                @endif--}}
+                @endif
             </div>
         </div>
         <div class="justify-content-center">
