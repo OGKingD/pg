@@ -19,14 +19,14 @@ class Remita
 
     }
 
-    public function remitaGenerateRRR($amount,$trn_ref,$customerEmail,$description,$serviceId,$lineItems)
+    public function remitaGenerateRRR($amount,$trn_ref,$customer_name,$customerEmail,$description,$serviceId,$lineItems)
     {
 
         $payload = [
             'amount' => $amount,
             'orderId' => $trn_ref."_".time(),
             'serviceTypeId' => $serviceId,
-            'payerName' => $trn_ref,
+            'payerName' => $customer_name,
             'payerEmail' => $customerEmail,
             'payerPhone' => "NA",
             'description' => $description,

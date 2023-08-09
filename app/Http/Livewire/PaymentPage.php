@@ -80,7 +80,7 @@ class PaymentPage extends Component
                 [
                     "lineItemsId" => "itemid1",
                     "beneficiaryName" => "University of Ibadan TSA Collections Account",
-                    "beneficiaryAccount" => "3000050704",
+                    "beneficiaryAccount" => "0070217761016",
                     "bankCode" => "000",
                     "beneficiaryAmount" => $amount - $charge,
                     "deductFeeFrom" => "0"
@@ -88,8 +88,8 @@ class PaymentPage extends Component
                 [
                     "lineItemsId" => "itemid2",
                     "beneficiaryName" => "Saanapay Collection Account",
-                    "beneficiaryAccount" => "9020006763",
-                    "bankCode" => "070",
+                    "beneficiaryAccount" => "0048954708",
+                    "bankCode" => "032",
                     "beneficiaryAmount" => $charge,
                     "deductFeeFrom" => "1"
                 ]
@@ -97,11 +97,23 @@ class PaymentPage extends Component
 
 
             $remitaServiceId = $this->getRemitaServiceTypeId($this->invoice->transaction);
-            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no, $this->invoice->customer_email, $this->invoice->name, $remitaServiceId, $lineItems);
-            $parsedResult = $response;
-            if (str_contains($parsedResult, "jsonp")) {
-                $status = true;
-                $parsedResult = json_decode(trim($response, 'jsonp ( )'), false, 512, JSON_THROW_ON_ERROR);
+            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->customer_name, $this->invoice->invoice_no, $this->invoice->customer_email, $this->invoice->name, $remitaServiceId, $lineItems);
+            $parsedResult = $tempResult = $response;
+            $varType = gettype($parsedResult);
+
+            if ($varType === "string"){
+
+                if (str_contains($tempResult, "jsonp")) {
+                    $status = true;
+
+                    $parsedResult = json_decode(trim($response, 'jsonp ( )'), false, 512, JSON_THROW_ON_ERROR);
+                }
+
+                if (!str_contains($tempResult, "jsonp")) {
+                    $status = true;
+                    $parsedResult = json_decode($parsedResult, false, 512, JSON_THROW_ON_ERROR);
+                }
+
             }
             logger("Remita Response: " . json_encode($parsedResult, JSON_THROW_ON_ERROR));
             //insert RRR into rrr table;
