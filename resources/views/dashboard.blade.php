@@ -210,7 +210,7 @@
                             <div class="col-md-6 mb-md-2 ">
                                 <div class="card">
                                     <div class="card-body text-center">
-                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$googlepay_transactions_count}}">{{$$googlepay_transactions_count}}</span> <span
+                                        <h1 class="text-gradient text-primary"><span id="status4" countto="{{$googlepay_transactions_count}}">{{$googlepay_transactions_count}}</span> <span
                                                 class="text-lg ms-n2">°</span></h1>
                                         <h6 class="mb-0 font-weight-bolder">GooglePay</h6>
 
@@ -537,7 +537,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
-                                        + &#{{nairaSymbol()}} {{ number_format($successful_google_pay_transactions_total)}}
+                                        + &#{{nairaSymbol()}} {{ number_format($successful_googlepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -554,7 +554,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-warning text-gradient text-sm font-weight-bold ms-auto">
-                                        + &#{{nairaSymbol()}} {{ number_format($pending_google_pay_transactions_total)}}
+                                        + &#{{nairaSymbol()}} {{ number_format($pending_googlepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -571,7 +571,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
-                                        - &#{{nairaSymbol()}} {{ number_format($failed_google_pay_transactions_total)}}
+                                        - &#{{nairaSymbol()}} {{ number_format($failed_googlepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -589,7 +589,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold ms-auto">
-                                        + &#{{nairaSymbol()}} {{ number_format($successful_apple_pay_transactions_total)}}
+                                        + &#{{nairaSymbol()}} {{ number_format($successful_applepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -606,7 +606,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-warning text-gradient text-sm font-weight-bold ms-auto">
-                                        + &#{{nairaSymbol()}} {{ number_format($pending_apple_pay_transactions_total)}}
+                                        + &#{{nairaSymbol()}} {{ number_format($pending_applepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
@@ -623,7 +623,7 @@
                                     </div>
                                     <div
                                         class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold ms-auto">
-                                        - &#{{nairaSymbol()}} {{ number_format($failed_apple_pay_transactions_total)}}
+                                        - &#{{nairaSymbol()}} {{ number_format($failed_applepay_transactions_total)}}
                                     </div>
                                 </div>
                                 <hr class="horizontal dark mt-3 mb-2">
