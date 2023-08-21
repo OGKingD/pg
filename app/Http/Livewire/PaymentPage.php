@@ -97,7 +97,7 @@ class PaymentPage extends Component
 
 
             $remitaServiceId = $this->getRemitaServiceTypeId($this->invoice->transaction);
-            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->customer_name, $this->invoice->invoice_no, $this->invoice->customer_email, $this->invoice->name, $remitaServiceId, $lineItems);
+            $response = $remitaService->remitaGenerateRRR($amount, $this->invoice->invoice_no,$this->invoice->customer_name, $this->invoice->customer_email, $this->invoice->name, $remitaServiceId, $lineItems);
             $parsedResult = $tempResult = $response;
             $varType = gettype($parsedResult);
 
