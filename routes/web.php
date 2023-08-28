@@ -67,4 +67,5 @@ Route::middleware(['auth'])->group(function () {
 Route::get('payment/process/{id}',[\App\Http\Controllers\PaymentController::class, "paymentPage"])->name('payment-page');
 Route::get('payment/card/validate/{id}',[\App\Http\Controllers\PaymentController::class, "validateCardPayment"]);
 Route::get('payment/receipt/{id}',[\App\Http\Controllers\PaymentController::class,'receipt'])->name('receipt');
+Route::get('customers/search', \App\Http\Livewire\ReceiptPage::class);
 
