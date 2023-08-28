@@ -1,11 +1,11 @@
-<div>
+<div class="min-vh-90">
 
     <section>
         <div class="container">
             <div class="row">
                 <div class="nonPrintable col-lg-8 col-md-7 mx-auto">
                     <form action="" id="searchForm">
-                        <div class="card z-index-0 mt-sm-12 mt-9 mb-4">
+                        <div class="card z-index-0 mt-2 mb-4 ">
                             <div class="card-header text-center pt-4 pb-1">
                                 <h4 class="font-weight-bolder mb-1">Search Transactions </h4>
                             </div>
@@ -129,7 +129,7 @@
                                             <tr class="nonPrintable">
                                                 <td class="text-sm font-weight-normal">{{++$k}}</td>
                                                 <td class="text-sm font-weight-normal">{{$val->merchant_transaction_ref}}</td>
-                                                <td class="text-sm font-weight-normal" style="text-wrap: balance">{{ $val->gateway->name??  "N/A"}}</td>
+                                                <td class="text-sm font-weight-normal" style="text-wrap: unset">{{ $val->gateway->name??  "N/A"}}</td>
                                                 <td>&#{{nairaSymbol()}} {{number_format($val->total,'2','.',',')}}</td>
                                                 <td class="text-sm font-weight-normal">{{$val->invoice->customer_name ?? "N/A"}}</td>
 
