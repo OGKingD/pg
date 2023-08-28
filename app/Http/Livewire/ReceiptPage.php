@@ -25,7 +25,7 @@ class ReceiptPage extends Component
             $this->dispatchBrowserEvent('closeAlert');
         }
         if (!empty($this->searchViavalue)){
-            $needle = ["status" => "successful"];
+            $needle = [];
 
             if ($searchVia === "EMAIL"){
                 $needle ["email"]  = trim($this->searchViavalue);

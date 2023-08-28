@@ -129,26 +129,29 @@
                                             <tr class="nonPrintable">
                                                 <td class="text-sm font-weight-normal">{{++$k}}</td>
                                                 <td class="text-sm font-weight-normal">{{$val->merchant_transaction_ref}}</td>
-                                                <td class="text-sm font-weight-normal" style="text-wrap: unset">{{ $val->gateway->name??  "N/A"}}</td>
+                                                <td class="text-sm font-weight-normal"
+                                                    style="text-wrap: unset">{{ $val->gateway->name??  "N/A"}}</td>
                                                 <td>&#{{nairaSymbol()}} {{number_format($val->total,'2','.',',')}}</td>
                                                 <td class="text-sm font-weight-normal">{{$val->invoice->customer_name ?? "N/A"}}</td>
 
                                                 <td>{{date("Y/m/d h:i:A", strtotime($val->updated_at))}}</td>
                                                 <td>
-                                                    @if( in_array(strtoupper($val->status),["SUCCESSFUL","FAILED"]))
-                                                        <button type="button" class="btn btn-icon bg-gradient-primary"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#modal-open-receipt{{$val->merchant_transaction_ref}}">
-                                                            Receipt
-                                                        </button>
-                                                    @endif
+                                                    <button type="button" class="btn btn-icon bg-gradient-primary"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modal-open-receipt{{$val->merchant_transaction_ref}}">
+                                                        Receipt
+                                                    </button>
                                                 </td>
                                             </tr>
-                                            <div class="modal fade" id="modal-open-receipt{{$val->merchant_transaction_ref}}" tabindex="-1" aria-labelledby="modal-new-gateway"
+                                            <div class="modal fade"
+                                                 id="modal-open-receipt{{$val->merchant_transaction_ref}}" tabindex="-1"
+                                                 aria-labelledby="modal-new-gateway"
                                                  aria-hidden="true" style="display: none;">
-                                                <div class="modal-dialog modal-dialog-centered modal-md" role="document" id="printPage">
+                                                <div class="modal-dialog modal-dialog-centered modal-md" role="document"
+                                                     id="printPage">
                                                     <div class="modal-content">
-                                                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal"
+                                                        <button type="button" class="btn-close text-dark"
+                                                                data-bs-dismiss="modal"
                                                                 aria-label="Close">
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
@@ -156,8 +159,10 @@
                                                         <div class="modal-body p-0">
                                                             <div class="row container">
                                                                 <div class="col-lg-4">
-                                                                    <img class="max-width-200" src="{{asset('assets/img/saanapay.png')}} "
-                                                                         alt="SAANAPAY BRAND IMAGE" style="max-width: 120px!important;">
+                                                                    <img class="max-width-200"
+                                                                         src="{{asset('assets/img/saanapay.png')}} "
+                                                                         alt="SAANAPAY BRAND IMAGE"
+                                                                         style="max-width: 120px!important;">
                                                                 </div>
 
 
@@ -168,33 +173,56 @@
 
                                                                 <div class="card-body">
                                                                     <div class="row text-center">
-                                                                        <h3 class="text-uppercase text-center mt-3" style="font-size: 30px;">Payment Slip</h3>
+                                                                        <h3 class="text-uppercase text-center mt-3"
+                                                                            style="font-size: 30px;">Payment Slip</h3>
                                                                     </div>
                                                                     <div class="row container">
                                                                         <ul class="list-group">
-                                                                            <li class="list-group-item">Customer Name  <span class="float-end text-bolder " > {{$val->invoice->customer_name ?? "N/A"}} </span> </li>
-                                                                            <li class="list-group-item">Customer Email  <span class="float-end text-bolder"> {{$val->invoice->customer_email  ?? "N/A"}} </span> </li>
-                                                                            <li class="list-group-item">Transaction Number  <span class="float-end text-bolder"> {{$val->merchant_transaction_ref ?? "N/A"}} </span> </li>
-                                                                            <li class="list-group-item">Item Description:  <span class="float-end text-bolder"> {{$val->type ?? "N/A"}} </span> </li>
+                                                                            <li class="list-group-item">Customer Name
+                                                                                <span
+                                                                                    class="float-end text-bolder "> {{$val->invoice->customer_name ?? "N/A"}} </span>
+                                                                            </li>
+                                                                            <li class="list-group-item">Customer Email
+                                                                                <span
+                                                                                    class="float-end text-bolder"> {{$val->invoice->customer_email  ?? "N/A"}} </span>
+                                                                            </li>
+                                                                            <li class="list-group-item">Transaction
+                                                                                Number <span
+                                                                                    class="float-end text-bolder"> {{$val->merchant_transaction_ref ?? "N/A"}} </span>
+                                                                            </li>
+                                                                            <li class="list-group-item">Item
+                                                                                Description: <span
+                                                                                    class="float-end text-bolder"> {{$val->type ?? "N/A"}} </span>
+                                                                            </li>
                                                                             {{--                                                                                <li class="list-group-item">Item Amount:  <span class="float-end text-bolder"> &#{{nairaSymbol()}} {{number_format($val->amount,'2','.',',')}}</span> </li>--}}
-                                                                            <li class="list-group-item">Payment Status:  <span class="float-end text-bolder"> {{$val->status ?? "N/A"}} </span> </li>
-                                                                            <li class="list-group-item">Payment Date:  <span class="float-end text-bolder"> {{date("Y/m/d h:i:A", strtotime($val->updated_at))}} </span> </li>
+                                                                            <li class="list-group-item">Payment Status:
+                                                                                <span
+                                                                                    class="float-end text-bolder"> {{ucfirst($val->status )?? "N/A"}} </span>
+                                                                            </li>
+                                                                            <li class="list-group-item">Payment Date:
+                                                                                <span
+                                                                                    class="float-end text-bolder"> {{date("Y/m/d h:i:A", strtotime($val->updated_at))}} </span>
+                                                                            </li>
 
                                                                         </ul>
 
                                                                         <div class="col-xl-8">
                                                                             <ul class="list-unstyled float-end me-0">
 
-                                                                                <li> <span class="me-5">Fee:</span>
-                                                                                    <b> &#{{nairaSymbol()}} {{number_format($val->fee,'2','.',',')}} </b>
+                                                                                <li><span class="me-5">Fee:</span>
+                                                                                    <b>
+                                                                                        &#{{nairaSymbol()}} {{number_format($val->fee,'2','.',',')}} </b>
                                                                                 </li>
                                                                                 <li>
-                                                                                    <span class="float-start" style="margin-right: 35px;">Amount: </span>
-                                                                                    <b> &#{{nairaSymbol()}} {{number_format($val->amount,'2','.',',')}} </b>
+                                                                                    <span class="float-start"
+                                                                                          style="margin-right: 35px;">Amount: </span>
+                                                                                    <b>
+                                                                                        &#{{nairaSymbol()}} {{number_format($val->amount,'2','.',',')}} </b>
                                                                                 </li>
 
                                                                             </ul>
-                                                                            <div class="col-xl-8" style="margin-left:10px">
+                                                                            <div class="col-xl-8"
+                                                                                 style="margin-left:10px">
                                                                                 <p class="float-end"
                                                                                    style="font-size: 30px; color: red; font-weight: 400;font-family: Arial, Helvetica, sans-serif;">
                                                                                     Total:
@@ -207,10 +235,7 @@
                                                                         </div>
 
 
-
                                                                     </div>
-
-
 
 
                                                                 </div>
@@ -219,7 +244,9 @@
                                                         </div>
                                                         <div class="modal-footer">
                                                             <div class="text-center">
-                                                                <button class="btn btn-sm btn-info" onclick="printMe('modal-open-receipt{{$val->merchant_transaction_ref}}')"> <i class="fa fa-thumbs-up"> Print Me!</i>  </button>
+                                                                <button class="btn btn-sm btn-info"
+                                                                        onclick="printMe('modal-open-receipt{{$val->merchant_transaction_ref}}')">
+                                                                    <i class="fa fa-thumbs-up"> Print Me!</i></button>
                                                             </div>
 
                                                         </div>
@@ -262,8 +289,8 @@
         <style>
             @media print {
 
-                .nonPrintable,div>nav{
-                    display:none!important
+                .nonPrintable, div > nav {
+                    display: none !important
                 }
             }
 
@@ -289,7 +316,7 @@
 
             }
 
-            function printMe(el){
+            function printMe(el) {
                 window.print();
             }
         </script>
