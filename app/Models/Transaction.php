@@ -114,7 +114,7 @@ class Transaction extends Model
             $queryArray[] = ['description', 'like', "%" . $query['transaction_ref'] . "%"];
         }
         if (isset($query['status'])) {
-            $queryArray[] = ['status', '=', (string)($query['status'])];
+            $queryArray[] = ['transactions.status', '=', (string)($query['status'])];
         }
         if (isset($query['flag'])) {
             $queryArray[] = ['flag', '=', (string)($query['flag'])];
