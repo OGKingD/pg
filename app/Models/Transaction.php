@@ -330,7 +330,7 @@ class Transaction extends Model
                     $status = true;
 
                 }
-                PushtoWebhookJob::dispatch($transaction)->delay(now()->addMinutes(3));
+                PushtoWebhookJob::dispatch($transaction)->delay(now()->addMinutes(config('app.push_to_webhook_timeout')));
 
             });
         } catch (\Throwable $e) {
