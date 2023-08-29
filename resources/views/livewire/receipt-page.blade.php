@@ -141,6 +141,10 @@
                                                             data-bs-target="#modal-open-receipt{{$val->merchant_transaction_ref}}">
                                                         Receipt
                                                     </button>
+                                                    @if(isset($val->redirect_url))
+                                                        <a href="{{$val->redirect_url."?".http_build_query($val->transactionToPayload())}}" class="btn btn-icon btn-info">
+                                                            <i class="fa fa-plane-departure"> Re-Push!</i></a>
+                                                    @endif
                                                 </td>
                                             </tr>
                                             <div class="modal fade"

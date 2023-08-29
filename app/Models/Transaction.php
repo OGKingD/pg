@@ -70,6 +70,7 @@ class Transaction extends Model
             'transactions.user_id',
             'transactions.invoice_no',
             'type',
+            'redirect_url',
             'transactions.amount',
             'fee',
             'total',
