@@ -5,6 +5,8 @@ namespace App\Http\Livewire;
 use App\Lib\Services\Flutterwave;
 use App\Lib\Services\NinePSB;
 use App\Lib\Services\Providus;
+use App\Lib\Services\Remita;
+use App\Models\RRR;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
@@ -188,6 +190,66 @@ class RequeryTool extends Component
                 }
             }
         }
+        if ($provider === "REMITA") {
+
+            $transactionExists = false;
+            //check to see if transaction is not already successful;
+            if (str_contains($trnx,"INV")){
+                $transactionExists = RRR::with('invoice')->firstWhere('invoice_no',$trnx);
+            }
+            if (!str_contains($trnx,"INV")){
+                if (strlen( $trnx) === 12){
+                    $transactionExists = RRR::with('invoice')->firstWhere('rrr',$trnx);
+                }
+                if (strlen( $trnx) !== 12){
+                    $transactionExists = Transaction::firstWhere('merchant_transaction_ref',$trnx)->invoice->rrr;
+                }
+            }
+
+
+            if ($transactionExists && $transactionExists->status === "successful") {
+                $processTransaction = false;
+                $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
+                $this->messageType = "info";
+            }
+
+            if ($processTransaction) {
+                //call remita to get status of transaction
+                $remita = (new Remita())->rrrStatus($transactionExists->rrr);
+
+                if ($remita['status']) {
+                    //check for PENDING;
+                    $paymentStatus = strtoupper($remita['data']['status']);
+
+                    if ($paymentStatus !== "00"){
+                        $this->message = "Transaction  : $trnx cannot be processed, {$remita['message']}";
+                        $this->messageType = "warning";
+                    }
+
+                    if ($paymentStatus ===  "00"){
+                        $this->transactionDetails = [
+                            "transaction_ref" =>  $remita['data']['RRR'],
+                            "orderRef" =>  $remita['data']['orderId'],
+                            "orderId" =>  $remita['data']['orderId'],
+                            "rrr" =>  $remita['data']['RRR'],
+                            "amount" => $remita['data']['amount'],
+                            "date" => $remita['data']['paymentDate'],
+                            "remarks" => $remita['message'],
+                        ];
+                        $this->transactionDetails = array_merge($this->transactionDetails,$remita['data']);
+
+                    }
+
+                }
+
+                if (!$remita['status']) {
+                    $this->message = "Transaction  : $trnx cannot be processed, {$remita['message']}";
+                    $this->messageType = "danger";
+                }
+            }
+
+        }
+
 
         $this->dispatchBrowserEvent('closeAlert');
 
@@ -218,6 +280,14 @@ class RequeryTool extends Component
             //call repush API;
             Http::withoutVerifying()->post(route('webhook.nine-psb-settlement'), $this->transactionDetails)->json();
 
+            $this->message = "Transaction  $this->transaction_ref Pushed for requery!";
+            $this->messageType = "success";
+            $this->dispatchBrowserEvent('alertBox', ['type' => 'success', 'message' => $this->message]);
+
+        }
+        if ($provider === "REMITA"){
+            //Push to Remita
+            Http::withoutVerifying()->post(route('webhook.remita-settlement'),[$this->transactionDetails])->body();
             $this->message = "Transaction  $this->transaction_ref Pushed for requery!";
             $this->messageType = "success";
             $this->dispatchBrowserEvent('alertBox', ['type' => 'success', 'message' => $this->message]);
