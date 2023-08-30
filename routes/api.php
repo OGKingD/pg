@@ -40,7 +40,7 @@ Route::middleware(['terminate'])->group(function () {
         Route::post('flutterwave',[WebhookController::class,'flutterwave'])->name('webhook.flutterwave');
         Route::post('flutterwavepercent',[WebhookController::class,'flwavePercent'])->name('webhook.flutterwave.percent');
         Route::post('providus',[WebhookController::class,'providusSettlement']);
-        Route::any('remita',[WebhookController::class,'remitaSettlement']);
+        Route::any('remita',[WebhookController::class,'remitaSettlement'])->name('webhook.remita-settlement');
         Route::post('ninepsbvirtual',[WebhookController::class,'ninePsbSettlement'])->name('webhook.nine-psb-settlement');
     });
 });
