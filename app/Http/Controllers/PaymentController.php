@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class PaymentController extends Controller
 {
@@ -45,8 +46,16 @@ class PaymentController extends Controller
         }
 
         //declare other variables for the payment page;
-        $data['activeTab'] = "card";
-        $data['merchantGateways'] = $this->getMerchantGatewayDetails($invoice);
+        $merchantGatewayDetails= $this->getMerchantGatewayDetails($invoice);
+        $tranx_details = $invoice->transaction->details;
+        if (isset($tranx_details['channel'])){
+            if (array_key_exists($tranx_details['channel'],$merchantGatewayDetails)){
+                $temp[$tranx_details['channel']] = $merchantGatewayDetails[$tranx_details['channel']];
+                $merchantGatewayDetails = $temp;
+            }
+        }
+        $data['merchantGateways'] = $merchantGatewayDetails;
+        $data['activeTab'] = array_key_first($merchantGatewayDetails);
 
         return view('payment_page', $data);
 
@@ -168,12 +177,20 @@ class PaymentController extends Controller
 
     public function createPaymentRequest(Request $request)
     {
+        $gateways = [];
+        $trn_details = [];
+
+        if ($request->has('channel')){
+            $gateways = Gateway::all()->pluck('id','name')->toArray();
+            $trn_details['channel'] = strtolower(str_replace(" ","",array_search($request->channel, $gateways, false)));
+        }
         $request->validate([
             "name" => "required",
             "amount" => ["required", "numeric", "min:100"],
             "email" => ["required",'email:rfc'],
             "quantity" => ["required", "numeric", "min:1"],
             'request_id' => ["required", "min:5","max:32"],
+            "channel" => ['sometimes',Rule::in($gateways)],
             "redirect_url" => ["sometimes", "url"]
 
         ], $request->all());
@@ -200,9 +217,8 @@ class PaymentController extends Controller
 
         }
 
-        DB::transaction(function () use ($request,$request_id, $user, &$data) {
+        DB::transaction(function () use ($request,$request_id, $user, &$data, &$trn_details) {
             $redirect_url = $request->redirect_url;
-            $trn_details = [];
             $amount = $request->amount;
             /** @var Invoice $invoiceAdded */
             $invoiceAdded = $user->invoice()->create([
