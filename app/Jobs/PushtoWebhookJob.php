@@ -36,9 +36,6 @@ class PushtoWebhookJob implements ShouldQueue
             $webhookPush = $webhookPush->logWebhookPush($this->transaction->id,$this->transaction->merchant_transaction_ref,$this->user_id,$payload);
             //send request to webhookUrl;
             $url = $webhook_url->url;
-            if (isset($transaction->details["redirect_url"])){
-                $url = $transaction->details['redirect_url'];
-            }
             if ($this->transaction->user->id === 3){
                 $url = $this->transaction->redirect_url;
             }

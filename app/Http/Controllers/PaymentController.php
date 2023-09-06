@@ -38,6 +38,20 @@ class PaymentController extends Controller
 
         $data['title'] = "Payment Page";
         $data['invoice'] = $invoice;
+        if ($invoice->user->id === 3){
+            //check if the invoice has expired on UI;
+            $url = "https://pgcollegeui.com/payment/saana/payment_status.php";
+            $data['type'] = $invoice->transaction->type;
+            if (strtolower(str_replace(" ", "", $data['type'])) === "undergraduatetranscript"){
+                $url = "http://academic.ui.edu.ng/payment/saana/payment_status.php";
+            }
+            $data['invoiceno'] = $invoice->transaction->merchant_transaction_ref;
+            $response = \Http::withoutVerifying()->get($url,$data)->json();
+            if (!$response['status']){
+                //redirect to information page showing student should make payment
+                return  view('invoice.notavailable',['merchant_ref' => $data['invoiceno']]);
+            }
+        }
 
         //only show payment page when invoice is pending
         if ($invoice->status !== "pending") {

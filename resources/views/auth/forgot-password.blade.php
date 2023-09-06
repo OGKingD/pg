@@ -4,7 +4,7 @@
     @include('layouts.navigation')
 
     <section class="mt-1">
-        <div class="page-header min-vh-100">
+        <div class="page-header min-vh-90">
             <div class="container">
 
                 <div class="row">
@@ -38,16 +38,26 @@
                                     </div>
                                 </form>
                             </div>
+                            <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                                <p class="mb-4 text-sm mx-auto">
+                                    Don't have an account?
+                                    <a href="{{route('register')}}" class="text-primary text-gradient font-weight-bold">Sign up</a> |
+
+                                    <a href="{{route('login')}}" class="text-primary text-gradient font-weight-bold">Sign in</a>
+
+                                </p>
+                            </div>
+
                         </div>
                     </div>
-                    <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 end-0 text-center justify-content-center flex-column">
+                    <div class="col-6 d-lg-flex d-none my-auto pe-0 position-absolute end-0 text-center justify-content-center flex-column">
                         <div class="position-relative  h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center">
                             <img src="{{asset('assets/img/shapes/pattern-lines.svg')}}" alt="pattern-lines" class="position-absolute opacity-4 start-0">
                             <div class="position-relative">
                                 <img class="max-width-500 w-100 position-relative z-index-2" src="{{asset('assets/img/illustrations/forgot-password.png')}}" alt="chat-img">
                             </div>
-                            <h4 class="mt-5 text-white font-weight-bolder">"{{$author}}"</h4>
-                            <p class="text-white">{{$quote}}</p>
+                            <h4 class="mt-5 text-dark font-weight-bolder">"{{$author}}"</h4>
+                            <p class="text-dark">{{$quote}}</p>
                         </div>
                     </div>
                 </div>
