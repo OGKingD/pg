@@ -13,5 +13,11 @@ class InvoiceController extends Controller
 
     }
 
+    public function notAvailable(Request $request)
+    {
+        return view('invoice.notavailable');
+
+    }
+
     //
 }
