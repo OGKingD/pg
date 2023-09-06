@@ -132,7 +132,6 @@ function setUserField(type,value,id) {
     let userIdField = document.getElementById('userId');
     userIdField.value = id;
 
-    console.log(type,document.getElementById('username').value)
 
 }
 

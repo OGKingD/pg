@@ -4,7 +4,7 @@
     @include('layouts.navigation')
 
     <section class="mt-1">
-        <div class="page-header min-vh-100">
+        <div class="page-header min-vh-80">
             <div class="container">
 
                 <div class="row">
@@ -62,7 +62,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 end-0 text-center justify-content-center flex-column">
+                    <div class="col-6 d-lg-flex d-none my-auto pe-0 position-absolute  end-0 text-center justify-content-center flex-column">
                         <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center">
                             <img src="{{asset('assets/img/shapes/pattern-lines.svg')}}" alt="pattern-lines" class="position-absolute opacity-4 start-0">
                             <div class="position-relative">

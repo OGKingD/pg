@@ -23,19 +23,12 @@ class EmailSearch extends Component
     }
     public function searchForUser()
     {
-        //search for User;
-        if (empty($this->emailToSearch)){
-            $this->users = [];
-        }
-        if (!empty($this->emailToSearch)){
-            $this->users = User::select(['id','email'])->where('email', 'like', "%{$this->emailToSearch}%")->get()->take(5);
-        }
-        //change and search by phone when result is empty
+        $this->passEmailToAllLivewireComponents($this->emailToSearch);
+
     }
 
     public function passEmailToAllLivewireComponents($email)
     {
-        logger($email);
         $this->emitTo('show-users','refreshUsers',$email);
 
     }

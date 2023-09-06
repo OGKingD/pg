@@ -68,4 +68,5 @@ Route::get('payment/process/{id}',[\App\Http\Controllers\PaymentController::clas
 Route::get('payment/card/validate/{id}',[\App\Http\Controllers\PaymentController::class, "validateCardPayment"]);
 Route::get('payment/receipt/{id}',[\App\Http\Controllers\PaymentController::class,'receipt'])->name('receipt');
 Route::get('customers/search', \App\Http\Livewire\ReceiptPage::class);
+Route::get('invoice_notavailable',[\App\Http\Controllers\InvoiceController::class,'notAvailable'])->name('invoice.not-available');
 
