@@ -59,9 +59,9 @@
     .ccicon {
         height: 38px;
         position: absolute;
-        right: 6px;
+        right: 1px;
         top: calc(50% - 4px);
-        width: 60px;
+        width: 50px;
     }
 
     /* CREDIT CARD IMAGE STYLING */
@@ -533,16 +533,16 @@
         })
 
 //On Input Change Events
-        name.addEventListener('input', function () {
-
-            if (name.value.length == 0) {
-                document.getElementById('svgname').innerHTML = 'John Doe';
-                document.getElementById('svgnameback').innerHTML = 'John Doe';
-            } else {
-                document.getElementById('svgname').innerHTML = this.value;
-                document.getElementById('svgnameback').innerHTML = this.value;
-            }
-        });
+//         name.addEventListener('input', function () {
+//
+//             if (name.value.length == 0) {
+//                 document.getElementById('svgname').innerHTML = 'John Doe';
+//                 document.getElementById('svgnameback').innerHTML = 'John Doe';
+//             } else {
+//                 document.getElementById('svgname').innerHTML = this.value;
+//                 document.getElementById('svgnameback').innerHTML = this.value;
+//             }
+//         });
 
         cardnumber_mask.on('accept', function () {
             if (cardnumber_mask.value.length == 0) {
@@ -569,9 +569,9 @@
         });
 
 //On Focus Events
-        name.addEventListener('focus', function () {
-            document.querySelector('.creditcard').classList.remove('flipped');
-        });
+//         name.addEventListener('focus', function () {
+//             document.querySelector('.creditcard').classList.remove('flipped');
+//         });
 
         cardnumber.addEventListener('focus', function () {
             document.querySelector('.creditcard').classList.remove('flipped');

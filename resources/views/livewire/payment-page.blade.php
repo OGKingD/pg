@@ -202,7 +202,7 @@
                                                 @if(!$hideCardFields)
                                                     <div id="mandatoryFields">
 
-                                                        <div class="col-md-10 mb-3 field-container">
+                                                        <div class=" mb-3 field-container">
                                                             <label for="card_number">Card Number</label>
                                                             <input class="form-control" required id="card_number" name="card_number"
                                                                    type="text"
