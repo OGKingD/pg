@@ -34,22 +34,16 @@ class PaymentController extends Controller
 
     public function paymentPage($id)
     {
+        /** @var Invoice $invoice */
         $invoice = $this->checkIfInvoiceExist($id);
 
         $data['title'] = "Payment Page";
         $data['invoice'] = $invoice;
         if ($invoice->user->id === 3){
-            //check if the invoice has expired on UI;
-            $url = "https://pgcollegeui.com/payment/saana/payment_status.php";
-            $data['type'] = $invoice->transaction->type;
-            if (strtolower(str_replace(" ", "", $data['type'])) === "undergraduatetranscript"){
-                $url = "http://academic.ui.edu.ng/payment/saana/payment_status.php";
-            }
-            $data['invoiceno'] = $invoice->transaction->merchant_transaction_ref;
-            $response = \Http::withoutVerifying()->get($url,$data)->json();
+            $response = $invoice->statusOnUI();
             if (!$response['status']){
                 //redirect to information page showing student should make payment
-                return  view('invoice.notavailable',['merchant_ref' => $data['invoiceno']]);
+                return  view('invoice.notavailable',['merchant_ref' => $invoice->transaction->merchant_transaction_ref]);
             }
         }
 

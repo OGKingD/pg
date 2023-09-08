@@ -83,4 +83,17 @@ class Invoice extends Model
         return $this->hasOne(DynamicAccount::class,'invoice_no','invoice_no');
 
     }
+
+    public function statusOnUI()
+    {
+        //check if the invoice has expired on UI;
+        $url = "https://pgcollegeui.com/payment/saana/payment_status.php";
+        $data['type'] = $this->transaction->type;
+        if (strtolower(str_replace(" ", "", $data['type'])) === "undergraduatetranscript"){
+            $url = "http://academic.ui.edu.ng/payment/saana/payment_status.php";
+        }
+        $data['invoiceno'] = $this->transaction->merchant_transaction_ref;
+        return \Http::withoutVerifying()->get($url,$data)->json();
+
+    }
 }
