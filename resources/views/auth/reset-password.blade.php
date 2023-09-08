@@ -88,8 +88,8 @@
                             <div class="position-relative">
                                 <img class="max-width-500 w-100 position-relative z-index-2" src="{{asset('assets/img/illustrations/dark-lock-ill.png')}}" alt="chat-img">
                             </div>
-                            <h4 class="mt-5 text-black font-weight-bolder">"{{$author}}"</h4>
-                            <p class="text-black">{{$quote}}</p>
+                            <h6 class=" mt-2 text-dark">{{$quote}}</h6>
+                            <h4 class="text-dark font-weight-bolder">"{{$author}}"</h4>
                         </div>
                     </div>
                 </div>
