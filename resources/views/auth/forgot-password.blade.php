@@ -56,8 +56,8 @@
                             <div class="position-relative">
                                 <img class="max-width-500 w-100 position-relative z-index-2" src="{{asset('assets/img/illustrations/forgot-password.png')}}" alt="chat-img">
                             </div>
-                            <h4 class="mt-5 text-dark font-weight-bolder">"{{$author}}"</h4>
-                            <p class="text-dark">{{$quote}}</p>
+                            <h6 class=" mt-3 text-dark">{{$quote}}</h6>
+                            <h4 class="text-dark font-weight-bolder">"{{$author}}"</h4>
                         </div>
                     </div>
                 </div>
