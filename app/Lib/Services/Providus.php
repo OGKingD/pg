@@ -45,11 +45,7 @@ class Providus
     {
         try {
             //if $trnx length > 25 that means it's session Id
-            if (strlen($trnx)>25) {
-                $data = ['session_id' => $trnx];
-            } else {
-                $data = ["settlement_id" => $trnx];
-            }
+            $data = $this->pushData($trnx);
             $response = $this->getWithHeaders()->post($this->base_url."PiP_RepushTransaction_SettlementId",$data);
             return json_decode($response->body(), false, 512, JSON_THROW_ON_ERROR);
 
@@ -62,11 +58,7 @@ class Providus
     {
         try {
             //if $trnx length > 25 that means it's session Id
-            if (strlen($trnx)>25) {
-                $data = ['session_id' => $trnx];
-            } else {
-                $data = ["settlement_id" => $trnx];
-            }
+            $data = $this->pushData($trnx);
             $this->client_id = $this->client_id_old_ptpp;
             $this->client_secret = $this->client_secret_old_ptpp;
 
@@ -84,11 +76,7 @@ class Providus
     {
         try {
             //if $trnx length > 25 that means it's session Id
-            if (strlen($trnx)>25) {
-                $data = ['session_id' => $trnx];
-            } else {
-                $data = ["settlement_id" => $trnx];
-            }
+            $data = $this->pushData($trnx);
             $response = $this->getWithHeaders()->post($this->base_url."PiPreturnTransaction",$data);
             return json_decode($response->body(), false, 512, JSON_THROW_ON_ERROR);
 
@@ -102,11 +90,7 @@ class Providus
     {
         try {
             //if $trnx length > 25 that means it's session Id
-            if (strlen($trnx)>25) {
-                $data = ['session_id' => $trnx];
-            } else {
-                $data = ["settlement_id" => $trnx];
-            }
+            $data = $this->pushData($trnx);
             $this->client_id = $this->client_id_old_ptpp;
             $this->client_secret = $this->client_secret_old_ptpp;
 
@@ -318,5 +302,28 @@ class Providus
             "Accept" => "application/json",
             "Content-Type" => "application/json",
         ])->withoutVerifying();
+    }
+
+    /**
+     * @param $trnx
+     * @return array
+     */
+    protected function pushData($trnx): array
+    {
+
+        if (strlen($trnx) > 25) {
+            $data = [
+                'session_id' => $trnx,
+                'settlement_id' => ''
+            ];
+        } else {
+            $data = [
+                "settlement_id" => $trnx,
+                "session_id" => ""
+            ];
+        }
+
+
+        return $data;
     }
 }
