@@ -191,6 +191,7 @@
                                     <thead>
                                     <tr class="table-info">
                                         <th>Transaction Ref</th>
+                                        <th>Invoice No</th>
                                         <th>Amount</th>
                                         <th>Remarks</th>
                                         <th>Date</th>
@@ -200,6 +201,7 @@
                                     <tbody>
                                     <tr>
                                         <td>{{$transactionDetails['transaction_ref']}}</td>
+                                        <td>{{$transactionDetails['invoice_no']}}</td>
                                         <td>{{$transactionDetails['amount']}}</td>
                                         <td style="word-break: break-word !important; ">{{$transactionDetails['remarks']}}</td>
                                         <td>{{$transactionDetails['date']}}</td>
