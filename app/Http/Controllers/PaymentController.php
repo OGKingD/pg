@@ -64,6 +64,18 @@ class PaymentController extends Controller
         }
         $data['merchantGateways'] = $merchantGatewayDetails;
         $data['activeTab'] = array_key_first($merchantGatewayDetails);
+        if ($invoice->transaction->currency === "NGN"){
+            $invoice->currency_symbol = '8358';
+        }
+        if ($invoice->transaction->currency === "USD"){
+            $invoice->currency_symbol = '36';
+        }
+        if ($invoice->transaction->currency === "GBP"){
+            $invoice->currency_symbol = '163';
+        }
+        if ($invoice->transaction->currency === "EUR"){
+            $invoice->currency_symbol = 'euro';
+        }
 
         return view('payment_page', $data);
 
@@ -186,11 +198,18 @@ class PaymentController extends Controller
     public function createPaymentRequest(Request $request)
     {
         $gateways = [];
+        $currencies = [];
+        $currency = "NGN";
         $trn_details = [];
 
         if ($request->has('channel')){
             $gateways = Gateway::all()->pluck('id','name')->toArray();
             $trn_details['channel'] = strtolower(str_replace(" ","",array_search($request->channel, $gateways, false)));
+        }
+        if ($request->has('currency')){
+            $currencies = ["NGN","USD","GBP","EUR"];
+            $currency = strtoupper($request->currency);
+            $request->offsetSet('currency',$currency);
         }
         $request->validate([
             "name" => "required",
@@ -199,6 +218,7 @@ class PaymentController extends Controller
             "quantity" => ["required", "numeric", "min:1"],
             'request_id' => ["required", "min:5","max:32"],
             "channel" => ['sometimes',Rule::in($gateways)],
+            "currency" => ['sometimes',Rule::in($currencies)],
             "redirect_url" => ["sometimes", "url"]
 
         ], $request->all());
@@ -225,7 +245,7 @@ class PaymentController extends Controller
 
         }
 
-        DB::transaction(function () use ($request,$request_id, $user, &$data, &$trn_details) {
+        DB::transaction(function () use ($request,$request_id, $user, &$data, &$trn_details, &$currency) {
             $redirect_url = $request->redirect_url;
             $amount = $request->amount;
             /** @var Invoice $invoiceAdded */
@@ -255,6 +275,7 @@ class PaymentController extends Controller
                 "total" => $amount,
                 'details' => $trn_details,
                 "flag" => "debit",
+                "currency" => $currency,
                 "redirect_url" => $redirect_url
             ]);
             $data = new InvoiceCollection($invoiceAdded);
