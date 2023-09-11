@@ -85,6 +85,7 @@ class RequeryTool extends Component
                                 "amount" => $providus->transactionAmount,
                                 "date" => $providus->settlementDateTime,
                                 "remarks" => $providus->tranRemarks,
+                                "invoice_no" => $transactionExists->invoice_no,
                             ];
                         }
                     }
@@ -129,6 +130,7 @@ class RequeryTool extends Component
                            "amount" => $ninePsb['data']['order']['amount'],
                            "date" => $ninePsb['data']['transaction']['date'],
                            "remarks" => $ninePsb['message'],
+                           "invoice_no" => $transactionExists->invoice_no,
                        ];
                        $this->transactionDetails = array_merge($this->transactionDetails,$ninePsb['data']);
 
@@ -186,6 +188,7 @@ class RequeryTool extends Component
                     $this->transactionDetails["amount"] = $payload['charged_amount'];
                     $this->transactionDetails["date"] = $payload['created_at'];
                     $this->transactionDetails["remarks"] = $payload['status'];
+                    $this->transactionDetails["invoice_no"] = $transactionExists->invoice_no;
 
                 }
             }
@@ -212,6 +215,11 @@ class RequeryTool extends Component
                 $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
                 $this->messageType = "info";
             }
+            if (!$transactionExists){
+                $processTransaction = false;
+                $this->message = "No Transaction found for $trnx. Make sure the transaction exists on This Platform or try using the Invoice Number.";
+                $this->messageType = "info";
+            }
 
             if ($processTransaction) {
                 //call remita to get status of transaction
@@ -229,6 +237,7 @@ class RequeryTool extends Component
                     if ($paymentStatus ===  "00"){
                         $this->transactionDetails = [
                             "transaction_ref" =>  $remita['data']['RRR'],
+                            "invoice_no" => $transactionExists->invoice_no,
                             "orderRef" =>  $remita['data']['orderId'],
                             "orderId" =>  $remita['data']['orderId'],
                             "rrr" =>  $remita['data']['RRR'],
