@@ -275,7 +275,7 @@ class PaymentPage extends Component
             "cvv" => $this->cardDetails['cvv'],
             "expiry_month" => trim($expiry_month),
             "expiry_year" => trim($expiry_year),
-            "currency" => "NGN",
+            "currency" => $this->invoice->transaction->currency,
             "amount" => $this->merchantGateways[$this->activeTab]['invoiceTotal'],
             "email" => $this->invoice->customer_email,
             "redirect_url" => config('app.url') . "/payment/card/validate/{$this->invoice->invoice_no}",

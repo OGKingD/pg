@@ -108,7 +108,7 @@
                             <b class="fa fa-file-invoice" style="font-size: 11px; line-height: 3px;"> {{$invoice->transaction->type}}</b><br>
                         </span>
                         <span class="text-success  text-bold">
-                                NGN {{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}
+                                &#{{$invoice->currency_symbol}};{{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}
                     </span>
                     </li>
                 </ul>
@@ -400,7 +400,8 @@
 
                                                 <div class="col-12 text-center">
                                                     <button class="btn btn-success btn-lg btn-block"
-                                                            type="submit">Pay {{number_format($merchantGateways[$activeTab]['invoiceTotal'])}} NGN
+                                                            type="submit">Pay &#{{$invoice->currency_symbol}};{{number_format($merchantGateways[$activeTab]['invoiceTotal'])}}
+                                                        ({{$invoice->transaction->currency}})
                                                     </button>
                                                 </div>
                                             @endif
