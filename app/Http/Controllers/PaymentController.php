@@ -64,18 +64,6 @@ class PaymentController extends Controller
         }
         $data['merchantGateways'] = $merchantGatewayDetails;
         $data['activeTab'] = array_key_first($merchantGatewayDetails);
-        if ($invoice->transaction->currency === "NGN"){
-            $invoice->currency_symbol = '8358';
-        }
-        if ($invoice->transaction->currency === "USD"){
-            $invoice->currency_symbol = '36';
-        }
-        if ($invoice->transaction->currency === "GBP"){
-            $invoice->currency_symbol = '163';
-        }
-        if ($invoice->transaction->currency === "EUR"){
-            $invoice->currency_symbol = 'euro';
-        }
 
         return view('payment_page', $data);
 
