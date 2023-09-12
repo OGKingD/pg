@@ -39,12 +39,17 @@ class PaymentController extends Controller
 
         $data['title'] = "Payment Page";
         $data['invoice'] = $invoice;
-        if ($invoice->user->id === 3){
-            $response = $invoice->statusOnUI();
-            if (!$response['status']){
-                //redirect to information page showing student should make payment
-                return  view('invoice.notavailable',['merchant_ref' => $invoice->transaction->merchant_transaction_ref]);
-            }
+        $merchRef = $invoice->transaction->merchant_transaction_ref;
+        //declare other variables for the payment page;
+        $merchantGatewayDetails= $this->getMerchantGatewayDetails($invoice);
+        $tranx_details = $invoice->transaction->details;
+        //check for UIGatewayRules;
+        list($merchantGatewayDetails,$details) = $this->uiGatewayRules($invoice, $merchRef, $merchantGatewayDetails);
+        if (!$details['status']){
+            //redirect to information page showing student should make payment
+            return  view('invoice.notavailable',[
+                'message' => $details['message']
+            ]);
         }
 
         //only show payment page when invoice is pending
@@ -53,9 +58,6 @@ class PaymentController extends Controller
             return redirect()->route('receipt', ['id' => $id])->with('status', 'Invoice Paid!');
         }
 
-        //declare other variables for the payment page;
-        $merchantGatewayDetails= $this->getMerchantGatewayDetails($invoice);
-        $tranx_details = $invoice->transaction->details;
         if (isset($tranx_details['channel'])){
             if (array_key_exists($tranx_details['channel'],$merchantGatewayDetails)){
                 $temp[$tranx_details['channel']] = $merchantGatewayDetails[$tranx_details['channel']];
@@ -486,6 +488,46 @@ class PaymentController extends Controller
         ]
         ]);
 
+    }
+
+    /**
+     * @param Invoice $invoice
+     * @param $merchRef
+     * @param array $merchantGatewayDetails
+     * @return array[]
+     */
+    protected function uiGatewayRules(Invoice $invoice, $merchRef, array $merchantGatewayDetails): array
+    {
+        $temp = [];
+        $uiDetails = [];
+        $status = true;
+        if ($invoice->user->id === 3) {
+            $response = $invoice->statusOnUI();
+            $message = "This invoice <b> $merchRef </b> is not available for payment, Kindly generate another record to solve this issue.";
+            if ($response) {
+                if (!$response['status']) {
+                    $status = false;
+                }
+
+            }
+            if (!$response) {
+                $status = false;
+                $message = "Oops! Sorry we cannot confirm the status of your invoice $merchRef ! Please try again later.";
+            }
+
+            //ui handle only remita;
+            if (str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)), "undergraduatetranscript")) {
+                //use only remita channel;
+                if (array_key_exists("remita", $merchantGatewayDetails)) {
+                    $temp['remita'] = $merchantGatewayDetails['remita'];
+                    $merchantGatewayDetails = $temp;
+                }
+            }
+            $uiDetails['status'] = $status;
+            $uiDetails['message'] = $message;
+
+        }
+        return array($merchantGatewayDetails, $uiDetails);
     }
 
 }

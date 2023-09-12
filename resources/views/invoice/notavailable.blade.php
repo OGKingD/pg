@@ -9,7 +9,7 @@
                     <div class="col-lg-6 my-auto">
                         <h1 class="display-1 text-bolder text-gradient text-danger">Error 404</h1>
                         <h2>Erm. Invoice not found</h2>
-                        <p class="lead">This invoice <b>{{$merchant_ref}}</b> is not available for payment, Kindly generate another another record to solve this issue.</p>
+                        <p class="lead">{!! $message !!}</p>
                         <a href="mailto:support@saanapay.ng" role="button"class="btn bg-gradient-dark mt-4">Contact Support</a>
                     </div>
                     <div class="col-lg-6 my-auto position-relative">

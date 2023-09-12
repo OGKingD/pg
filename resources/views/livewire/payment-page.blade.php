@@ -527,7 +527,7 @@
                                     @endif
 
                                     <div id="genVirtualAccstep2" class=" mt-2">
-                                        <div class="col-10 mx-auto card  word-break ">
+                                        <div class=" mx-auto card  word-break ">
                                             <div class="card-body pt-4 text-start ">
                                                 @if(!empty($virtualAccDetails))
                                                     <div class="row">
@@ -553,7 +553,7 @@
                                                                                 </div>
                                                                                 <div class="d-flex flex-column justify-content-center">
                                                                                     <h6 class="mb-1 text-xs">Bank Name</h6>
-                                                                                    <p class="text-xl font-weight-bolder text-secondary mb-0">{{$virtualAccDetails['bankName']}}</p>
+                                                                                    <p class="text-xl font-weight-bolder text-secondary mb-0" id="bankName">{{$virtualAccDetails['bankName']}}</p>
                                                                                 </div>
                                                                             </div>
                                                                         </td>
