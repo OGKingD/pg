@@ -105,7 +105,9 @@
                             <b class="fa fa-envelope-open-text " style="font-size: 11px; line-height: 3px;"> {{$invoice->customer_email}}</b><br>
                             </span>
                         <span>
-                            <b class="fa fa-file-invoice" style="font-size: 11px; line-height: 3px;"> {{$invoice->transaction->type}}</b><br>
+                            @if($invoice->transaction->type)
+                                <b class="fa fa-file-invoice" style="font-size: 11px; line-height: 3px;"> {{$invoice->transaction->type}}</b><br>
+                            @endif
                         </span>
                         <span class="text-success  text-bold">
                                 &#{{$invoice->currency_symbol}};{{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}
@@ -514,51 +516,129 @@
                                         <div class="col-10 mx-auto card  word-break ">
                                             <div class="card-body pt-4 text-start ">
                                                 @if(!empty($virtualAccDetails))
-                                                    <ul>
-                                                        <li class="mt-3 mb-2"> <b class="text-danger">Always ensure the Account name matches before making a transfer </b> </li>
-                                                        <li class="mt-3 mb-2"> <b class="text-danger">This is a one-off account number, do not save or re-use it</b> </li>
-                                                        <li class="mt-3 mb-2"> <b class="text-danger"> Due to delays on the banking networks, please wait 15 minutes for our bank to acknowledge receipt. </b> </li>
-                                                        <li class="mt-3 mb-2"> <b class="text-danger">Ensure you complete your transfer within the period displayed by the timer below </b> </li>
+                                                    <div class="row">
+                                                        <div class="alert alert-warning alert-dismissible fade show  text-white " role="alert">
+                                                            <span class="alert-icon"><i class="fa fa-info-circle"></i></span>
+                                                            <span class="alert-text">
+                                                                <strong>
+                                                                This account is valid for this transaction only and expires in  !</strong>
+                                                                <div id="countdown" class=" text-danger text-center text-bold" style="font-size: 25px"></div>
+                                                            </span>
 
-                                                    </ul>
-                                                    <div class="text-center">
-                                                        <h6 class="bg-warning text-dark"> Account Number expires in </h6>
-                                                        <!-- HTML code for the countdown timer -->
-                                                        <div id="countdown" class=" text-danger" style="font-size: 45px"></div>
-                                                        <br>
+                                                        </div>
+
+                                                        <div class="card">
+                                                            <div class="table-responsive">
+                                                                <table class="table align-items-center mb-0">
+                                                                    <tbody>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <div class="d-flex px-2 py-1">
+                                                                                <div>
+                                                                                    <i class="fa-bank text-dark fa-2x fa avatar avatar-sm me-2"></i>
+                                                                                </div>
+                                                                                <div class="d-flex flex-column justify-content-center">
+                                                                                    <h6 class="mb-1 text-xs">Bank Name</h6>
+                                                                                    <p class="text-xl font-weight-bolder text-secondary mb-0">{{$virtualAccDetails['bankName']}}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+
+
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>
+                                                                            <div class="d-flex px-2 py-1">
+                                                                                <div>
+                                                                                    <i class="fa-list-numeric text-dark fa-2x fa  avatar avatar-sm me-2"></i>
+                                                                                </div>
+                                                                                <div class="d-flex flex-column justify-content-center">
+                                                                                    <h6 class="mb-1 text-xs">Account Number</h6>
+                                                                                    <p class="text-xl font-weight-bolder text-secondary mb-0 ">
+                                                                                        {{$virtualAccDetails['accountNumber']}}
+                                                                                        @if(!empty($virtualAccDetails) && $virtualAccDetails['status'])
+                                                                                            <span class="mx-5 badge badge-sm bg-gradient-dark " role="button"
+                                                                                                  onclick="copyTextToClipboard('bankAccountNumber')"><i class="fas fa-copy"></i> Copy
+                                                                                            </span>
+                                                                                        @endif
+
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+
+
+
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>
+                                                                            <div class="d-flex px-2 py-1">
+                                                                                <div>
+                                                                                    <i class="fa-search-location text-dark fa-2x fa  avatar avatar-sm me-2"></i>
+                                                                                </div>
+                                                                                <div class="d-flex flex-column justify-content-center">
+                                                                                    <h6 class="mb-1 text-xs">Account Name</h6>
+                                                                                    <p class="text-xl font-weight-bolder text-secondary mb-0">{{$virtualAccDetails['accountName']}}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+
+
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>
+                                                                            <div class="d-flex px-2 py-1">
+                                                                                <div>
+                                                                                    <i class=" text-dark fa-2x fa fa-money avatar avatar-sm me-2"></i>
+                                                                                </div>
+                                                                                <div class="d-flex flex-column justify-content-center">
+                                                                                    <h6 class="mb-1 text-xs">Amount Payable</h6>
+                                                                                    <p class="text-xl font-weight-bolder text-secondary mb-0">({{$invoice->transaction->currency}}) {{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+
+
+                                                                    </tr>
+
+
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            <hr>
+                                                            <div class="mt-4">
+                                                                <ul class="list-group " style="font-size: 14px">
+                                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                        <b class="text-danger">Always ensure the Account name matches before making a transfer</b>
+                                                                        <span class="badge badge-warning badge-pill"><i class="fa fa-info text-info"></i></span>
+                                                                    </li>
+                                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                        <b class="text-danger">This is a one-off account number, do not save or re-use it</b>
+                                                                        <span class="badge badge-warning badge-pill"><i class="fa fa-info text-info"></i></span>
+                                                                    </li>
+                                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                        <b class="text-danger"> Due to delays on the banking networks, please wait 15 minutes for our bank to acknowledge receipt. </b>
+                                                                        <span class="badge badge-warning badge-pill"><i class="fa fa-info text-info"></i></span>
+                                                                    </li>
+                                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                        <b class="text-danger">Ensure you complete your transfer within the period displayed by the timer </b>
+                                                                        <span class="badge badge-warning badge-pill"><i class="fa fa-info text-info"></i></span>
+                                                                    </li>
+                                                                </ul>
+
+                                                            </div>
+                                                        </div>
+
                                                     </div>
 
-                                                    <p class="fs-4 mb-2 ">
-                                                        <b>Bank Name:   </b>
-                                                        <span id="bankName" class="fs-5 text-bold"> {{$virtualAccDetails['bankName']}} </span>
-                                                    </p>
-                                                    <p class="fs-4  mt-1 mb-2 ">
-                                                        <b>Account Number:   </b>
-                                                        <span id="bankAccountNumber" class="fs-5 text-bold">  {{$virtualAccDetails['accountNumber']}} </span>
-                                                    </p>
-                                                    <p class="fs-4  mt-1 mb-2 ">
-                                                        <b>Account Name:   </b>
-                                                        <span id="bankAccount" class="fs-5 text-bold" >  {{$virtualAccDetails['accountName']}} </span>
-                                                    </p>
-                                                    <p class="fs-4  mt-1 mb-2 ">
-                                                        <b>Amount Payable:   </b>
-                                                        <span class="text-success  text-bold fs-5">
-                                                    NGN {{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}
-                                                </span>
-                                                    </p>
+
 
                                                 @endif
                                                 <br>
 
-
-                                                @if(!empty($virtualAccDetails) && $virtualAccDetails['status'])
-
-                                                    <span class="badge badge-lg d-block bg-gradient-dark mb-2 up" role="button"
-                                                          onclick="copyTextToClipboard('bankAccountNumber')">
-                                    <i class="fas fa-clipboard"></i>
-                                    Copy Account Number
-                                    </span>
-                                                @endif
 
                                             </div>
 
