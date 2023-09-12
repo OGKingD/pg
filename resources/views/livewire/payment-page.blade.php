@@ -1,3 +1,17 @@
+@php
+    if ($invoice->transaction->currency === "NGN"){
+             $invoice->currency_symbol = '8358';
+         }
+         if ($invoice->transaction->currency === "USD"){
+             $invoice->currency_symbol = '36';
+         }
+         if ($invoice->transaction->currency === "GBP"){
+             $invoice->currency_symbol = '163';
+         }
+         if ($invoice->transaction->currency === "EUR"){
+             $invoice->currency_symbol = 'euro';
+         }
+@endphp
 @if($merchantGateways)
     <div class="row">
         <div class="col-md-3">
@@ -794,9 +808,7 @@
 
 
                 if (response.status === true) {
-                    bankName.innerText = response.bankName;
-                    bankAccount.innerText = response.accountName;
-                    bankAccountNumber.innerText = response.accountNumber;
+
                     // document.getElementById('genVirtualAccstep1').style.display = "none";
                     document.getElementById('genVirtualAccstep2').style.display = "block";
 
@@ -832,14 +844,6 @@
                     if (distance <= 0) {
                         clearInterval(timer);
                         countdownElement.textContent = 'Countdown is over! Account Number Expired, Please Reload Page';
-                        let bankName = document.getElementById('bankName');
-
-                        let bankAccount = document.getElementById('bankAccount');
-
-                        let bankAccountNumber = document.getElementById('bankAccountNumber');
-                        bankName.innerText = "N/A";
-                        bankAccount.innerText = "N/A";
-                        bankAccountNumber.innerText = "N/A";
                         return;
                     }
 
@@ -851,7 +855,7 @@
 
                     // Format the remaining time as a string
                     // Update the countdown element with the remaining time
-                    countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    countdownElement.textContent = `${days}d ${hours}h:${minutes}m:${seconds}s`;
                 }
 
                 // Initial update to prevent delay
