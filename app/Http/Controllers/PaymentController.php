@@ -499,8 +499,8 @@ class PaymentController extends Controller
     protected function uiGatewayRules(Invoice $invoice, $merchRef, array $merchantGatewayDetails): array
     {
         $temp = [];
-        $uiDetails = [];
         $status = true;
+        $uiDetails['status'] = $status ;
         if ($invoice->user->id === 3) {
             $response = $invoice->statusOnUI();
             $message = "This invoice <b> $merchRef </b> is not available for payment, Kindly generate another record to solve this issue.";
