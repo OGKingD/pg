@@ -184,6 +184,9 @@ class NinePSB
             "status" => $status,
             "message" => $message
         ];
+        if ($trnx_id > 30){
+            $trnx_id = substr($trnx_id,0,25);
+        }
         $url = $this->dynamicAccBaseUrl."vmw-api/v1/merchant/account/generate";
         $spayRef = $trnx_id."_".microtime(true);
         $payload = [

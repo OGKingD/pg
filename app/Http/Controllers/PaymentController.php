@@ -516,7 +516,10 @@ class PaymentController extends Controller
             }
 
             //ui handle only remita;
-            if (str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)), "undergraduatetranscript")) {
+            if (!str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)), "undergraduatetranscript")) {
+                unset($merchantGatewayDetails['remita']);
+            }
+            if (str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)), "undergraduatetranscript")){
                 //use only remita channel;
                 if (array_key_exists("remita", $merchantGatewayDetails)) {
                     $temp['remita'] = $merchantGatewayDetails['remita'];
