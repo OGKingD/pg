@@ -72,6 +72,7 @@ class RequeryTool extends Component
                             "amount" => $providus->transactionAmount,
                             "date" => $providus->settlementDateTime,
                             "remarks" => $providus->tranRemarks,
+                            "invoice_no" => 'N/A',
                         ];
                     }
                     if (!$this->byPassInitiationRef){
