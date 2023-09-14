@@ -769,6 +769,10 @@
                     title: 'Please Wait!',
                     timer: 1500,
                     timerProgressBar: true,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
                     didOpen: () => {
                         Swal.showLoading()
                         timerInterval = setInterval(null,100);
