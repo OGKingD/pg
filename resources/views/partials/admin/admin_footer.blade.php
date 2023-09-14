@@ -45,7 +45,7 @@
                 <p class="mb-0 text-secondary">
                     Copyright © <script>
                         document.write(new Date().getFullYear())
-                    </script> Saanapay Limited.
+                    </script> <b class="text-primary text-gradient">Saanapay</b> Limited.
                 </p>
             </div>
         </div>

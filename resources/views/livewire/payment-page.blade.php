@@ -15,12 +15,12 @@
 @if($merchantGateways)
     <div class="row">
         <div class="col-md-3">
-            <div class="border-right mr-3">
+            <div class="border-right">
 
-                <div class="text-center pt-3 pb-3">
+                <div class="d-lg-block d-none text-center ">
                     <a href="/">
-                        <img class="max-width-200" src="{{asset('assets/img/saanapay.png')}} "
-                             alt="SAANAPAY BRAND IMAGE" style="max-width: 120px!important;">
+                        <img src="{{asset('assets/img/saanapay.png')}} "
+                             alt="SAANAPAY BRAND IMAGE" style="max-width: 110px!important;">
                     </a>
                     <h4 class="mt-1">PAY WITH</h4>
                 </div>
@@ -31,8 +31,8 @@
 
 
                     @if(isset($merchantGateways['remita']))
-                        <li class="nav-item" wire:click="setActiveTab('remita')">
-                            <a class="nav-link mt-5 @if($activeTab === "remita") active @endif" data-bs-toggle="pill"
+                        <li class="nav-item" onclick="setActiveTab('remita')">
+                            <a class="nav-link mt-1 @if($activeTab === "remita") active @endif" data-bs-toggle="pill"
                                href="#remita">
                                 <i class="fas fa-school ">
                                     &nbsp; Remita
@@ -44,8 +44,8 @@
 
 
                     @if(isset($merchantGateways['card']))
-                        <li wire:click="setActiveTab('card') " class="nav-item">
-                            <a class="nav-link @if($activeTab === "card") active @endif mt-5 " data-bs-toggle="pill"
+                        <li onclick="setActiveTab('card') " class="nav-item">
+                            <a class="nav-link @if($activeTab === "card") active @endif mt-1 " data-bs-toggle="pill"
                                href="#card">
                                 <i class="fa-solid fa-credit-card ">
                                     &nbsp; Card
@@ -56,8 +56,8 @@
 
 
                     @if(isset($merchantGateways['banktransfer']))
-                        <li class="nav-item" wire:click="setActiveTab('banktransfer')">
-                            <a class="nav-link mt-5 @if($activeTab === "banktransfer") active @endif"
+                        <li class="nav-item" onclick="setActiveTab('banktransfer')">
+                            <a class="nav-link mt-1 @if($activeTab === "banktransfer") active @endif"
                                data-bs-toggle="pill"
                                href="#banktransfer">
                                 <i class="fas fa-landmark ">
@@ -68,8 +68,8 @@
                     @endif
 
                     @if(isset($merchantGateways['cashatbank']))
-                        <li class="nav-item" wire:click="setActiveTab('cashatbank')">
-                            <a class="nav-link mt-5 @if($activeTab === "cashatbank") active @endif"
+                        <li class="nav-item" onclick="setActiveTab('cashatbank')">
+                            <a class="nav-link mt-1 @if($activeTab === "cashatbank") active @endif"
                                data-bs-toggle="pill"
                                href="#cashatbank">
                                 <i class="fas fa-landmark ">
@@ -81,8 +81,8 @@
 
 
                     @if(isset($merchantGateways['googlepay']))
-                        <li class="nav-item" wire:click="setActiveTab('googlepay')">
-                            <a class="nav-link mt-5 @if($activeTab === "googlepay") active @endif" data-bs-toggle="pill"
+                        <li class="nav-item" onclick="setActiveTab('googlepay')">
+                            <a class="nav-link mt-1 @if($activeTab === "googlepay") active @endif" data-bs-toggle="pill"
                                href="#googlepay">
                                 <i class="fa-brands fa-google-pay">
                                     &nbsp; Google Pay
@@ -92,8 +92,8 @@
                     @endif
 
                     @if(isset($merchantGateways['applepay']))
-                        <li class="nav-item" wire:click="setActiveTab('applepay')">
-                            <a class="nav-link mt-5 @if($activeTab === "applepay") active @endif" data-bs-toggle="pill"
+                        <li class="nav-item" onclick="setActiveTab('applepay')">
+                            <a class="nav-link mt-1 @if($activeTab === "applepay") active @endif" data-bs-toggle="pill"
                                href="#applepay">
                                 <i class="fa-brands fa-cc-apple-pay ">
                                     &nbsp; Apple Pay
@@ -425,8 +425,7 @@
 
                                         <div class="col-12 text-center">
                                             <button class="btn btn-success btn-lg btn-block"
-                                                    type="submit">Pay &#{{$invoice->currency_symbol}}
-                                                ;{{number_format($merchantGateways[$activeTab]['invoiceTotal'])}}
+                                                    type="submit">Pay &#{{$invoice->currency_symbol}}; {{number_format($merchantGateways[$activeTab]['invoiceTotal'])}}
                                                 ({{$invoice->transaction->currency}})
                                             </button>
                                         </div>
@@ -543,115 +542,88 @@
                                 </div>
                             @endif
 
-                            <div id="genVirtualAccstep2" class=" mt-2">
+                            <div id="genVirtualAccstep2" class=" mt-2" tabindex="0">
                                 <div class=" mx-auto card  word-break ">
                                     <div class="card-body pt-4 text-start ">
                                         @if(!empty($virtualAccDetails))
-                                            <div class="row">
-                                                <div
-                                                    class="alert alert-warning alert-dismissible fade show  text-white "
-                                                    role="alert">
-                                                    <span class="alert-icon"><i class="fa fa-info-circle"></i></span>
-                                                    <span class="alert-text">
-                                                                <strong>
-                                                                This account is valid for this transaction only and expires in  !</strong>
+                                            <div class="row" id="bankTransferDisplayContent">
+                                                @if(!in_array($invoice->user->id, config('bankTransfer.initiate4merchants')))
+                                                    <div
+                                                        class="alert alert-warning alert-dismissible fade show  text-white "
+                                                        role="alert">
+                                                        <span class="alert-icon"><i class="fa fa-info-circle"></i></span>
+                                                        <span class="alert-text font-weight-bold">
+                                                                This account is valid only for this transaction and expires in  !
                                                                 <div id="countdown"
                                                                      class=" text-danger text-center text-bold"
                                                                      style="font-size: 25px"></div>
                                                             </span>
 
-                                                </div>
-
-                                                <div class="card">
-                                                    <div class="table-responsive">
-                                                        <table class="table align-items-center mb-0">
-                                                            <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <div class="d-flex px-2 py-1">
-                                                                        <div>
-                                                                            <i class="fa-bank text-dark fa-2x fa avatar avatar-sm me-2"></i>
-                                                                        </div>
-                                                                        <div
-                                                                            class="d-flex flex-column justify-content-center">
-                                                                            <h6 class="mb-1 text-xs">Bank Name</h6>
-                                                                            <p class="text-xl font-weight-bolder text-secondary mb-0"
-                                                                               id="bankName">{{$virtualAccDetails['bankName']}}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-
-
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>
-                                                                    <div class="d-flex px-2 py-1">
-                                                                        <div>
-                                                                            <i class="fa-list-numeric text-dark fa-2x fa  avatar avatar-sm me-2"></i>
-                                                                        </div>
-                                                                        <div
-                                                                            class="d-flex flex-column justify-content-center">
-                                                                            <h6 class="mb-1 text-xs">Account Number</h6>
-                                                                            <p class="text-xl font-weight-bolder text-secondary mb-0 ">
-                                                                                {{$virtualAccDetails['accountNumber']}}
-                                                                                @if(!empty($virtualAccDetails) && $virtualAccDetails['status'])
-                                                                                    <span
-                                                                                        class="mx-5 badge badge-sm bg-gradient-dark "
-                                                                                        role="button"
-                                                                                        onclick="copyTextToClipboard('bankAccountNumber')"><i
-                                                                                            class="fas fa-copy"></i> Copy
-                                                                                            </span>
-                                                                                @endif
-
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-
-
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>
-                                                                    <div class="d-flex px-2 py-1">
-                                                                        <div>
-                                                                            <i class="fa-search-location text-dark fa-2x fa  avatar avatar-sm me-2"></i>
-                                                                        </div>
-                                                                        <div
-                                                                            class="d-flex flex-column justify-content-center">
-                                                                            <h6 class="mb-1 text-xs">Account Name</h6>
-                                                                            <p class="text-xl font-weight-bolder text-secondary mb-0">{{$virtualAccDetails['accountName']}}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-
-
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>
-                                                                    <div class="d-flex px-2 py-1">
-                                                                        <div>
-                                                                            <i class=" text-dark fa-2x fa fa-money avatar avatar-sm me-2"></i>
-                                                                        </div>
-                                                                        <div
-                                                                            class="d-flex flex-column justify-content-center">
-                                                                            <h6 class="mb-1 text-xs">Amount Payable</h6>
-                                                                            <p class="text-xl font-weight-bolder text-secondary mb-0">
-                                                                                ({{$invoice->transaction->currency}}
-                                                                                ) {{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-
-
-                                                            </tr>
-
-
-                                                            </tbody>
-                                                        </table>
                                                     </div>
+                                                @endif
+                                                <div  class="card" tabindex="0">
+                                                    <ul class="list-group " style="font-size: 14px">
+                                                        <li class="list-group-item d-flex align-items-center">
+                                                            <i class="fa-bank text-dark fa-2x fa avatar avatar-sm me-2"></i>
+                                                            <div
+                                                                class="d-flex flex-column justify-content-center">
+                                                                <h6 class=" text-xs">Bank Name</h6>
+                                                                <p style="word-break: break-word; font-size: 18px" class="text-xl font-weight-bolder text-secondary mb-0"
+                                                                   id="bankName">{{$virtualAccDetails['bankName']}}</p>
+                                                            </div>
+
+                                                        </li>
+                                                        <li class="list-group-item d-flex align-items-center">
+                                                            <i class="fa-list-numeric text-dark fa-2x fa  avatar avatar-sm me-2"></i>
+                                                            <div
+                                                                class="d-flex flex-column justify-content-center">
+                                                                <h6 class=" text-xs">Account Number</h6>
+                                                                <p style="word-break: break-word; font-size: 18px" class="text-xl font-weight-bolder text-secondary mb-0 ">
+                                                                    {{$virtualAccDetails['accountNumber']}}
+                                                                    @if(!empty($virtualAccDetails) && $virtualAccDetails['status'])
+                                                                        <span
+                                                                            class="badge badge-sm bg-gradient-dark "
+                                                                            role="button"
+                                                                            onclick="copyTextToClipboard('bankAccountNumber')"><i
+                                                                                class="fas fa-copy"></i> Copy
+                                                                                            </span>
+                                                                    @endif
+                                                                    @if(in_array($invoice->user->id, config('bankTransfer.initiate4merchants')))
+                                                                        <br>
+                                                                        <span  class=" text-danger text-center text-bold"
+                                                                               style="font-size: 15px" >
+                                                                            Expires in
+                                                                            <span id="countdown" class=" text-danger text-center text-bold" style="font-size: 15px">
+                                                                            </span>
+                                                                    </span>
+                                                                    @endif
+
+                                                                </p>
+                                                            </div>
+
+                                                        </li>
+                                                        <li class="list-group-item d-flex align-items-center">
+                                                            <i class="fa-search-location text-dark fa-2x fa  avatar avatar-sm me-2"></i>
+                                                            <div
+                                                                class="d-flex flex-column justify-content-center">
+                                                                <h6 class=" text-xs">Account Name</h6>
+                                                                <p style="word-break: break-word; font-size: 18px" class="text-xl font-weight-bolder text-secondary mb-0">{{$virtualAccDetails['accountName']}}</p>
+                                                            </div>
+
+                                                        </li>
+                                                        <li class="list-group-item d-flex align-items-center">
+                                                            <i class=" text-dark fa-2x fa fa-money avatar avatar-sm me-2"></i>
+                                                            <div
+                                                                class="d-flex flex-column justify-content-center">
+                                                                <h6 class=" text-xs">Amount Payable</h6>
+                                                                <p style="word-break: break-word; font-size: 18px" class="text-xl font-weight-bolder text-secondary mb-0">
+                                                                    ({{$invoice->transaction->currency}}
+                                                                    ) {{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}</p>
+                                                            </div>
+
+                                                        </li>
+
+                                                    </ul>
                                                     <hr>
                                                     <div class="mt-4">
                                                         <ul class="list-group " style="font-size: 14px">
@@ -681,7 +653,6 @@
                                                                         class="fa fa-info text-info"></i></span>
                                                             </li>
                                                         </ul>
-
                                                     </div>
                                                 </div>
 
@@ -787,9 +758,27 @@
                     @if(in_array($invoice->user->id, config('bankTransfer.initiate4merchants')))
                         generateVirtualACC();
                     @endif
+                    document.getElementById('genVirtualAccstep2').focus();
                 @endif
             });
 
+            function setActiveTab(tab) {
+                @this.activeTab = tab;
+                let timerInterval
+                Swal.fire({
+                    title: 'Please Wait!',
+                    timer: 1500,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        timerInterval = setInterval(null,100);
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                })
+
+            }
 
             function generateRRR() {
                 Swal.fire({
@@ -878,6 +867,7 @@
             // JavaScript code for the countdown timer
             function countdownTimer(endTime) {
                 const countdownElement = document.getElementById('countdown');
+                const bankTransfercontent = document.getElementById('bankTransferDisplayContent');
 
                 // Update the countdown every second
                 const timer = setInterval(updateCountdown, 1000);
@@ -890,6 +880,7 @@
                     if (distance <= 0) {
                         clearInterval(timer);
                         countdownElement.textContent = 'Countdown is over! Account Number Expired, Please Reload Page';
+                        bankTransfercontent.style.visibility = 'hidden';
                         return;
                     }
 
@@ -901,7 +892,7 @@
 
                     // Format the remaining time as a string
                     // Update the countdown element with the remaining time
-                    countdownElement.textContent = `${days}d ${hours}h:${minutes}m:${seconds}s`;
+                    countdownElement.textContent = `${hours}h:${minutes}m:${seconds}s`;
                 }
 
                 // Initial update to prevent delay

@@ -336,8 +336,6 @@
     </div>
 
 
-    {{--            //footer goes here--}}
-    @include('partials.admin.admin_footer')
     @if(isset($merchantGateways['card']))
         @include('partials.card_gateway')
     @endif
@@ -353,6 +351,8 @@
         allowEnterKey: false,
     });
 </script>
+<script src="{{asset('assets/js/soft-ui-dashboard.min.js')}}"></script>
+<script src="{{asset('assets/js/app.js')}}"></script>
 </body>
 
 
