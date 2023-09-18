@@ -585,7 +585,7 @@
                                                                             class="badge badge-sm bg-gradient-dark "
                                                                             role="button"
                                                                             onclick="copyTextToClipboard('bankAccountNumber')"><i
-                                                                                class="fas fa-copy"></i> Copy
+                                                                                class="fas fa-copy"></i>
                                                                                             </span>
                                                                     @endif
                                                                     @if(in_array($invoice->user->id, config('bankTransfer.initiate4merchants')))
@@ -863,7 +863,7 @@
 
                 }
 
-                salert('Virtual Account GENERATED SUCCESSFULLY', 'success', 'success');
+                salert('Virtual Account GENERATED SUCCESSFULLY', 'success', 'success',true);
 
 
             })
