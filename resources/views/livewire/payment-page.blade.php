@@ -578,8 +578,8 @@
                                                             <div
                                                                 class="d-flex flex-column justify-content-center">
                                                                 <h6 class=" text-xs">Account Number</h6>
-                                                                <p style="word-break: break-word; font-size: 18px" class="text-xl font-weight-bolder text-secondary mb-0 ">
-                                                                    {{$virtualAccDetails['accountNumber']}}
+                                                                <p style="word-break: break-word; font-size: 18px" class="text-xl font-weight-bolder text-secondary mb-0 " >
+                                                                    <span id="bankAccountNumber"> {{$virtualAccDetails['accountNumber']}} </span>
                                                                     @if(!empty($virtualAccDetails) && $virtualAccDetails['status'])
                                                                         <span
                                                                             class="badge badge-sm bg-gradient-dark "
@@ -617,8 +617,7 @@
                                                                 class="d-flex flex-column justify-content-center">
                                                                 <h6 class=" text-xs">Amount Payable</h6>
                                                                 <p style="word-break: break-word; font-size: 18px" class="text-xl font-weight-bolder text-secondary mb-0">
-                                                                    ({{$invoice->transaction->currency}}
-                                                                    ) {{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}</p>
+                                                                     &#{{$invoice->currency_symbol}};{{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}} ({{$invoice->transaction->currency}})</p>
                                                             </div>
 
                                                         </li>
@@ -753,7 +752,7 @@
 
         <script>
             document.addEventListener("DOMContentLoaded", () => {
-                Swal.close();
+                sclose();
                 @if(isset($merchantGateways['banktransfer']))
                     @if(in_array($invoice->user->id, config('bankTransfer.initiate4merchants')))
                         generateVirtualACC();
@@ -854,6 +853,7 @@
                     // Usage: Set the desired end time for the countdown
                     const endTime = new Date(response.endtime).getTime();
                     countdownTimer(endTime);
+                    salert('Virtual Account GENERATED SUCCESSFULLY', 'success', 'success');
 
 
                 } else {
@@ -863,7 +863,7 @@
 
                 }
 
-                salert('Virtual Account GENERATED SUCCESSFULLY', 'success', 'success',true);
+                sclose();
 
 
             })

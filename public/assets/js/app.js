@@ -11,6 +11,10 @@ function salert(title, text, icon,showConfirmButton = false, allowOutsideClick =
     });
 }
 
+function sclose() {
+    Swal.close();
+}
+
 function positonedAlert(position,htmlMessage) {
     Swal.fire({
         position: position,
