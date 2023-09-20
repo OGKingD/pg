@@ -386,6 +386,10 @@
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                                 data-sortable="">
+                                <a href="#" class="dataTable-sorter">Currency</a>
+                            </th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                data-sortable="">
                                 <a href="#" class="dataTable-sorter">Provider</a>
                             </th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
@@ -456,6 +460,7 @@
                                 <td class="text-sm font-weight-normal">{{ $trnRef }}</td>
                                 <td class="text-sm font-weight-normal">{{ $val->type }}</td>
                                 <td class="text-sm font-weight-normal">{{ $val->gateway->name??  "N/A"}}</td>
+                                <td class="text-sm font-weight-normal">{{ $val->currency}}</td>
                                 <td class="text-sm font-weight-normal">{{ $val->provider ??  "N/A"}}</td>
                                 <td> &#{{nairaSymbol()}} {{number_format($val->amount,'2','.',',')}}</td>
                                 <td>&#{{nairaSymbol()}} {{number_format($val->fee,'2','.',',')}}</td>

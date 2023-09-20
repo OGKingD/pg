@@ -94,13 +94,18 @@ class PaymentController extends Controller
     public function getMerchantGatewayDetails($invoice): array
     {
         $mGateways = $invoice->user->usergateway;
-        $merchantGateways = $mGateways ? $mGateways->config_details : null;
+        $merchantGateways = $mGateways->config_details ?? null;
 
         $freshArr = [];
 
         if ($merchantGateways) {
             array_walk($merchantGateways, function ($item, $key) use (&$freshArr, $invoice) {
                 if ($item['status']){
+                    //check if percentage is set use flwavePercent Channel;
+                    if (!empty($item['charge_factor'])){
+                        $item['flwave_percent'] = true;
+                    }
+
                     if (strtolower($item['name']) === "card"){
                         if ($invoice->user_id === 3){
                             $item = $this->setCardMerchantCharge($invoice,$item);
@@ -109,6 +114,13 @@ class PaymentController extends Controller
                     $item['gateway_id'] = $key;
                     $item["invoiceCharge"] = $item['charge_factor'] ?  ($item['charge'] / 100) * $invoice->amount : $item['charge'];
                     $item["invoiceTotal"] = $invoice->amount + $item['invoiceCharge'];
+                    //check if it's intlPayment
+                    if (strtoupper($invoice->transaction->currency) !== "NGN"){
+                        if (str_replace(' ', '',strtolower($item['name'])) === "intcard"){
+                            $item['name'] = $freshArr['card']['name'];
+                            $item['gateway_id'] = $freshArr['card']['gateway_id'];
+                        }
+                    }
                     $freshArr[str_replace(' ', '', strtolower($item['name']))] = $item;
 
                 }
@@ -128,6 +140,7 @@ class PaymentController extends Controller
         //Acceptance fees - 22000 % 1.5
         //Check if it's UI merchant;
         $type = strtolower(str_replace(" ", "", $transaction->type));
+        $item['flwave_percent'] = false;
 
         if ( str_contains($type,"tuition") || str_contains($type,"school") ){
             $item['charge_factor'] = 0;
@@ -137,19 +150,19 @@ class PaymentController extends Controller
         if ( str_contains($type,"application") ){
             $item['charge_factor'] = 0;
             $item['charge'] = 350;
-//            $item['flwave_percent'] = true;
+            $item['flwave_percent'] = true;
         }
 
         if ( str_contains($type,"transcript") ){
             $item['charge_factor'] = 0;
             $item['charge'] = 350;
-//            $item['flwave_percent'] = true;
+            $item['flwave_percent'] = true;
         }
 
         if ( str_contains($type,"acceptance") ){
             $item['charge_factor'] = 0;
             $item['charge'] = 350;
-//            $item['flwave_percent'] = true;
+            $item['flwave_percent'] = true;
         }
         return $item;
 
@@ -191,6 +204,7 @@ class PaymentController extends Controller
         $currencies = [];
         $currency = "NGN";
         $trn_details = [];
+        $trn_channelId = $request->channel;
 
         if ($request->has('channel')){
             $gateways = Gateway::all()->pluck('id','name')->toArray();
@@ -235,7 +249,7 @@ class PaymentController extends Controller
 
         }
 
-        DB::transaction(function () use ($request,$request_id, $user, &$data, &$trn_details, &$currency) {
+        DB::transaction(function () use ($trn_channelId, $request,$request_id, $user, &$data, &$trn_details, &$currency) {
             $redirect_url = $request->redirect_url;
             $amount = $request->amount;
             /** @var Invoice $invoiceAdded */
@@ -266,6 +280,7 @@ class PaymentController extends Controller
                 'details' => $trn_details,
                 "flag" => "debit",
                 "currency" => $currency,
+                "gateway_id" => $trn_channelId,
                 "redirect_url" => $redirect_url
             ]);
             $data = new InvoiceCollection($invoiceAdded);
