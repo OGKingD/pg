@@ -260,7 +260,7 @@ class PaymentController extends Controller
                 "user_id" => $invoiceAdded->user_id,
                 "merchant_transaction_ref" => $request_id ?? $uuid,
                 "status" => "pending",
-                "type" => $request->service_type,
+                "type" => $request->service_type ?? "N/A",
                 "amount" => $amount,
                 "total" => $amount,
                 'details' => $trn_details,
