@@ -425,7 +425,7 @@
 
                                         <div class="col-12 text-center">
                                             <button class="btn btn-success btn-lg btn-block"
-                                                    type="submit">Pay &#{{$invoice->currency_symbol}}; {{number_format($merchantGateways[$activeTab]['invoiceTotal'])}}
+                                                    type="submit">Pay &#{{$invoice->currency_symbol}};{{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}
                                                 ({{$invoice->transaction->currency}})
                                             </button>
                                         </div>
