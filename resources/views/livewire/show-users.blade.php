@@ -1,4 +1,344 @@
 <div>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-lg-6 col-12">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-12">
+                        <div class="card"
+                             style="background-image: url('https://demos.creative-tim.com/soft-ui-dashboard-pro/assets/img/curved-images/white-curved.jpeg')">
+                            <span class="mask bg-gradient-dark opacity-9 border-radius-xl"></span>
+                            <div class="card-body p-3 position-relative">
+                                <div class="row">
+                                    <div class="col-8 text-start">
+                                        <div class="icon icon-shape bg-white shadow text-center border-radius-md">
+                                            <i class="ni ni-circle-08 text-dark text-gradient text-lg opacity-10"
+                                               aria-hidden="true"></i>
+                                        </div>
+                                        <h5 class="text-white font-weight-bolder mb-0 mt-3">
+                                            1600
+                                        </h5>
+                                        <span class="text-white text-sm">Users Active</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="dropdown text-end mb-6">
+                                            <a href="javascript:;" class="cursor-pointer" id="dropdownUsers1"
+                                               data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa fa-ellipsis-h text-white" aria-hidden="true"></i>
+                                            </a>
+                                            <ul class="dropdown-menu px-2 py-3" aria-labelledby="dropdownUsers1">
+                                                <li><a class="dropdown-item border-radius-md"
+                                                       href="javascript:;">Action</a></li>
+                                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Another
+                                                        action</a></li>
+                                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Something
+                                                        else here</a></li>
+                                            </ul>
+                                        </div>
+                                        <p class="text-white text-sm text-end font-weight-bolder mt-auto mb-0">+55%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-12 mt-4 mt-md-0">
+                        <div class="card"
+                             style="background-image: url('https://demos.creative-tim.com/soft-ui-dashboard-pro/assets/img/curved-images/white-curved.jpeg')">
+                            <span class="mask bg-gradient-dark opacity-9 border-radius-xl"></span>
+                            <div class="card-body p-3 position-relative">
+                                <div class="row">
+                                    <div class="col-8 text-start">
+                                        <div class="icon icon-shape bg-white shadow text-center border-radius-md">
+                                            <i class="ni ni-active-40 text-dark text-gradient text-lg opacity-10"
+                                               aria-hidden="true"></i>
+                                        </div>
+                                        <h5 class="text-white font-weight-bolder mb-0 mt-3">
+                                            357
+                                        </h5>
+                                        <span class="text-white text-sm">Click Events</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="dropstart text-end mb-6">
+                                            <a href="javascript:;" class="cursor-pointer" id="dropdownUsers2"
+                                               data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa fa-ellipsis-h text-white" aria-hidden="true"></i>
+                                            </a>
+                                            <ul class="dropdown-menu px-2 py-3" aria-labelledby="dropdownUsers2">
+                                                <li><a class="dropdown-item border-radius-md"
+                                                       href="javascript:;">Action</a></li>
+                                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Another
+                                                        action</a></li>
+                                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Something
+                                                        else here</a></li>
+                                            </ul>
+                                        </div>
+                                        <p class="text-white text-sm text-end font-weight-bolder mt-auto mb-0">+124%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-lg-6 col-md-6 col-12">
+                        <div class="card"
+                             style="background-image: url('https://demos.creative-tim.com/soft-ui-dashboard-pro/assets/img/curved-images/white-curved.jpeg')">
+                            <span class="mask bg-gradient-dark opacity-9 border-radius-xl"></span>
+                            <div class="card-body p-3 position-relative">
+                                <div class="row">
+                                    <div class="col-8 text-start">
+                                        <div class="icon icon-shape bg-white shadow text-center border-radius-md">
+                                            <i class="ni ni-cart text-dark text-gradient text-lg opacity-10"
+                                               aria-hidden="true"></i>
+                                        </div>
+                                        <h5 class="text-white font-weight-bolder mb-0 mt-3">
+                                            2300
+                                        </h5>
+                                        <span class="text-white text-sm">Purchases</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="dropdown text-end mb-6">
+                                            <a href="javascript:;" class="cursor-pointer" id="dropdownUsers3"
+                                               data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa fa-ellipsis-h text-white" aria-hidden="true"></i>
+                                            </a>
+                                            <ul class="dropdown-menu px-2 py-3" aria-labelledby="dropdownUsers3">
+                                                <li><a class="dropdown-item border-radius-md"
+                                                       href="javascript:;">Action</a></li>
+                                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Another
+                                                        action</a></li>
+                                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Something
+                                                        else here</a></li>
+                                            </ul>
+                                        </div>
+                                        <p class="text-white text-sm text-end font-weight-bolder mt-auto mb-0">+15%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-12 mt-4 mt-md-0">
+                        <div class="card"
+                             style="background-image: url('https://demos.creative-tim.com/soft-ui-dashboard-pro/assets/img/curved-images/white-curved.jpeg')">
+                            <span class="mask bg-gradient-dark opacity-9 border-radius-xl"></span>
+                            <div class="card-body p-3 position-relative">
+                                <div class="row">
+                                    <div class="col-8 text-start">
+                                        <div class="icon icon-shape bg-white shadow text-center border-radius-md">
+                                            <i class="ni ni-like-2 text-dark text-gradient text-lg opacity-10"
+                                               aria-hidden="true"></i>
+                                        </div>
+                                        <h5 class="text-white font-weight-bolder mb-0 mt-3">
+                                            940
+                                        </h5>
+                                        <span class="text-white text-sm">Likes</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="dropstart text-end mb-6">
+                                            <a href="javascript:;" class="cursor-pointer" id="dropdownUsers4"
+                                               data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa fa-ellipsis-h text-white" aria-hidden="true"></i>
+                                            </a>
+                                            <ul class="dropdown-menu px-2 py-3" aria-labelledby="dropdownUsers4">
+                                                <li><a class="dropdown-item border-radius-md"
+                                                       href="javascript:;">Action</a></li>
+                                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Another
+                                                        action</a></li>
+                                                <li><a class="dropdown-item border-radius-md" href="javascript:;">Something
+                                                        else here</a></li>
+                                            </ul>
+                                        </div>
+                                        <p class="text-white text-sm text-end font-weight-bolder mt-auto mb-0">+90%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-12 mt-4 mt-lg-0">
+                <div class="card h-100">
+                    <div class="card-header pb-0 p-3">
+                        <h6 class="mb-0">Reviews</h6>
+                    </div>
+                    <div class="card-body pb-0 p-3">
+                        <ul class="list-group">
+                            <li class="list-group-item border-0 d-flex align-items-center px-0 mb-0">
+                                <div class="w-100">
+                                    <div class="d-flex mb-2">
+                                        <span
+                                            class="me-2 text-sm font-weight-bold text-capitalize">Positive reviews</span>
+                                        <span class="ms-auto text-sm font-weight-bold">80%</span>
+                                    </div>
+                                    <div>
+                                        <div class="progress progress-md">
+                                            <div class="progress-bar bg-gradient-info w-80" role="progressbar"
+                                                 aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
+                                <div class="w-100">
+                                    <div class="d-flex mb-2">
+                                        <span
+                                            class="me-2 text-sm font-weight-bold text-capitalize">Neutral reviews</span>
+                                        <span class="ms-auto text-sm font-weight-bold">17%</span>
+                                    </div>
+                                    <div>
+                                        <div class="progress progress-md">
+                                            <div class="progress-bar bg-gradient-dark w-10" role="progressbar"
+                                                 aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
+                                <div class="w-100">
+                                    <div class="d-flex mb-2">
+                                        <span
+                                            class="me-2 text-sm font-weight-bold text-capitalize">Negative reviews</span>
+                                        <span class="ms-auto text-sm font-weight-bold">3%</span>
+                                    </div>
+                                    <div>
+                                        <div class="progress progress-md">
+                                            <div class="progress-bar bg-gradient-danger w-5" role="progressbar"
+                                                 aria-valuenow="5" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer pt-0 p-3 d-flex align-items-center">
+                        <div class="w-60">
+                            <p class="text-sm">
+                                More than <b>1,500,000</b> developers used Creative Tim's products and over
+                                <b>700,000</b> projects were created.
+                            </p>
+                        </div>
+                        <div class="w-40 text-end">
+                            <a class="btn bg-gradient-dark mb-0 text-end" href="javascript:;">View all reviews</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row my-4">
+            <div class="col-12">
+                <div class="card">
+                    <form role="form" action="#" wire:submit.prevent="searchUsers">
+                        @csrf
+
+                        <div class="pb-lg-3 pb-3 pt-2 postion-relative z-index-2">
+                            <h3 class="text">Search</h3>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="customer_email" class="col-form-label text-md-right">
+                                            {{__("Merchant Email")}}
+                                        </label>
+                                        <livewire:email-search/>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name
+                                </th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                    Business
+                                </th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                    Status
+                                </th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    Email
+                                </th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            @forelse($users as $k=>$val)
+
+                                <tr>
+
+                                    <td>{{++$k}}.</td>
+
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            <a href="{{route('user-settings',['id' => $val['id']])}}">
+                                                <i class="text-dark fa fa-cog fa-2x avatar avatar-sm me-3 "
+                                                   alt="Settings Icon" data-bs-toggle="tooltip" title="Settings!"></i>
+                                            </a>
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm"> {{$val['first_name'].' '.$val['last_name']}} </h6>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <p class="text-sm text-secondary mb-0">{{$val['business_name']}}</p>
+                                    </td>
+
+                                    <td>
+                                        <span class="text-dark text-xs">
+                                                @if($val['status']=== 1)
+                                                <span class="badge badge-pill badge-success">{{__('Active')}}</span>
+                                            @elseif($val['status']=== 0)
+                                                <span class="badge badge-pill badge-danger">{{__('Blocked')}}</span>
+                                            @endif
+                                            </span>
+                                    </td>
+
+                                    <td class="align-middle text-center text-sm">
+                                        <p class="text-secondary mb-0 text-sm">{{$val['email']}}</p>
+                                    </td>
+
+
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="col-lg-10 mt-4 mx-auto">
+                                            <div class="justify-content-start card card-plain">
+                                                <div class="card-header pb-0 text-start">
+                                                    <h2 class="font-weight-bolder">😢 There are no registered Users
+                                                        Yet!</h2>
+                                                    <p class="mb-0 text-center">Once Users Sign Up they'll appear
+                                                        here.</p>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+                                </tr>
+
+
+                            @endforelse
+                            {{ $usersCollection->links() }}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
     <div class="card card-plain">
 
         <div class="card-body pb-3">
@@ -8,304 +348,29 @@
                          class="position-absolute opacity-6 start-0 top-0 w-100">
 
                 </div>
-                <form role="form" action="#"  wire:submit.prevent="searchUsers">
-                    @csrf
-
-                    <div class="pb-lg-3 pb-3 pt-2 postion-relative z-index-2">
-                        <h3 class="text">Search</h3>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="customer_email" class="col-form-label text-md-right">
-                                        {{__("Merchant Email")}}
-                                    </label>
-                                    <livewire:email-search />
-                                </div>
-
-                            </div>
-
-
-                        </div>
-                    </div>
-
-                </form>
 
 
             </div>
 
         </div>
     </div>
-    <div class="card-header header-elements-inline">
-        <h3 class="mb-0">{{__('Users')}}</h3>
-    </div>
-    <table class="container table table-flush" id="datatable-basic">
-        <thead>
-        <tr>
-            <th>{{__('S/N')}}</th>
-            <th class="scope"></th>
-            <th>{{__('Name')}}</th>
-            <th>{{__('Business name')}}</th>
-            <th>{{__('Email')}}</th>
-            <th>{{__('Status')}}</th>
-{{--            <th>{{__('Balance')}}</th>--}}
-            <th>{{__('Created')}}</th>
-            <th>{{__('Updated')}}</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{-- Nothing in the world is as soft and yielding as water. --}}
-        @forelse($users as $k=>$val)
-
-            <tr>
-                <td>{{++$k}}.</td>
-                <td class="text-right">
-                    <div class="dropstart">
-                        <a href="javascript:;" class="text-success" id="dropdownUserOptions" data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                            <i class="fas fa-ellipsis-v fa-2x" aria-hidden="true"> </i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-start px-2 py-3 bg-light-vertical"
-                            aria-labelledby="dropdownUserOptions">
-                            <li>
-                                <a class="dropdown-item border-radius-md text-info" href="javascript:"
-                                   wire:click="openEditPaymentGatewayModal('{{ json_encode($val['usergateway']) }}','{{$val['id']}}','{{$val['first_name']." ". $val['last_name']}}')"
-                                   >
-                                    Edit {{$val['first_name']}} Gateway(s)
-                                </a>
-                                <hr class="dropdown-divider">
-                            </li>
-
-                            <li>
-                                <a class="dropdown-item border-radius-md" href="javascript:;">See Details</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                @if($val['status']==0)
-
-                                    <a class="dropdown-item border-radius-md text-danger" href="javascript:"
-                                       wire:click="blockUser('{{$val['email']}}','block')"
-                                       onclick="salert('SUCCESS','Done','success')">
-                                        <i class="fas fa-stop-circle"> </i>
-                                        Disable {{$val['first_name']}}
-                                    </a>
-
-                                @elseif($val['status']==1)
-                                    <a class="dropdown-item border-radius-md text-success" href="javascript:"
-                                       wire:click="blockUser('{{$val['email']}}','activate')"
-                                       onclick="salert('SUCCESS','Done','success')">
-                                        <i class="fas fa-check-circle"> </i>
-                                        Activate {{$val['first_name']}}
-                                    </a>
-
-                                @endif
 
 
-                            </li>
-                        </ul>
-                    </div>
-                </td>
-
-                <td>{{$val['first_name'].' '.$val['last_name']}}</td>
-                <td>{{$val['business_name']}}</td>
-                <td>{{$val['email']}}</td>
-                <td>
-                    @if($val['status']==0)
-                        <span class="badge badge-pill badge-success" id="{{$val['email']}}+status">{{__('Active')}}</span>
-                    @elseif($val['status']==1)
-                        <span class="badge badge-pill badge-danger" id="{{$val['email']}}+status">{{__('Blocked')}}</span>
-                    @endif
-                </td>
-{{--                <td>{{number_format($val['balance'] ?? 0,'2','.','')}}</td>--}}
-                <td>{{date("Y/m/d h:i:A", strtotime($val['created_at']))}}</td>
-                <td>{{date("Y/m/d h:i:A", strtotime($val['updated_at']))}}</td>
-            </tr>
-            @empty
-            <tr>
-              <td>
-                  <div class="col-lg-10 col-sm-8 mt-lg-0 mt-4 mx-auto">
-                      <div class="justify-content-start card card-plain">
-                          <div class="card-header pb-0 text-start">
-                              <h2 class="font-weight-bolder">😢 There are no registered Users Yet!</h2>
-                              <p class="mb-0 text-center">Once Users Sign Up they'll appear here.</p>
-                          </div>
-
-                      </div>
-
-                  </div>
-
-              </td>
-            </tr>
-
-
-        @endforelse
-        {{ $usersCollection->links() }}
-
-        </tbody>
-
-    </table>
-
-    {{--    //modal to edit gateway comes here;--}}
-    <div class="modal fade" id="modal-edit-user-gateway" tabindex="-1" aria-labelledby="modal-edit-user-gateway"
-         aria-hidden="true" style="display: none;">
-        <div class="modal-dialog modal-dialog-centered modal-md" role="document">
-            <div class="modal-content">
-                <form role="form" action="{{route('paymentgateway.edit')}}" method="post"
-                      onsubmit="editUserPaymentGateways(this)">
-                    <div class="modal-header ">
-                        <h3 class="modal-title font-weight-bolder text-info text-gradient justify-content-center">
-                            Edit {{$selectedUserName}} Gateway(s) </h3>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal"
-                                aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body p-0">
-                        <div class="card card-plain justify-content-center">
-
-                            <div class="card-body">
-                                @if(!is_null($merchantGateways))
-
-                                    @foreach($merchantGateways as $key => $gway)
-
-                                        <fieldset>
-                                            <legend> {{$gway['name']}}</legend>
-
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label class="form-label " for="charge_factor"> Charge Type
-                                                        :</label>
-                                                    <select class="form-control form-select " id="charge_factor"
-                                                            title="Percentage / Flat Rate" name="charge_type+{{$key}}">
-                                                        <option value="0" @if(!$gway['charge_factor']) selected @endif>
-                                                            Flat
-                                                            Rate
-                                                        </option>
-                                                        <option value="1" @if($gway['charge_factor']) selected @endif>
-                                                            Percentage(%)
-                                                        </option>
-                                                    </select>
-                                                </div>
-
-                                                <div class="col-4">
-                                                    <label class="form-label" for="charge_factor_{{$key}}}}"> Charge
-                                                        Factor
-                                                        Value:</label>
-                                                    <div class=" input-group mb-3">
-                                                        <input type="number" class="form-control"
-                                                               id="charge_factor_{{$key}}" placeholder="Value..."
-                                                               value="{{$gway['charge']}}" step="0.1"
-                                                               aria-label="Charge_Factor_value" onfocus="focused(this)"
-                                                               onfocusout="defocused(this)" name="charge+{{$key}}">
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <label class="form-check-label" for="status">Gateway Status:</label>
-                                                    <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" id="status"
-                                                               name="status+{{$key}}"
-                                                               @if($gway['status'] === 1) checked @endif> Active
-
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="col d-none">
-                                                <label>
-                                                    <input type="text" name="name+{{$key}}" value="{{$gway['name']}}" >
-                                                </label>
-                                            </div>
-
-                                        </fieldset>
-
-                                        <hr>
-
-                                    @endforeach
-
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-round bg-gradient-info btn-lg w-100 mt-4 mb-0">
-                                Update
-                            </button>
-                        </div>
-
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    @if($selectedUser)
+        @include('partials.users.settings')
+    @endif
 
 
     @section('scripts')
         <script>
-            addEventListener('openEditPaymentGatewayModal', function () {
-               openEditPaymentGatewayModal()
-            });
 
-            addEventListener('setSearchField',function () {
+
+            addEventListener('setSearchField', function () {
                 let value = event.detail.email;
                 setUserField(value);
                 document.getElementById('customer_email').value = value;
 
             });
-            function openEditPaymentGatewayModal() {
-
-                Swal.fire({
-                    title: 'Fetching ' + name + ' Gateways!',
-                    html: '<span class="spinner-border text-primary"></span>',
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    allowEnterKey: false,
-                })
-
-            }
-
-
-            function gatewaysFetched() {
-                Swal.close();
-                $('#modal-edit-user-gateway').modal('show');
-            }
-
-            window.addEventListener('gatewaysFetched', event => {
-                gatewaysFetched();
-            });
-
-            function editUserPaymentGateways(element) {
-                event.preventDefault();
-                const formData = new FormData(element);
-                let formValues = {};
-                formData.forEach(function (value, key) {
-                    formValues[key] = value;
-                });
-                //bind value;
-                @this.editedUsersGateways= JSON.stringify(formValues);
-                //trigger method;
-                Livewire.emit('editUserPaymentGateways');
-                Swal.fire({
-                    title: 'Updating  Gateway Details!',
-                    html: '<span class="spinner-border text-primary"></span>',
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    allowEnterKey: false,
-                });
-
-            }
-
-
-            window.addEventListener('merchantGatewayUpdated', event => {
-                toggleModal('#modal-edit-user-gateway');
-                salert("Merchant Gateway Updated", "Success", 'success');
-            });
-
         </script>
         @if(count($users))
             <script>

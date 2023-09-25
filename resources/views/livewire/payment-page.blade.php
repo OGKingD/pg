@@ -19,7 +19,13 @@
 
                 <div class="d-lg-block d-none text-center ">
                     <a href="/">
-                        <img src="{{asset('assets/img/saanapay.png')}} "
+
+                        <img
+                            @if($merchantAvatar)
+                                src="{{asset('assets/avatars/'.$merchantAvatar)}} "
+                            @else
+                                src="{{asset('assets/img/saanapay.png')}} "
+                            @endif
                              alt="SAANAPAY BRAND IMAGE" style="max-width: 110px!important;">
                     </a>
                     <h4 class="mt-1">PAY WITH</h4>

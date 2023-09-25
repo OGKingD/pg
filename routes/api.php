@@ -21,7 +21,7 @@ Route::middleware(['terminate'])->group(function () {
     Route::middleware(['api'])->group(function (){
         Route::get('welcome',function (Request $request){
             $inspirationalText = inspirationalText();
-            return [ "message" => "Hello 👋  {$request->user()->first_name} : {$inspirationalText['quote']} -- {$inspirationalText['author']}", 'success' => true,];
+            return ['status' => true, "message" => "Hello 👋  {$request->user()->first_name} : {$inspirationalText['quote']} -- {$inspirationalText['author']}", ];
 
         });
         //Payment Request Routes!

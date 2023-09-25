@@ -53,6 +53,7 @@ Route::middleware(['auth'])->group(function () {
            Route::get('logs',[\App\Http\Controllers\DirectoryListingController::class,'index'])->name('logs');
            Route::get('delete/{filename}/{path}',[\App\Http\Controllers\DirectoryListingController::class, 'deleteFile']);
            Route::get('monitor/transactionsummary',\App\Http\Livewire\TransactionSummary::class);
+           Route::get('users/settings/{id}', \App\Http\Livewire\UserSettings::class )->name('user-settings');
 
        });
 

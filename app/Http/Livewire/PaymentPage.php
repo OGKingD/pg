@@ -30,6 +30,7 @@ class PaymentPage extends Component
     public $cardDetails;
     public $gatewayId;
     public $merchantRedirectUrl;
+    public $merchantAvatar;
 
     public $cc_Number;
     public $cc_Expiration;

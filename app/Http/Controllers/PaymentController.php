@@ -7,6 +7,7 @@ use App\Models\Gateway;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserSettings;
 use App\Models\Wallet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -44,7 +45,7 @@ class PaymentController extends Controller
         $merchantGatewayDetails= $this->getMerchantGatewayDetails($invoice);
         $tranx_details = $invoice->transaction->details;
         //check for UIGatewayRules;
-        list($merchantGatewayDetails,$details) = $this->uiGatewayRules($invoice, $merchRef, $merchantGatewayDetails);
+        [$merchantGatewayDetails, $details] = $this->uiGatewayRules($invoice, $merchRef, $merchantGatewayDetails);
         if (!$details['status']){
             //redirect to information page showing student should make payment
             return  view('invoice.notavailable',[
@@ -66,6 +67,11 @@ class PaymentController extends Controller
         }
         $data['merchantGateways'] = $merchantGatewayDetails;
         $data['activeTab'] = array_key_first($merchantGatewayDetails);
+        $merchantSettings = UserSettings::firstWhere('user_id',$invoice->user->id);
+        $data['merchantAvatar'] = false;
+        if ($merchantSettings){
+            $data['merchantAvatar'] = $merchantSettings->values['avatar'] ?? null;
+        }
 
         return view('payment_page', $data);
 
@@ -100,9 +106,10 @@ class PaymentController extends Controller
 
         if ($merchantGateways) {
             array_walk($merchantGateways, function ($item, $key) use (&$freshArr, $invoice) {
-                if ($item['status']){
+
+                if ($item['customer_service']['status']){
                     //check if percentage is set use flwavePercent Channel;
-                    if (!empty($item['charge_factor'])){
+                    if (!empty($item['customer_service']['charge_factor'])){
                         $item['flwave_percent'] = true;
                     }
 
@@ -112,7 +119,7 @@ class PaymentController extends Controller
                         }
                     }
                     $item['gateway_id'] = $key;
-                    $item["invoiceCharge"] = $item['charge_factor'] ?  ($item['charge'] / 100) * $invoice->amount : $item['charge'];
+                    $item["invoiceCharge"] = $item['customer_service']['charge_factor'] ?  ($item['customer_service']['charge'] / 100) * $invoice->amount : $item['customer_service']['charge'];
                     $item["invoiceTotal"] = $invoice->amount + $item['invoiceCharge'];
                     //check if it's intlPayment
                     if (strtoupper($invoice->transaction->currency) !== "NGN"){
