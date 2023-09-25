@@ -156,29 +156,39 @@ class RequeryTool extends Component
             }else{
                 $transactionExists = Transaction::firstWhere('flutterwave_ref',$trnx);
             }
-            if ($transactionExists && $transactionExists->status === "successful") {
-                $processTransaction = false;
-                $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
-                $this->messageType = "info";
-            }
+
             if (is_null($transactionExists)){
                 $processTransaction = false;
                 $this->message = "Transaction  : $trnx cannot be processed, transaction Not Found";
                 $this->messageType = "danger";
             }
-            if ($byTranxRef){
-                $flutterwave = (new Flutterwave(config('flutterwave.secret_key')))->verifyTansactionByRef($trnx);
+
+            if ($transactionExists){
+                if ($transactionExists->status === "successful"){
+                    $processTransaction = false;
+                    $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
+                    $this->messageType = "info";
+                }
+                $flwaveInstance = new Flutterwave(config('flutterwave.secret_key'));
+
+                if ($transactionExists->provider === "FLWAVEPERCENT"){
+                    $flwaveInstance = getFlwave(true);
+                }
+                if ($byTranxRef){
+                    $flutterwave = ($flwaveInstance)->verifyTansactionByRef($trnx);
+                }
+                if (!$byTranxRef){
+                    $flutterwave = ($flwaveInstance)->verifyTransaction($trnx);
+                }
             }
-            if (!$byTranxRef){
-                $flutterwave = (new Flutterwave(config('flutterwave.secret_key')))->verifyTransaction($trnx);
-            }
+
 
             if ($processTransaction && isset($flutterwave['data'])) {
                 $payload = $flutterwave['data'];
                 $status = strtoupper($payload['status']);
 
                 if ($status=== "FAILED") {
-                    $this->message = "Transaction  : $trnx cannot be processed, " .$payload['narration']. $payload['status'];
+                    $this->message = "Transaction  : $trnx cannot be processed, \n" .$payload['narration']. $payload['status'] . ' reason---> '. $payload['processor_response'];
                     $this->messageType = "danger";
                 }
 
