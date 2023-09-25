@@ -51,6 +51,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     }
 
+    public function usersettings()
+    {
+        return $this->hasOne(UserSettings::class);
+
+    }
+
 
     public function addGateway()
     {

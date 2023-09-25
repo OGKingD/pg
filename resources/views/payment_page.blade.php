@@ -330,7 +330,7 @@
 
     <div class="container-fluid py-3 col-lg-9 mx-auto">
         <div class="card">
-            @livewire('payment-page', ['invoice' => $invoice, 'merchantGateways' => $merchantGateways, 'activeTab' => $activeTab])
+            @livewire('payment-page', ['invoice' => $invoice, 'merchantGateways' => $merchantGateways, 'activeTab' => $activeTab, 'merchantAvatar' => $merchantAvatar])
         </div>
 
     </div>
