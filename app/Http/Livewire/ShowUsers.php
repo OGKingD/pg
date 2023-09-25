@@ -53,7 +53,7 @@ class ShowUsers extends Component
             $config_details[$gateway->id] = [
                 "charge" => $merchantGateways[$gateway->id]['charge'] ?? 0,
                 "name" => $merchantGateways[$gateway->id]['name'] ?? $gateway->name,
-                'charge_factor' => $merchantGateways[$gateway->id]['charge_type'] ?? 0,
+                'charge_factor' => $merchantGateways[$gateway->id]['charge_factor'] ?? 0,
             ];
             $config_details[$gateway->id]['status'] = $merchantGateways[$gateway->id]["status"] ?? 0;
 
