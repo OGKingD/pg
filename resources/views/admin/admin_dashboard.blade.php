@@ -51,7 +51,7 @@
                                     <canvas id="chart-consumption" class="chart-canvas" height="197"></canvas>
                                 </div>
                                 <h4 class="font-weight-bold mt-n8">
-                                    <span>{{$transactions_count}}</span>
+                                    <span>{{number_format($transactions_count)}}</span>
                                     <span class="d-block text-body text-sm">TRANSACTIONS</span>
                                 </h4>
                             </div>
