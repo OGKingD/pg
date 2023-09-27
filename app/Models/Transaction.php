@@ -647,7 +647,7 @@ class Transaction extends Model
         $userGateways = $this->user->usergateway->config_details;
         $gateway_charge = 0;
         if (isset($userGateways[$gateway_id])){
-            $gateway_charge = $userGateways[$gateway_id]['charge_factor'] ? ($userGateways[$gateway_id]['charge'] / 100 ) * $this->amount : $userGateways[$gateway_id]['charge'] ;
+            $gateway_charge = $userGateways[$gateway_id]['customer_service']['charge_factor'] ? ($userGateways[$gateway_id]['customer_service']['charge'] / 100 ) * $this->amount : $userGateways[$gateway_id]['customer_service']['charge'] ;
             $transactionTotal = $this->amount + $gateway_charge;
         }
         return ["total" => $transactionTotal, "charge" => $gateway_charge ];

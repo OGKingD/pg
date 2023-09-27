@@ -53,7 +53,7 @@
                         <div class="row ">
                             <div class="text-center col-md-6">
                                 <h6 class="card-header">TOTAL TRANSACTIONS </h6>
-                                <h2>{{$transactionCount}}</h2>
+                                <h2>{{number_format($transactionCount)}}</h2>
                             </div>
 
                         </div>

@@ -20,7 +20,27 @@
 
                         <fieldset>
                             <legend>
-                                <h5>{{$gway['name']}}</h5>
+                                <div class="row justify-content-center align-items-center">
+                                    <div class="col-sm-auto col-8 my-auto">
+                                        <div class="h-100">
+                                            <h3 class="mb-1 font-weight-bolder">
+                                                {{$gway['name']}}
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-auto ms-sm-auto mt-sm-0 mt-3 d-flex">
+                                        <label class="form-check-label mb-0">
+                                            <h4 >
+                                                Active
+                                            </h4>
+                                        </label>
+                                        <div class="form-check form-switch ms-2">
+                                            <label for="{{$gway['name']}}_status"></label>
+                                            <input class="form-check-input" type="checkbox" id="{{$gway['name']}}_status" name="status+{{$key}}" @if($gway['status'] === 1) checked @endif
+                                            style="height: 23px !important;">
+                                        </div>
+                                    </div>
+                                </div>
                             </legend>
 
                             <div class="row">
@@ -50,15 +70,6 @@
                                                value="{{$gway['merchant_service']['charge']}}" step="0.1"
                                                aria-label="Charge_value" onfocus="focused(this)"
                                                onfocusout="defocused(this)" name="merchant_service_charge+{{$key}}">
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <label class="form-check-label" for="status">Gateway Status:</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="merchant_service_status+{{$key}}"
-                                               name="merchant_service_status+{{$key}}"
-                                               @if($gway['merchant_service']['status'] === 1) checked @endif> Active
-
                                     </div>
                                 </div>
 
@@ -92,15 +103,6 @@
                                                value="{{$gway['customer_service']['charge']}}" step="0.1"
                                                aria-label="Charge_value" onfocus="focused(this)"
                                                onfocusout="defocused(this)" name="customer_service_charge+{{$key}}">
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <label class="form-check-label" for="status">Gateway Status:</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="customer_service_status+{{$key}}"
-                                               name="customer_service_status+{{$key}}"
-                                               @if($gway['customer_service']['status'] === 1) checked @endif> Active
-
                                     </div>
                                 </div>
 
