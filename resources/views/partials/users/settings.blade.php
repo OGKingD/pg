@@ -7,7 +7,7 @@
 <div>
     {{--            //content for Modal come here--}}
 
-    <div class="container-fluid my-3 py-3">
+    <div class="py-lg-3">
         <div class="row mb-5">
             <div class="col-lg-10 mx-auto text-center">
                 <h3 class="mb-1 font-weight-bolder">
@@ -85,7 +85,7 @@
                                     {{$selectedUserName}}
                                 </h5>
                                 <p class="mb-0 font-weight-bold text-sm">
-                                    CEO / Co-Founder
+                                    {{$selectedUser['business_name']}}
                                 </p>
                             </div>
                         </div>

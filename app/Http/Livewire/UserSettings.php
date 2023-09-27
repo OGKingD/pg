@@ -57,6 +57,8 @@ UserSettings extends Component
 
         foreach ($gateways as $gateway) {
             $config_details[$gateway->id]['name'] = $merchantGateways[$gateway->id]['name'] ?? $gateway->name;
+            $config_details[$gateway->id]['status'] = $merchantGateways[$gateway->id]["status"] ?? 0;
+
             $config_details[$gateway->id]['merchant_service'] = [
                 "charge" => $merchantGateways[$gateway->id]['merchant_service']['charge'] ?? 0,
                 'charge_factor' => $merchantGateways[$gateway->id]['merchant_service']['charge_factor'] ?? 0,
@@ -65,9 +67,6 @@ UserSettings extends Component
                 "charge" => $merchantGateways[$gateway->id]['customer_service']['charge'] ?? 0,
                 'charge_factor' => $merchantGateways[$gateway->id]['customer_service']['charge_factor'] ?? 0,
             ];
-            $config_details[$gateway->id]['merchant_service']['status'] = $merchantGateways[$gateway->id]['merchant_service']["status"] ?? 0;
-            $config_details[$gateway->id]['customer_service']['status'] = $merchantGateways[$gateway->id]['customer_service']["status"] ?? 0;
-
         }
         $this->merchantGateways = $config_details;
 
@@ -89,15 +88,14 @@ UserSettings extends Component
             $config_details[$gateway->id]['merchant_service'] = [
                 "charge" => $merchantGateways['merchant_service_charge+'.$gateway->id],
                 'charge_factor' => $merchantGateways['merchant_service_charge_factor+'.$gateway->id],
-                'status' =>   (isset($merchantGateways["merchant_service_status+$gateway->id"])) ? 1 : 0
             ];
             //customerService
             $config_details[$gateway->id]['customer_service'] = [
                 "charge" => $merchantGateways['customer_service_charge+'.$gateway->id],
                 'charge_factor' => $merchantGateways['customer_service_charge_factor+'.$gateway->id],
-                'status' =>   (isset($merchantGateways["customer_service_status+$gateway->id"])) ? 1 : 0
             ];
             $config_details[$gateway->id]['name'] = $gateway->name;
+            $config_details[$gateway->id]['status'] =  (isset($merchantGateways["status+$gateway->id"])) ? 1 : 0;
 
         }
 

@@ -107,7 +107,7 @@ class PaymentController extends Controller
         if ($merchantGateways) {
             array_walk($merchantGateways, function ($item, $key) use (&$freshArr, $invoice) {
 
-                if ($item['customer_service']['status']){
+                if ($item['status']){
                     //check if percentage is set use flwavePercent Channel;
                     if (!empty($item['customer_service']['charge_factor'])){
                         $item['flwave_percent'] = true;
@@ -147,28 +147,9 @@ class PaymentController extends Controller
         //Acceptance fees - 22000 % 1.5
         //Check if it's UI merchant;
         $type = strtolower(str_replace(" ", "", $transaction->type));
+        //above 22500 => flatrate
         $item['flwave_percent'] = false;
-
-        if ( str_contains($type,"tuition") || str_contains($type,"school") ){
-            $item['charge_factor'] = 0;
-            $item['charge'] = 350;
-        }
-
-        if ( str_contains($type,"application") ){
-            $item['charge_factor'] = 0;
-            $item['charge'] = 350;
-            $item['flwave_percent'] = true;
-        }
-
-        if ( str_contains($type,"transcript") ){
-            $item['charge_factor'] = 0;
-            $item['charge'] = 350;
-            $item['flwave_percent'] = true;
-        }
-
-        if ( str_contains($type,"acceptance") ){
-            $item['charge_factor'] = 0;
-            $item['charge'] = 350;
+        if ($invoice->amount <= 22500){
             $item['flwave_percent'] = true;
         }
         return $item;
