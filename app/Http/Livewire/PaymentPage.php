@@ -531,6 +531,7 @@ class PaymentPage extends Component
                 $params = array_merge($response['data']['customer'], [
                     "narration" => $response['data']['narration'],
                     "tx_ref" => $response['data']['tx_ref'],
+                    "id" => $response['data']['id'],
                     "ip" => $response['data']['ip'],
                     "payment_type" => $response['data']['payment_type']
                 ]);

@@ -81,10 +81,7 @@ class NinePSB
         $httpVerb = strtolower($verb);
 
 
-        return Http::withHeaders([
-            "Accept" => "application/json",
-            "Content-Type" => "application/json",
-        ])->withoutVerifying()->withToken($token)->{$httpVerb}($url, $payload)->json();
+        return httpRequestWithoutVerifying()->withToken($token)->{$httpVerb}($url, $payload)->json();
     }
 
 

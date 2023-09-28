@@ -108,15 +108,13 @@ class PaymentController extends Controller
             array_walk($merchantGateways, function ($item, $key) use (&$freshArr, $invoice) {
 
                 if ($item['status']){
-                    //check if percentage is set use flwavePercent Channel;
-                    if (!empty($item['customer_service']['charge_factor'])){
-                        $item['flwave_percent'] = true;
-                    }
 
                     if (strtolower($item['name']) === "card"){
-                        if ($invoice->user_id === 3){
-                            $item = $this->setCardMerchantCharge($invoice,$item);
+                        //check if percentage is set use flwavePercent Channel;
+                        if ((int) $item['customer_service']['charge_factor'] === 1){
+                            $item['flwave_percent'] = true;
                         }
+                        $item = $this->setCardMerchantCharge($invoice,$item);
                     }
                     $item['gateway_id'] = $key;
                     $item["invoiceCharge"] = $item['customer_service']['charge_factor'] ?  ($item['customer_service']['charge'] / 100) * $invoice->amount : $item['customer_service']['charge'];
@@ -140,15 +138,7 @@ class PaymentController extends Controller
 
     public function setCardMerchantCharge(Invoice $invoice,$item)
     {
-        $transaction = $invoice->transaction;
-        //Tuition fees - 50 - 500,000 - flat rate 350
-        //Application fees - 18000 - 25000 - % 1.5
-        //Transcript fees - 700 - 25000 %1.5
-        //Acceptance fees - 22000 % 1.5
-        //Check if it's UI merchant;
-        $type = strtolower(str_replace(" ", "", $transaction->type));
         //above 22500 => flatrate
-        $item['flwave_percent'] = false;
         if ($invoice->amount <= 22500){
             $item['flwave_percent'] = true;
         }
