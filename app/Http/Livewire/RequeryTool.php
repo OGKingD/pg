@@ -6,6 +6,7 @@ use App\Lib\Services\Flutterwave;
 use App\Lib\Services\NinePSB;
 use App\Lib\Services\Providus;
 use App\Lib\Services\Remita;
+use App\Models\DynamicAccount;
 use App\Models\RRR;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Http;
@@ -86,7 +87,7 @@ class RequeryTool extends Component
                                 "amount" => $providus->transactionAmount,
                                 "date" => $providus->settlementDateTime,
                                 "remarks" => $providus->tranRemarks,
-                                "invoice_no" => $transactionExists->invoice_no,
+                                "invoice_no" => 'N/A',
                             ];
                         }
                     }
@@ -103,17 +104,25 @@ class RequeryTool extends Component
 
         if ($provider === "9PSB") {
             //check to see if transaction is not already successful;
-            $transactionExists = Transaction::firstWhere('bank_transfer_ref', $trnx);
+            $transactionExists = Transaction::Where('bank_transfer_ref', $trnx)
+                ->orWhere('merchant_transaction_ref',$trnx)
+                ->orWhere('invoice_no',$trnx)->first();
 
-            if ($transactionExists && $transactionExists->status === "successful") {
-                $processTransaction = false;
-                $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
-                $this->messageType = "info";
+
+            if ($transactionExists){
+                if ($transactionExists->status === "successful"){
+                    $processTransaction = false;
+                    $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
+                    $this->messageType = "info";
+                }
+                if (is_null($transactionExists->bank_transfer_ref)){
+                    $trnx =DynamicAccount::firstWhere('invoice_no',$transactionExists->invoice_no)->initiationTranRef;
+                }
+
             }
 
             if ($processTransaction) {
                 //call providus to get transaction details;
-                /** @var object $providus */
                 $ninePsb = (new NinePSB())->transactionStatusDynamicAccount($trnx);
 
                 if ($ninePsb['status']) {
@@ -125,17 +134,17 @@ class RequeryTool extends Component
                         $this->messageType = "warning";
                     }
 
-                   if ($paymentStatus !==  "PENDING"){
-                       $this->transactionDetails = [
-                           "transaction_ref" => $ninePsb['data']['transaction']['linkingreference'] ?? $trnx,
-                           "amount" => $ninePsb['data']['order']['amount'],
-                           "date" => $ninePsb['data']['transaction']['date'],
-                           "remarks" => $ninePsb['message'],
-                           "invoice_no" => $transactionExists->invoice_no,
-                       ];
-                       $this->transactionDetails = array_merge($this->transactionDetails,$ninePsb['data']);
+                    if ($paymentStatus !==  "PENDING"){
+                        $this->transactionDetails = [
+                            "transaction_ref" => $ninePsb['data']['transaction']['linkingreference'] ?? $trnx,
+                            "amount" => $ninePsb['data']['order']['amount'],
+                            "date" => $ninePsb['data']['transaction']['date'],
+                            "remarks" => $ninePsb['message'],
+                            "invoice_no" => $transactionExists->invoice_no ?? 'N/A',
+                        ];
+                        $this->transactionDetails = array_merge($this->transactionDetails,$ninePsb['data']);
 
-                   }
+                    }
 
                 }
                 if (!$ninePsb['status']) {

@@ -3,6 +3,8 @@
 use App\Lib\Services\Flutterwave;
 use App\Models\User;
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
 
@@ -132,4 +134,16 @@ function getFlwave(bool $percent = false): Flutterwave
     }
 
     return new Flutterwave(config('flutterwave.secret_key'));
+}
+
+
+/**
+ * @return PendingRequest
+ */
+function httpRequestWithoutVerifying(): PendingRequest
+{
+    return Http::withHeaders([
+        "Accept" => "application/json",
+        "Content-Type" => "application/json",
+    ])->withoutVerifying();
 }

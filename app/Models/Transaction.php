@@ -281,23 +281,28 @@ class Transaction extends Model
                 $invoice = $transaction->invoice;
                 $details = array_merge($transaction->details, $details);
 
-                $transaction->update([
+                $values = [
                     "status" => "successful",
                     "gateway_id" => $gateway_id,
                     "payment_provider_message" => $payment_provider_message,
                     "details" => $details
-                ]);
+                ];
+                if ($gateway_id == 1){
+                    $values['flutterwave_ref'] = $details['id'] ?? '';
+                }
+                $transaction->update($values);
                 $invoice->update([
                     'status' => 'successful'
                 ]);
 
-                //for Bank transfers close out the dynamic account
-                /** @var DynamicAccount $dynamicAccount */
-                $dynamicAccount = $invoice->dynamicAccount;
-                if (isset($dynamicAccount)){
-                    $dynamicAccount->update([
-                        'status' => 0,
-                    ]);
+                if ($gateway_id == 2) { //for Bank transfers close out the dynamic account
+                    /** @var DynamicAccount $dynamicAccount */
+                    $dynamicAccount = $invoice->dynamicAccount;
+                    if (isset($dynamicAccount)) {
+                        $dynamicAccount->update([
+                            'status' => 0,
+                        ]);
+                    }
                 }
                 //credit merchant wallet with amount - charge
                 $amount = $transaction->amount;
