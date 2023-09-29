@@ -40,9 +40,11 @@ class PushtoWebhookJob implements ShouldQueue
                 $url = $this->transaction->redirect_url;
             }
             //send to the URL;
-            $response = Http::withoutVerifying()->get($url, $payload)->json();
-            //update with response from webhookUrl;
-            $webhookPush->logWebhookResponse($response);
+           if ($url){
+               $response = Http::withoutVerifying()->get($url, $payload)->json();
+               //update with response from webhookUrl;
+               $webhookPush->logWebhookResponse($response);
+           }
 
         }
     }

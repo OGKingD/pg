@@ -344,9 +344,10 @@ class PaymentController extends Controller
         $details = ['status' => true, 'flag' => self::pending];
         //validate Payment;
         $flutterwaveId = $data->id;
+        /** @var Invoice $invoice */
         $invoice = $this->checkIfInvoiceExist($id);
         if ($invoice) {
-            /** @var \App\Models\Transaction $transaction */
+            /** @var Transaction $transaction */
             $transaction = $invoice->transaction;
 
             //make sure invoice status is not successful;

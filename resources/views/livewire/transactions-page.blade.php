@@ -473,7 +473,7 @@
                                 <td>{{date("Y/m/d h:i:A", strtotime($val->updated_at))}}</td>
                                 <td>
                                     @if( in_array(strtoupper($val->status),["SUCCESSFUL","FAILED"]))
-                                        <a target="_blank" href="{{route('receipt',['id'=>"INV$val->merchant_transaction_ref"])}}" class="btn btn-success"> Receipt »</a>
+                                        <a target="_blank" href="{{route('receipt',['id'=>"INV$val->merchant_transaction_ref"])}}" class="btn btn-success btn-sm"> Receipt »</a>
                                     @endif
                                 </td>
                             </tr>

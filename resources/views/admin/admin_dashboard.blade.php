@@ -69,7 +69,7 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold">  {{$successful_transactions_count}} == {{empty($transactions_count) ?0 : number_format((($successful_transactions_count/$transactions_count) * 100) ,1). "%" }}</span>
+                                                <span class="text-xs font-weight-bold">  {{number_format($successful_transactions_count)}} == {{empty($transactions_count) ?0 : number_format((($successful_transactions_count/$transactions_count) * 100) ,1). "%" }}</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -82,7 +82,7 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> {{$pending_transactions_count}} == {{empty($transactions_count) ?0 : number_format((($pending_transactions_count/$transactions_count) * 100) ,1). "%" }}</span>
+                                                <span class="text-xs font-weight-bold"> {{number_format($pending_transactions_count)}} == {{empty($transactions_count) ?0 : number_format((($pending_transactions_count/$transactions_count) * 100) ,1). "%" }}</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -95,7 +95,7 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle text-center text-sm">
-                                                <span class="text-xs font-weight-bold"> {{$failed_transactions_count}} == {{empty($transactions_count) ?0 : number_format((($failed_transactions_count/$transactions_count) * 100) ,1). "%" }}</span>
+                                                <span class="text-xs font-weight-bold"> {{number_format($failed_transactions_count)}} == {{empty($transactions_count) ?0 : number_format((($failed_transactions_count/$transactions_count) * 100) ,1). "%" }}</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -201,7 +201,7 @@
                                 <div class="col-md-6 mb-md-2">
                                     <div class="card">
                                         <div class="card-body text-center">
-                                            <h1 class="text-gradient text-primary"><span id="status3" countto="{{(${$channel."_transactions_count"})}}">{{(${$channel."_transactions_count"})}}</span> <span
+                                            <h1 class="text-gradient text-primary"><span id="status3" countto="{{(${$channel."_transactions_count"})}}">{{number_format((${$channel."_transactions_count"}))}}</span> <span
                                                     class="text-lg ms-n2">°</span></h1>
                                             <h6 class="mb-0 font-weight-bolder">{{$gateway->name}}</h6>
 
