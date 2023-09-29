@@ -59,7 +59,7 @@ class GenerateCsvReport implements ShouldQueue
 
         if (!isset($this->payload['group_by'])) {
             //when it's a detailed report
-            $headers = ["Merchant Name","Merchant Ref","Status","Channel","Currency","Provider","Type","Fee","Amount","Total", "customer_service_charge","customer_service_charge_amount","merchant_service_charge","merchant_service_charge_amount", "Customer Name", "Customer Email","Flag", "Date" ];
+            $headers = ["Merchant Name","Merchant Ref","Status","Channel","Currency","Provider","Type","StampDuty","Fee","Amount","Total", "customer_service_charge","customer_service_charge_amount","merchant_service_charge","merchant_service_charge_amount", "Customer Name", "Customer Email","Flag", "Date" ];
             $transaction->generateCsvReport($this->payload, $headers);
         }
         //send Mail insert to Notification DB;
