@@ -237,7 +237,7 @@ class WebhookController extends Controller
                     $gateway = Gateway::where('name', "Bank Transfer")->get()->pluck("id", "name");
 
                     //check if transaction Exists on Saanapay
-                    /** @var Transaction $transactionExists */
+                    /** @var DynamicAccount $transactionExists */
                     $transactionExists = DynamicAccount::with(['invoice','transaction'])->where("initiationTranRef", $request->initiationTranRef)->where('status',1)->first();
 
 
@@ -253,15 +253,7 @@ class WebhookController extends Controller
                          * @var Wallet $wallet
                          **/
                         /** @var Transaction $spTransaction */
-                        $spTransaction = $transactionExists->transaction;
-                        $user = $spTransaction->user;
-                        $gateway_id = $gateway["Bank Transfer"];
-                        $transactionTotal = $spTransaction->computeChargeAndTotal($gateway_id);
-                        $spTransaction->total = $transactionTotal['total'];
-                        $spTransaction->fee = $transactionTotal['charge'];
-                        $userRef = $user->id;
-                        $company = company();
-                        $wallet = $user->wallet;
+                        [$spTransaction, $user, $gateway_id, $userRef, $company, $wallet] = $this->getUserWalletCompanyTransactionCharge($transactionExists, $gateway["Bank Transfer"]);
                         $statusCode = 200;
 
 
@@ -281,7 +273,6 @@ class WebhookController extends Controller
 
                             //make sure amount equal to or greater than transaction amount;
                             if ($transaction_status->transactionAmount >= $spTransaction->total) {
-                                $gateway_id = $gateway["Bank Transfer"];
                                 $details = [
                                     "initiationTranRef" => $transaction_status->initiationTranRef,
                                     "sourceAccountNumber" => $transaction_status->sourceAccountNumber,
@@ -292,17 +283,14 @@ class WebhookController extends Controller
                                 //update transaction
                                 $responseMessage = "successful";
                                 $requestSuccessful = true;
-                                $transactionExists->update([
-                                    'session_id' => $transaction_status->settlementId,
-                                    'settlement_id' =>  $transaction_status->sessionId,
-                                ]);
 
                                 DB::transaction(function () use ($details, $gateway_id, $transaction_status, $spTransaction, $wallet, $user, $company) {
                                     //update transaction fee and total;
-                                    $spTransaction->update([
-                                        'total' => $transaction_status->transactionAmount,
-                                        'fee' => $transaction_status->transactionAmount - $spTransaction->amount,
-                                        'bank_transfer_ref' => $transaction_status->settlementId
+                                    $details = array_merge($details,[
+                                        'bank_transfer_ref' => $transaction_status->settlementId,
+                                        'session_id' => $transaction_status->settlementId,
+                                        'settlement_id' =>  $transaction_status->sessionId,
+                                        'provider' => 'PROVIDUS'
                                     ]);
                                     $spTransaction->handleSuccessfulPayment($spTransaction, $gateway_id, $transaction_status->tranRemarks, $details, $wallet, $user, $company);
 
@@ -387,7 +375,7 @@ class WebhookController extends Controller
                     $gateway = Gateway::where('name', "Bank Transfer")->get()->pluck("id", "name");
 
                     //check if transaction Exists on Saanapay
-                    /** @var Transaction $transactionExists */
+                    /** @var DynamicAccount $transactionExists */
                     $transactionExists = DynamicAccount::with(['invoice','transaction'])->where("initiationTranRef", $settlementId)->first();
 
                     if (is_null($transactionExists)){
@@ -403,19 +391,7 @@ class WebhookController extends Controller
                          * @var Wallet $wallet
                          **/
                         /** @var Transaction $spTransaction */
-                        $spTransaction = $transactionExists->transaction;
-                        $user = $spTransaction->user;
-                        $gateway_id = $gateway["Bank Transfer"];
-                        $transactionTotal = $spTransaction->computeChargeAndTotal($gateway_id);
-                        $spTransaction->total = $transactionTotal['total'];
-                        $spTransaction->fee = $transactionTotal['charge'];
-                        $userRef = $user->id;
-                        $company = company();
-                        $wallet = $user->wallet;
-                        $transactionExists->update([
-                            'session_id' => $sessionId,
-                            'settlement_id' =>  $settlementId,
-                        ]);
+                        [$spTransaction, $user, $gateway_id, $userRef, $company, $wallet] = $this->getUserWalletCompanyTransactionCharge($transactionExists, $gateway["Bank Transfer"]);
 
 
                         //check if transaction is successful
@@ -446,11 +422,11 @@ class WebhookController extends Controller
                                     $responseMessage = "successful";
                                     $requestSuccessful = true;
 
-                                    DB::transaction(function () use ($details, $gateway_id, $transaction_status, $spTransaction, $wallet, $user, $company, $settlementId) {
+                                    DB::transaction(static function () use ($details, $gateway_id, $transaction_status, $spTransaction, $wallet, $user, $company, $settlementId, $sessionId) {
                                         //update transaction fee and total;
-                                        $spTransaction->update([
-                                            'total' => $transaction_status->data['order']['amount'],
-                                            'fee' => $transaction_status->data['order']['amount'] - $spTransaction->amount,
+                                        $details = array_merge($details,[
+                                            'session_id' => $sessionId,
+                                            'settlement_id' =>  $settlementId,
                                             'bank_transfer_ref' => $settlementId,
                                             'provider' => "9PSB"
                                         ]);
@@ -551,9 +527,6 @@ class WebhookController extends Controller
                             $statusCode = 200;
                             $gateway = Gateway::where('name', "Remita")->get()->pluck("id", "name");
                             $gateway_id = $gateway["Remita"];
-                            $transactionTotal = $transaction->computeChargeAndTotal($gateway_id);
-                            $transaction->total = $transactionTotal['total'];
-                            $transaction->fee = $transactionTotal['charge'];
                             if ($details['amount'] < $transaction->total ){
                                 $responseMessage = "Amount Paid less than Transaction Amount";
                                 $requestSuccessful = false;
@@ -569,13 +542,7 @@ class WebhookController extends Controller
                                 $wallet = $user->wallet;
 
                                 DB::transaction(static function () use ($details, $gateway_id, $transaction, $wallet, $user, $company, $settlementId) {
-                                    //update transaction fee and total;
-                                    $transaction->update([
-                                        'total' => $transaction->total,
-                                        'fee' => $transaction->fee,
-                                        'remita_ref' => $details['RRR'],
-                                        'provider' => "REMITA"
-                                    ]);
+
                                     $transaction->handleSuccessfulPayment($transaction, $gateway_id, $details['message'], $details, $wallet, $user, $company);
 
                                 });
@@ -602,5 +569,24 @@ class WebhookController extends Controller
 
 
         return "OK";
+    }
+
+    /**
+     * @param DynamicAccount $transactionExists
+     * @param $bankTransfer
+     * @return array
+     */
+    private function getUserWalletCompanyTransactionCharge(DynamicAccount $transactionExists, $bankTransfer): array
+    {
+        $spTransaction = $transactionExists->transaction;
+        $user = $spTransaction->user;
+        $gateway_id = $bankTransfer;
+        $transactionTotal = $spTransaction->computeChargeAndTotal($gateway_id);
+        $spTransaction->total = $transactionTotal['total'];
+        $spTransaction->fee = $transactionTotal['charge'];
+        $userRef = $user->id;
+        $company = company();
+        $wallet = $user->wallet;
+        return array($spTransaction, $user, $gateway_id, $userRef, $company, $wallet);
     }
 }

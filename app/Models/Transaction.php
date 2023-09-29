@@ -40,6 +40,10 @@ class Transaction extends Model
                     number_format($result->fee, 2),
                     number_format($result->amount, 2),
                     number_format($result->total, 2),
+                    $result->customer_service_charge,
+                    $result->customer_service_charge_amount,
+                    $result->merchant_service_charge,
+                    $result->merchant_service_charge_amount,
                     $result->invoice->customer_name ?? "N/A",
                     $result->invoice->customer_email ?? "N/A",
                     $result->flag,
@@ -76,6 +80,10 @@ class Transaction extends Model
             'transactions.amount',
             'fee',
             'total',
+            'customer_service_charge',
+            'customer_service_charge_amount',
+            'merchant_service_charge',
+            'merchant_service_charge_amount',
             'description',
             'transactions.status',
             'flag',
@@ -276,34 +284,63 @@ class Transaction extends Model
         $status = false;
 
         try {
-            DB::transaction(function () use ($company, $user, $wallet, $payment_provider_message, $gateway_id, $details, $transaction, &$status) {
+            DB::transaction(static function () use ($company, $user, $wallet, $payment_provider_message, $gateway_id, $details, $transaction, &$status) {
                 /** @var Invoice $invoice */
                 $invoice = $transaction->invoice;
                 $details = array_merge($transaction->details, $details);
+                $transactionChargeAndTotal = $transaction->computeChargeAndTotal($gateway_id);
+                $stamp_duty = 0;
+                if ($transaction->total >= 10000) {
+                    $stamp_duty = 50;
+                }
 
                 $values = [
                     "status" => "successful",
                     "gateway_id" => $gateway_id,
                     "payment_provider_message" => $payment_provider_message,
-                    "details" => $details
+                    "details" => $details,
+                    "total" => $transactionChargeAndTotal['total'],
+                    "fee" => $transactionChargeAndTotal['charge'],
+                    "merchant_service_charge" => $transactionChargeAndTotal['merchant_service_charge'],
+                    "merchant_service_charge_amount" => $transactionChargeAndTotal['merchant_service_charge_amount'],
+                    "customer_service_charge" => $transactionChargeAndTotal['customer_service_charge'],
+                    "customer_service_charge_amount" => $transactionChargeAndTotal['customer_service_charge_amount'],
+                    "stamp_duty" => $stamp_duty,
                 ];
-                if ($gateway_id == 1){
+
+                if ((int)$gateway_id === 1){
                     $values['flutterwave_ref'] = $details['id'] ?? '';
                 }
-                $transaction->update($values);
-                $invoice->update([
-                    'status' => 'successful'
-                ]);
-
-                if ($gateway_id == 2) { //for Bank transfers close out the dynamic account
+                if ((int)$gateway_id === 2) {
+                    //for Bank transfers close out the dynamic account
                     /** @var DynamicAccount $dynamicAccount */
                     $dynamicAccount = $invoice->dynamicAccount;
                     if (isset($dynamicAccount)) {
                         $dynamicAccount->update([
                             'status' => 0,
                         ]);
+                        $values['session_id'] = $details['session_id'];
+                        $values['settlement_id'] = $details['settlement_id'];
+                        $values['bank_transfer_ref'] = $details['bank_transfer_ref'];
+                        $values['provider'] = $details['provider'];
+
                     }
                 }
+                if ((int)$gateway_id === 3){
+                    $values['provider'] = "REMITA";
+                    $values['remita_ref'] = $details['RRR'];
+
+                }
+                if ((int)$gateway_id === 6){
+                    $values['provider'] = "UI MicroFinance";
+                }
+
+
+                $transaction->update($values);
+                $invoice->update([
+                    'status' => 'successful'
+                ]);
+
                 //credit merchant wallet with amount - charge
                 $amount = $transaction->amount;
                 $fee = $transaction->fee;
@@ -644,18 +681,30 @@ class Transaction extends Model
 
     /**
      * @param $gateway_id
-     * @return  array ["total","charge"]
+     * @return  array ["total","charge","merchant_service_charge","merchant_service_charge_amount",
+     * "customer_service_charge","customer_service_charge_amount",]
      */
     public function computeChargeAndTotal($gateway_id): array
     {
         $transactionTotal = $this->total;
         $userGateways = $this->user->usergateway->config_details;
-        $gateway_charge = 0;
+        $gateway_charge = $merchant_service_charge = $merchant_service_charge_amount = $customer_service_charge_amount = $customer_service_charge = 0;
         if (isset($userGateways[$gateway_id])){
             $gateway_charge = $userGateways[$gateway_id]['customer_service']['charge_factor'] ? ($userGateways[$gateway_id]['customer_service']['charge'] / 100 ) * $this->amount : $userGateways[$gateway_id]['customer_service']['charge'] ;
             $transactionTotal = $this->amount + $gateway_charge;
+
+            $merchant_service_charge =  $userGateways[$gateway_id]['merchant_service']['charge_factor'] ? $userGateways[$gateway_id]['merchant_service']['charge_factor'].' PERCENT' : $userGateways[$gateway_id]['merchant_service']['charge_factor'] .' FLAT';
+            $merchant_service_charge_amount = $userGateways[$gateway_id]['merchant_service']['charge_factor'] ? ($userGateways[$gateway_id]['merchant_service']['charge'] / 100 ) * $this->amount : $userGateways[$gateway_id]['merchant_service']['charge'] ;
+            $customer_service_charge =  $userGateways[$gateway_id]['customer_service']['charge_factor'] ? $userGateways[$gateway_id]['customer_service']['charge_factor'].' PERCENT' : $userGateways[$gateway_id]['customer_service']['charge_factor'] .' FLAT';
+            $customer_service_charge_amount = $gateway_charge ;
+
         }
-        return ["total" => $transactionTotal, "charge" => $gateway_charge ];
+        return ["total" => $transactionTotal, "charge" => $gateway_charge,
+            'merchant_service_charge' => $merchant_service_charge,
+            'merchant_service_charge_amount' => $merchant_service_charge_amount,
+            'customer_service_charge' => $customer_service_charge,
+            'customer_service_charge_amount' => $customer_service_charge_amount,
+        ];
 
     }
 
