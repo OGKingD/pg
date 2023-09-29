@@ -20,14 +20,18 @@ class Transaction extends Model
         $file = fopen(storage_path("logs/{$payload['filename']}"), "wb");
         $query = self::reportQuery($payload)->orderBy('user_id','desc')->orderBy('updated_at');
         //5,6,7
-        $totalFee= $totalAmount = $totalSum =0;
-        $query->chunk(3000, function ($results) use ($file, $csvHeaders, &$totalFee, &$totalAmount, &$totalSum) {
+        $totalFee= $totalAmount = $totalSum = $totalStampDuty = $totalCustomerServiceChargeAmount =
+        $totalMerchantServiceChargeAmount =0;
+        $query->chunk(3000, function ($results) use ($file, $csvHeaders, &$totalFee, &$totalAmount, &$totalSum, &$totalStampDuty, &$totalCustomerServiceChargeAmount, &$totalMerchantServiceChargeAmount) {
             //Define Headers;
             fputcsv($file, $csvHeaders);
             foreach ($results as $result) {
                 $totalFee += $result->fee;
                 $totalAmount += $result->amount;
                 $totalSum += $result->total;
+                $totalStampDuty += $result->stamp_duty;
+                $totalCustomerServiceChargeAmount+= $result->customer_service_charge_amount;
+                $totalMerchantServiceChargeAmount+= $result->merchant_service_charge_amount;
                 //Define Content;
                 $contents = [
                     $result->user->first_name. " ". $result->user->last_name,
@@ -37,6 +41,7 @@ class Transaction extends Model
                     $result->currency,
                     $result->provider ?? "N/A",
                     $result->type,
+                    $result->stamp_duty,
                     number_format($result->fee, 2),
                     number_format($result->amount, 2),
                     number_format($result->total, 2),
@@ -52,9 +57,11 @@ class Transaction extends Model
                 fputcsv($file, $contents);
             }
         });
-        fputcsv($file,["","","","","", number_format($totalFee, 2),
+        fputcsv($file,["","","","","","","",number_format($totalStampDuty, 2),number_format($totalFee, 2),
             number_format($totalAmount, 2),
-            number_format($totalSum, 2),"",""]);
+            number_format($totalSum, 2),"",number_format($totalCustomerServiceChargeAmount, 2),
+            "",number_format($totalMerchantServiceChargeAmount, 2)
+        ]);
         fclose($file);
 
     }
@@ -78,6 +85,7 @@ class Transaction extends Model
             'type',
             'redirect_url',
             'transactions.amount',
+            'stamp_duty',
             'fee',
             'total',
             'customer_service_charge',
@@ -693,9 +701,9 @@ class Transaction extends Model
             $gateway_charge = $userGateways[$gateway_id]['customer_service']['charge_factor'] ? ($userGateways[$gateway_id]['customer_service']['charge'] / 100 ) * $this->amount : $userGateways[$gateway_id]['customer_service']['charge'] ;
             $transactionTotal = $this->amount + $gateway_charge;
 
-            $merchant_service_charge =  $userGateways[$gateway_id]['merchant_service']['charge_factor'] ? $userGateways[$gateway_id]['merchant_service']['charge_factor'].' PERCENT' : $userGateways[$gateway_id]['merchant_service']['charge_factor'] .' FLAT';
+            $merchant_service_charge =  $userGateways[$gateway_id]['merchant_service']['charge_factor'] ? $userGateways[$gateway_id]['merchant_service']['charge'].' PERCENT' : $userGateways[$gateway_id]['merchant_service']['charge_factor'] .' FLAT';
             $merchant_service_charge_amount = $userGateways[$gateway_id]['merchant_service']['charge_factor'] ? ($userGateways[$gateway_id]['merchant_service']['charge'] / 100 ) * $this->amount : $userGateways[$gateway_id]['merchant_service']['charge'] ;
-            $customer_service_charge =  $userGateways[$gateway_id]['customer_service']['charge_factor'] ? $userGateways[$gateway_id]['customer_service']['charge_factor'].' PERCENT' : $userGateways[$gateway_id]['customer_service']['charge_factor'] .' FLAT';
+            $customer_service_charge =  $userGateways[$gateway_id]['customer_service']['charge_factor'] ? $userGateways[$gateway_id]['customer_service']['charge'].' PERCENT' : $userGateways[$gateway_id]['customer_service']['charge_factor'] .' FLAT';
             $customer_service_charge_amount = $gateway_charge ;
 
         }
