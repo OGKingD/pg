@@ -41,7 +41,7 @@ class RequeryTool extends Component
 
 
         $provider = strtoupper($this->provider);
-        $trnx = trim($this->transaction_ref);
+        $trnx = str_replace(' ','',trim($this->transaction_ref));
 
         if ( in_array($provider,['PROVIDUSOLD', 'PROVIDUS'])) {
 
