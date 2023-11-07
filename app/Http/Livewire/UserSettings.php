@@ -3,9 +3,9 @@
 namespace App\Http\Livewire;
 
 use App\Models\Gateway;
+use App\Models\MerchantWebhook;
 use App\Models\User;
 use App\Models\UserGateway;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
@@ -13,8 +13,17 @@ use Livewire\WithFileUploads;
 class
 UserSettings extends Component
 {
-    public $userId,$selectedUser,$selectedUserName,$merchantGateways,$bank_transfer_provider,
-        $first_name,$last_name,$email,$avatar, $pageReloading, $editedUsersGateways, $merchantAvatar;
+    /**
+     * @var \App\Models\UserSettings
+     */
+    public $settings;
+    /**
+     * @var User
+     */
+    public $selectedUser;
+    public $userId,$userSettings,$selectedUserName,$merchantGateways,$bank_transfer_provider,
+        $first_name,$last_name,$email,$avatar, $pageReloading, $editedUsersGateways,
+        $merchantAvatar, $merchantWebhook;
 
     protected $listeners = ['editUserPaymentGateways'];
 
@@ -24,15 +33,14 @@ UserSettings extends Component
     public function mount($id)
     {
         $this->userId = $id;
+        $this->selectedUser= User::with(['usergateway','usersettings','webhook_url'])->firstWhere('id','=', $this->userId);
+        $this->getUserData();
 
     }
     public function render()
     {
         $this->layout = 'layouts.admin.admin_dashboardapp';
-        $selectedUser= User::with(['usergateway','usersettings'])->firstWhere('id','=', $this->userId);
-        $this->selectedUser = $selectedUser;
-        $this->getUserData();
-        return view('livewire.user-settings',['selectedUser' => $selectedUser])->extends($this->layout, ["title" => "Settings"]);
+        return view('livewire.user-settings',['selectedUser' => $this->selectedUser])->extends($this->layout, ["title" => "Settings"]);
     }
 
     public function getUserData()
@@ -51,6 +59,9 @@ UserSettings extends Component
         $this->merchantAvatar = false;
         if ($this->selectedUser['usersettings']){
             $this->merchantAvatar = $this->selectedUser['usersettings']['values']['avatar'];
+        }
+        if ($this->selectedUser['webhook_url']){
+            $this->merchantWebhook = $this->selectedUser['webhook_url']['url'];
         }
         //Get all the gateways;
         $gateways = Gateway::select(['id','name'])->get();
@@ -113,26 +124,24 @@ UserSettings extends Component
     public function updateBankTransferProvider()
     {
         $this->bank_transfer_provider = strtoupper($this->bank_transfer_provider);
+        $data = [
+            "bank_transfer_provider" => $this->bank_transfer_provider,
+            "avatar" => $this->avatar,
+        ];
 
-        if (!empty($this->bank_transfer_provider)){
-            $userSetting = User::firstWhere('id',$this->selectedUser['id'])->usersettings;
-            if (is_null($userSetting)){
-                \App\Models\UserSettings::create([
-                    'user_id' => $this->selectedUser['id'],
-                    'values' => [
-                        'bank_transfer_provider' =>$this->bank_transfer_provider,
-                        'avatar' => null,
-                    ]
-                ]);
+        $values  = $data;
+
+        if (!empty($this->bank_transfer_provider)) {
+            if ($this->settings) {
+                $values = array_merge($this->settings->values, $data);
             }
-            if ($userSetting) {
-                $userSetting->update(
-                    ['values' => array_merge($userSetting->values, ['bank_transfer_provider' =>$this->bank_transfer_provider])]
-                );
-            }
+            $this->selectedUser->userSettings()->updateOrInsert([
+                "user_id" => $this->userId,
+            ], [
+                'values' => json_encode($values, JSON_THROW_ON_ERROR)
+            ]);
             $this->pageReloading = true;
             $this->dispatchBrowserEvent('merchantGatewayUpdated');
-
         }
 
     }
@@ -156,42 +165,55 @@ UserSettings extends Component
                 }
             }
             $avatarName .= ".".$avatar->getClientOriginalExtension();
+            $this->merchantAvatar = $avatarName;
 
             $avatar->storeAs('avatars',$avatarName,'assets');
+            $data = [
+                "bank_transfer_provider" => $this->bank_transfer_provider,
+                "avatar" => $avatarName,
+            ];
 
-        }
-        $userSetting = User::firstWhere('id',$this->selectedUser['id'])->usersettings;
-        if (is_null($userSetting)){
-            \App\Models\UserSettings::create([
-                'user_id' => $this->selectedUser['id'],
-                'values' => [
-                    'bank_transfer_provider' =>$this->bank_transfer_provider,
-                    'avatar' => $avatarName,
-                ]
+            $values  = $data;
+            if ($this->settings) {
+                $values = array_merge($this->settings->values, $data);
+            }
+            $this->selectedUser->userSettings()->updateOrInsert([
+                "user_id" => $this->userId,
+            ], [
+                'values' => json_encode($values, JSON_THROW_ON_ERROR)
             ]);
-        }
-        if ($userSetting) {
-            $userSetting->update(
-                ['values' => array_merge($userSetting->values, ['avatar' =>$avatarName])]
-            );
-        }
-        $this->pageReloading = true;
-        $this->dispatchBrowserEvent('merchantGatewayUpdated');
+            $this->pageReloading = true;
+            $this->dispatchBrowserEvent('merchantGatewayUpdated');
 
+        }
 
     }
 
 
-    public function blockUser($email, $status)
+    public function blockUser($status)
     {
         //toggle users status;
-        $user = User::where('email',$email)->first();
+        $user = User::where('id',$this->userId)->first();
         $user->update([
             "status" => ($status === 1) ? 0 : 1
         ]);
-        $this->pageReloading = true;
-        $this->dispatchBrowserEvent('merchantGatewayUpdated');
+        $this->setPageReloading();
 
+    }
+
+    public function updateWebhook()
+    {
+        //updateWebhook;
+        MerchantWebhook::updateOrCreate(['user_id' => $this->userId],[
+            'url' => $this->merchantWebhook
+        ])->update();
+        $this->setPageReloading();
+    }
+
+    private function setPageReloading($status=true): void
+    {
+        $this->pageReloading = $status;
+        $this->dispatchBrowserEvent('merchantGatewayUpdated');
     }
 
 }

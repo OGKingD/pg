@@ -22,7 +22,7 @@ class UserSearch extends Component
             $this->users = [];
         }
         if (!empty($this->username)){
-            $this->users = User::select(['id','last_name','first_name'])->where('first_name', 'like', "%{$this->username}%")->orWhere('last_name', 'like', "%{$this->username}%")->get()->take(5);
+            $this->users = User::select(['id','last_name','first_name'])->where('type',5)->whereRaw('(`first_name` like "%c%" or `last_name` like "%c%")')->get()->take(5);
         }
         //change and search by phone when result is empty
     }

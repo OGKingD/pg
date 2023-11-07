@@ -197,7 +197,7 @@
                                               <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                                             </span>
                                             <input class="form-control datepicker" placeholder="Please select date"
-                                                   type="text" name="due_date" id="due_date" onfocus="focused(this)"
+                                                   type="date" name="due_date" id="due_date" onfocus="focused(this)"
                                                    onfocusout="defocused(this)">
 
                                         </div>
