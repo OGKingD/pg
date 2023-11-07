@@ -66,7 +66,7 @@ class WebhookController extends Controller
                     $flwave = getFlwave(true);
                 }
                 $fromFlutterwave = $flwave->verifyTansactionByRef($flutterwaveId);
-                info("Transaction Verified :",$fromFlutterwave);
+                info("Transaction Verified :",$fromFlutterwave??[]);
                 $responseMessage = "Transaction Not Found on Flutterwave!";
 
                 /** @var array $flwavePayload */
@@ -527,6 +527,7 @@ class WebhookController extends Controller
                             $statusCode = 200;
                             $gateway = Gateway::where('name', "Remita")->get()->pluck("id", "name");
                             $gateway_id = $gateway["Remita"];
+                            $this->getTransactionCharges($transaction, $gateway_id);
                             if ($details['amount'] < $transaction->total ){
                                 $responseMessage = "Amount Paid less than Transaction Amount";
                                 $requestSuccessful = false;
@@ -588,5 +589,16 @@ class WebhookController extends Controller
         $company = company();
         $wallet = $user->wallet;
         return array($spTransaction, $user, $gateway_id, $userRef, $company, $wallet);
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @param $gateway_id
+     */
+    private function getTransactionCharges(Transaction $transaction, $gateway_id): void
+    {
+        $transactionTotal = $transaction->computeChargeAndTotal($gateway_id);
+        $transaction->total = $transactionTotal['total'];
+        $transaction->fee = $transactionTotal['charge'];
     }
 }
