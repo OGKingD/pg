@@ -135,7 +135,7 @@
                                     <div class="col-lg-6">
                                         <div class="input-group mb-3">
                                             <label>
-                                                Name
+                                                Invoice Name
                                                 <input type="text" name="item_name" class="form-control"
                                                        placeholder="Invoice Name" required="" onfocus="focused(this)"
                                                        onfocusout="defocused(this)"
@@ -177,17 +177,32 @@
                                     </div>
 
                                     <div class="col-lg-6">
+                                        <div class="input-group mb-3">
+                                            <label>
+                                                Invoice Description
+                                                <textarea  name="description" class="form-control"
+                                                           placeholder="Details of Invoice" required="" onfocus="focused(this)"
+                                                           onfocusout="defocused(this)">
+
+                                                </textarea>
+                                            </label>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
                                         <label class="col-form-label " for="due_date">Due Date</label>
                                         <div class="input-group">
                                             <span class="input-group-prepend">
                                               <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                                             </span>
                                             <input class="form-control datepicker" placeholder="Please select date"
-                                                   type="text" name="due_date" id="due_date" onfocus="focused(this)"
+                                                   type="date" name="due_date" id="due_date" onfocus="focused(this)"
                                                    onfocusout="defocused(this)">
 
                                         </div>
                                     </div>
+
 
 
                                 </div>

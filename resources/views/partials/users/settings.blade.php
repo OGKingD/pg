@@ -37,6 +37,12 @@
                                 <span class="text-sm">Change Password</span>
                             </a>
                         </li>
+                        <li class="nav-item pt-2">
+                            <a class="nav-link text-body" data-scroll="" href="#api_settings">
+                                <i class="fa fa-store-alt text-dark me-2"></i>
+                                <span class="text-sm">API Keys/ Webhook</span>
+                            </a>
+                        </li>
 
                         <li class="nav-item pt-2">
                             <a class="nav-link text-body" data-scroll="" href="#gateways">
@@ -200,6 +206,64 @@
                             </li>
                         </ul>
                         <button class="btn bg-gradient-dark btn-sm float-end mt-6 mb-0">Update password</button>
+                    </div>
+                </div>
+
+                <div class="card mt-4" id="api_settings">
+                    <div class="card-header">
+                        <h5>API SETTINGS</h5>
+                    </div>
+
+                    <div class="card-body pt-0">
+
+                        <div class="row">
+
+                            <div class="col-10 my-auto">
+                                <label class="form-label" for="password">Merchant Webhook </label>
+                                <div class="form-group">
+                                    <input class="form-control" type="url" placeholder="Current webhook"
+                                           onfocus="focused(this)" onfocusout="defocused(this)"
+                                           value="{{$merchantWebhook}}" wire:model.defer="merchantWebhook"
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-auto ">
+                                <label class="form-label" for="password"> </label>
+                                <div class="form-group">
+                                    <button class="btn btn-dark mt-3 " wire:click="updateWebhook">Update</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-10 my-auto">
+                                <div class="card-header">
+                                    <h5>API KEYS!</h5>
+                                    <p class="text-sm ">Here you can reset the API key of {{$selectedUserName}}.
+                                        Once you reset the API Key Please copy it and store in a safe place as it can only be viewed once. </p>
+                                    <button class="btn btn-dark mt-3 " onclick="resetApiKey">Reset</button>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+
+                        <label class="form-label">New password</label>
+                        <div class="form-group">
+                            <input class="form-control" type="password" placeholder="New password"
+                                   onfocus="focused(this)" onfocusout="defocused(this)">
+                        </div>
+                        <label class="form-label">Confirm new password</label>
+                        <div class="form-group">
+                            <input class="form-control" type="password" placeholder="Confirm password"
+                                   onfocus="focused(this)" onfocusout="defocused(this)">
+                        </div>
+
+                        <button class="btn bg-gradient-dark btn-sm float-end mt-6 mb-0">Update</button>
                     </div>
                 </div>
 
@@ -413,13 +477,13 @@
                         @if($selectedUser['status'])
                             <button class="btn btn-outline-secondary btn-warning mb-0 ms-auto" type="button"
                                     name="button"
-                                    wire:click="blockUser('{{$selectedUser['email']}}',{{$selectedUser['status']}})">
+                                    wire:click="blockUser({{$selectedUser['status']}})">
                                 Deactivitate
                             </button>
                         @else
                             <button class="btn btn-outline-secondary btn-success mb-0 ms-auto" type="button"
                                     name="button"
-                                    wire:click="blockUser('{{$selectedUser['email']}}',{{$selectedUser['status']}})">
+                                    wire:click="blockUser({{$selectedUser['status']}})">
                                 Activate
                             </button>
                         @endif

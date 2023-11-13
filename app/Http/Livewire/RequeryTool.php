@@ -41,7 +41,7 @@ class RequeryTool extends Component
 
 
         $provider = strtoupper($this->provider);
-        $trnx = trim($this->transaction_ref);
+        $trnx = str_replace(' ','',trim($this->transaction_ref));
 
         if ( in_array($provider,['PROVIDUSOLD', 'PROVIDUS'])) {
 
@@ -179,8 +179,10 @@ class RequeryTool extends Component
                     $this->messageType = "info";
                 }
                 $flwaveInstance = new Flutterwave(config('flutterwave.secret_key'));
+                $isFlwavePercent = false;
 
                 if ($transactionExists->provider === "FLWAVEPERCENT"){
+                    $isFlwavePercent = true;
                     $flwaveInstance = getFlwave(true);
                 }
                 if ($byTranxRef){
@@ -208,6 +210,7 @@ class RequeryTool extends Component
                     $this->transactionDetails["amount"] = $payload['charged_amount'];
                     $this->transactionDetails["date"] = $payload['created_at'];
                     $this->transactionDetails["remarks"] = $payload['status'];
+                    $this->transactionDetails["isFlwavePercent"] = $isFlwavePercent;
                     $this->transactionDetails["invoice_no"] = $transactionExists->invoice_no;
 
                 }
@@ -326,7 +329,13 @@ class RequeryTool extends Component
         if ($provider === "FLUTTERWAVE"){
 
             //push to webhook;
-            Http::withoutVerifying()->post(route('webhook.flutterwave'), $this->transactionDetails)->json();
+            //check if it's percentage
+            if ($this->transactionDetails["isFlwavePercent"]){
+                Http::withoutVerifying()->post(route('webhook.flutterwave.percent'), $this->transactionDetails)->json();
+            }
+            if (!$this->transactionDetails["isFlwavePercent"]){
+                Http::withoutVerifying()->post(route('webhook.flutterwave'), $this->transactionDetails)->json();
+            }
 
 
             $this->message = "Transaction  $this->transaction_ref Pushed for requery!";
