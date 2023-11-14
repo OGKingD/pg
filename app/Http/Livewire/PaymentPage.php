@@ -4,7 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Settings;
 use Exception;
-use App\Lib\Services\{Flutterwave, NinePSB, Providus, Remita};
+use App\Lib\Services\{CoralPay, Flutterwave, NinePSB, Providus, Remita};
 use App\Models\DynamicAccount;
 use App\Models\Gateway;
 use App\Models\PaymentRequest;
@@ -31,7 +31,7 @@ class PaymentPage extends Component
     public $gatewayId;
     public $merchantRedirectUrl;
     public $merchantAvatar;
-
+    public $qRCodeDetails;
     public $cc_Number;
     public $cc_Expiration;
     public $cc_Pin;
@@ -44,7 +44,7 @@ class PaymentPage extends Component
 
     protected $listeners = ['generateRRR', 'processCardTransaction',
         'cardAuthorizationWithPin', 'cardAuthorizationWithOtp', 'cardAuthorizationWithAvs',
-        'generateVirtualAccountNumber', 'payWith',];
+        'generateVirtualAccountNumber', 'payWith', 'generateQRCode'];
 
     public function render()
     {
@@ -58,6 +58,14 @@ class PaymentPage extends Component
      * @var float|int|mixed
      */
 
+    public function generateQRCode(CoralPay $coralPay)
+    {
+        $amount = $this->merchantGateways[$this->activeTab]['invoiceTotal'];
+
+        $this->qRCodeDetails = $coralPay->createQrCode($amount, $this->invoice->transaction->transaction_ref);
+
+        $this->dispatchBrowserEvent('qRCodeGenerated', $this->qRCodeDetails);
+    }
     public function generateRRR(Remita $remitaService)
     {
 
