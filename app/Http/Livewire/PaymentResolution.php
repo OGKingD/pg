@@ -176,6 +176,10 @@ class PaymentResolution extends Component
         ';
 
                         foreach ($dynAccResult as $item) {
+                            $channel = "N/A";
+                            if(isset($item->invoice->gateway)){
+                                $channel = $item->invoice->gateway->name;
+                            }
 
                             $this->message .= ' <tr>
             <td>
@@ -191,7 +195,7 @@ class PaymentResolution extends Component
                 '.$item->invoice->status.'
             </td>
             <td>
-                '.$item->invoice->gateway->name.'
+                '.$channel.'
             </td>
              <td>
                 '.$item->invoice->customer_email.'

@@ -275,7 +275,7 @@ class Transaction extends Model
 
     public function dynamicAccount()
     {
-        return $this->hasOne(DynamicAccount::class,'invoice_no');
+        return $this->hasOne(DynamicAccount::class,'invoice_no','invoice_no');
 
     }
     /**

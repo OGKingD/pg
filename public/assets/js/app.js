@@ -76,8 +76,17 @@ addEventListener('alertBox',function () {
     if (type === "success"){
         salert("Success", message ?? "Transaction Fetched!",'success',true)
     }
+    if (type === "error"){
+        salert("Error",message,'error')
+    }
+    if (type === "warning"){
+        salert("Warning",message,'warning')
+    }
+    if (type === "question"){
+        salert("Please Answer",message,'question')
+    }
     if (type === "info"){
-        salert("Info",message,'success')
+        salert("Info",message,'info')
     }
 })
 addEventListener("closeAlert",function () {
