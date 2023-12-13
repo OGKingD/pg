@@ -376,7 +376,15 @@ class WebhookController extends Controller
 
                     //check if transaction Exists on Saanapay
                     /** @var DynamicAccount $transactionExists */
-                    $transactionExists = DynamicAccount::with(['invoice','transaction'])->where("initiationTranRef", $settlementId)->first();
+                    $invoiceNo = $settlementId;
+                    if (isset($transaction_status->data['transaction']['reference'])){
+                        $invoiceString = $transaction_status->data['transaction']['reference'];
+                        $invoiceData = explode("_",$invoiceString);
+                        if (count($invoiceData)>1){
+                            $invoiceNo = $invoiceData[0];
+                        }
+                    }
+                    $transactionExists = DynamicAccount::with(['invoice','transaction'])->where("invoice_no", $invoiceNo)->first();
 
                     if (is_null($transactionExists)){
 
@@ -403,18 +411,18 @@ class WebhookController extends Controller
                         //check if transaction is pending
                         if ($spTransaction->status === "pending") {
 
-                            if ($transaction_status->data['order']['amountpaid'] < $spTransaction->total ){
+                            if ($transaction_status->data['order']['amount'] < $spTransaction->total ){
 
                                 $responseMessage = "Amount Paid less than Transaction Amount";
                             }
-                            if ($transaction_status->data['order']['amountpaid'] > $spTransaction->total ){
+                            if ($transaction_status->data['order']['amount'] > $spTransaction->total ){
 
                                 $responseMessage = "Amount Paid Greater than Transaction Amount";
                             }
 
 
                             if ($transaction_status->payment === "successful") { //make sure amount equal to or greater than transaction amount;
-                                if ($transaction_status->data['order']['amountpaid'] = $spTransaction->total) {
+                                if ($transaction_status->data['order']['amount'] == $spTransaction->total) {
 
                                     $details = $transaction_status->data['customer']['account'];
 

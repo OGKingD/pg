@@ -25,7 +25,7 @@ class RequeryTool extends Component
     public function render()
     {
         $this->dispatchBrowserEvent('resetPage');
-        return view('livewire.requery-tool',['messageType'=> $this->messageType])->extends('layouts.admin.admin_dashboardapp', ['title' => 'Requery Tool']);;
+        return view('livewire.requery-tool',['messageType'=> $this->messageType])->extends('layouts.admin.admin_dashboardapp', ['title' => 'Requery Tool']);
     }
 
 
@@ -310,11 +310,11 @@ class RequeryTool extends Component
 
         if ( $provider === "9PSB"){
             //call repush API;
-            Http::withoutVerifying()->post(route('webhook.nine-psb-settlement'), $this->transactionDetails)->json();
+            $response =Http::withoutVerifying()->post(route('webhook.nine-psb-settlement'), $this->transactionDetails)->json();
 
-            $this->message = "Transaction  $this->transaction_ref Pushed for requery!";
-            $this->messageType = "success";
-            $this->dispatchBrowserEvent('alertBox', ['type' => 'success', 'message' => $this->message]);
+            $this->message = "Transaction  $this->transaction_ref Pushed for requery! with response ".json_encode($response);
+            $this->messageType  = $response['requestSuccessful'] ? "success" : "warning";
+            $this->dispatchBrowserEvent('alertBox', ['type' => $this->messageType, 'message' => $this->message]);
 
         }
         if ($provider === "REMITA"){
