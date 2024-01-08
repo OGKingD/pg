@@ -8,10 +8,12 @@ use Livewire\Component;
 class UserSearch extends Component
 {
     public $username;
+    private $currentUserType;
     public $users = [];
 
     public function render()
     {
+        $this->currentUserType = auth()->user()->type;
         return view('livewire.user-search');
     }
 
@@ -22,7 +24,18 @@ class UserSearch extends Component
             $this->users = [];
         }
         if (!empty($this->username)){
-            $this->users = User::select(['id','last_name','first_name'])->where('type',5)->whereRaw('(`first_name` like "%c%" or `last_name` like "%c%")')->get()->take(5);
+
+            $userQuery = User::select(['id', 'last_name', 'first_name'])->
+                whereRaw('`first_name` like "%'.$this->username.'%" or `last_name` like "%'.$this->username.'%"');
+            //change query for normal users;
+            if ($this->currentUserType > 2 ){
+                $type = 5;
+            }
+            if (isset($type)){
+                $this->users = $userQuery->where('type',$type);
+            }
+
+            $this->users = $userQuery->get()->take(5);
         }
         //change and search by phone when result is empty
     }
