@@ -384,7 +384,13 @@ class WebhookController extends Controller
                             $invoiceNo = $invoiceData[0];
                         }
                     }
-                    $transactionExists = DynamicAccount::with(['invoice','transaction'])->where("invoice_no", $invoiceNo)->first();
+                    if(str_contains($invoiceNo,'INVL04CH')){
+                        $transactionExists = DynamicAccount::with(['invoice','transaction'])->where("initiationTranRef", $settlementId)->first();
+                    }
+                    
+                    if(!str_contains($invoiceNo,'INVL04CH')){
+                        $transactionExists = DynamicAccount::with(['invoice', 'transaction'])->where("invoice_no", $invoiceNo)->first();
+                    }
 
                     if (is_null($transactionExists)){
 
