@@ -707,6 +707,13 @@ class Transaction extends Model
             $customer_service_charge_amount = $gateway_charge ;
 
         }
+        if ($gateway_id === 2){
+            //stampDuty;
+            if ($transactionTotal >= 10000){
+                $merchant_service_charge_amount+= 50;
+            }
+            $merchant_service_charge_amount += $this->bankTransferServiceChargeComputation();
+        }
         return ["total" => $transactionTotal, "charge" => $gateway_charge,
             'merchant_service_charge' => $merchant_service_charge,
             'merchant_service_charge_amount' => $merchant_service_charge_amount,
@@ -780,5 +787,23 @@ class Transaction extends Model
         $grandTotalArray["total_amount"] += $summationArray["total_amount"];
         $grandTotalArray["total"] += $summationArray["total"];
         return $grandTotalArray;
+    }
+
+    /**
+     * @param int $serviceCharge
+     * @return int
+     */
+    public function bankTransferServiceChargeComputation(): int
+    {
+        $serviceCharge = 0;
+        if ($this->user_id === 130) {
+            if ($this->total <= 3000) {
+                $serviceCharge += 40;
+            }
+            if ($this->total >= 3001) {
+                $serviceCharge += 50;
+            }
+        }
+        return $serviceCharge;
     }
 }
