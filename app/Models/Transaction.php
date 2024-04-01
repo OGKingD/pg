@@ -708,10 +708,6 @@ class Transaction extends Model
 
         }
         if ($gateway_id === 2){
-            //stampDuty;
-            if ($transactionTotal >= 10000){
-                $merchant_service_charge_amount+= 50;
-            }
             $merchant_service_charge_amount += $this->bankTransferServiceChargeComputation();
         }
         return ["total" => $transactionTotal, "charge" => $gateway_charge,
