@@ -66,6 +66,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
         ],
+        'mismatchLog' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel-mismatch.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 14,
+        ],
 
         'merchant_request_log' => [
             'driver' => 'daily',

@@ -65,5 +65,43 @@ class Flutterwave extends Rave
 
     }
 
+    public function formatChargeCardResponse($response): array
+    {
+        $result = ['status' => false,];
+
+        if (isset($response['meta']['authorization'])) {
+            $result['status'] = true;
+
+            $result['authorization']['mode'] = $response['meta']['authorization']['mode'];
+
+
+            if ($response['meta']['authorization']['mode'] === 'pin') {
+                //pin required;
+                $result['flag'] = "pin_required";
+                $result['authorization']['pin'] = "";
+            }
+            if ($response['meta']['authorization']['mode'] === 'avs_noauth') {
+                $result["authorization"] = array("mode" => "avs_noauth", "city" => "Sampleville", "address" => "", "state" => "Simplicity", "country" => "Nigeria", "zipcode" => "000000",);
+                $result['flag'] = "charge_card";
+
+            }
+            if ($response['meta']['authorization']['mode'] === 'redirect') {
+                $result['flag'] = "redirect_required";
+                $result['url'] = $response['meta']['authorization']['redirect'];
+            }
+        }
+
+        //when OTP is required;
+        if (isset($response['data'])){
+            if (isset($response['data']['auth_mode'])){
+                if ($response['data']['auth_mode'] === "otp"){
+                    $result['flag'] = "otp_required";
+                }
+            }
+        }
+        return $result;
+
+    }
+
 
 }
