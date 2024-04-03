@@ -68,6 +68,7 @@ class PaymentController extends Controller
         $data['merchantGateways'] = $merchantGatewayDetails;
         $data['activeTab'] = array_key_first($merchantGatewayDetails);
         $merchantSettings = UserSettings::firstWhere('user_id',$invoice->user->id);
+        $data['merchantSettings'] = $merchantSettings;
         $data['merchantAvatar'] = false;
         if ($merchantSettings){
             $data['merchantAvatar'] = $merchantSettings->values['avatar'] ?? null;

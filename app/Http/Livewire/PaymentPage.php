@@ -23,6 +23,8 @@ class PaymentPage extends Component
     public $invoiceTotal;
     public $invoiceCharge;
     public $merchantGateways;
+    public $merchantSettings;
+    public $cardProvider;
     public $invoice;
     public $activeTab = "card";
     public $remitaDetails;

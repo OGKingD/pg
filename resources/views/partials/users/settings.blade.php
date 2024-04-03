@@ -59,6 +59,13 @@
                         </li>
 
                         <li class="nav-item pt-2">
+                            <a class="nav-link text-body" data-scroll="" href="#card_providers">
+                                <i class="fa fa-bank text-dark me-2"></i>
+                                <span class="text-sm"> Card Payment Providers</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item pt-2">
                             <a class="nav-link text-body" data-scroll="" href="#notifications">
                                 <i class="fa fa-bell-concierge text-dark me-2"></i>
                                 <span class="text-sm">Notifications</span>
@@ -307,7 +314,42 @@
                                     </select>
                                 </div>
                                 <button class="btn bg-gradient-dark btn-sm mt-2 mb-0"
-                                        wire:click="updateBankTransferProvider">Update
+                                        wire:click="updateBankCardTransferProvider">Update
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+                <div class="card mt-4" id="card_providers">
+                    <div class="card-header">
+                        <h5>Card Providers:</h5>
+                        <p class="text-sm">
+                            Choose provider to power Card Paymens. These
+                            settings
+                            apply to Card method.</p>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="row">
+                            <div class="col-8">
+                                <label class="form-label" for="card_provider"> Card
+                                    Transfer Provider: </label>
+                                <div class="input-group">
+                                    <select class="form-control form-select " id="card_provider"
+                                            title="Card Provider " name="card_provider"
+                                            wire:model.defer="card_provider">
+                                        <option value="">Choose Provider</option>
+                                        <option value="BLUSALT">BLUSALT</option>
+                                        <option value="FLUTTERWAVE">FLUTTERWAVE</option>
+                                    </select>
+                                </div>
+                                <button class="btn bg-gradient-dark btn-sm mt-2 mb-0"
+                                        wire:click="updateBankCardTransferProvider">Update
                                 </button>
 
                             </div>

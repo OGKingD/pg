@@ -21,7 +21,7 @@ UserSettings extends Component
      * @var User
      */
     public $selectedUser;
-    public $userId,$userSettings,$selectedUserName,$merchantGateways,$bank_transfer_provider,
+    public $userId,$userSettings,$selectedUserName,$merchantGateways,$bank_transfer_provider,$card_provider,
         $first_name,$last_name,$email,$avatar, $pageReloading, $editedUsersGateways,
         $merchantAvatar, $merchantWebhook, $api_key;
 
@@ -62,6 +62,7 @@ UserSettings extends Component
 
         $merchantGateways = $this->selectedUser['usergateway']['config_details'];
         $this->bank_transfer_provider = $this->selectedUser['usersettings']['values']['bank_transfer_provider'] ?? null;
+        $this->card_provider = $this->selectedUser['usersettings']['values']['card_provider'] ?? null;
         $this->first_name = $this->selectedUser['first_name'];
         $this->last_name = $this->selectedUser['last_name'];
         $this->email = $this->selectedUser['email'];
@@ -131,11 +132,12 @@ UserSettings extends Component
         }
     }
 
-    public function updateBankTransferProvider()
+    public function updateBankCardTransferProvider()
     {
         $this->bank_transfer_provider = strtoupper($this->bank_transfer_provider);
         $data = [
             "bank_transfer_provider" => $this->bank_transfer_provider,
+            "card_provider" => $this->card_provider,
             "avatar" => $this->avatar,
         ];
 
