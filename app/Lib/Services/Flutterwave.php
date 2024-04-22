@@ -19,7 +19,7 @@ class Flutterwave extends Rave
     public function cardCharge($array)
     {
         $this->setType('card');
-        if (!isset($array['tx_ref']) || empty($array['tx_ref'])) {
+        if (empty($array['tx_ref'])) {
             $array['tx_ref'] = $this->getTxRef();
         } else {
             $this->setTxRef($array['tx_ref']);
@@ -96,6 +96,7 @@ class Flutterwave extends Rave
             if (isset($response['data']['auth_mode'])){
                 if ($response['data']['auth_mode'] === "otp"){
                     $result['flag'] = "otp_required";
+                    $result['status'] = true;
                 }
             }
         }

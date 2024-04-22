@@ -24,7 +24,7 @@ class PaymentPage extends Component
     public $invoiceCharge;
     public $merchantGateways;
     public $merchantSettings;
-    public $cardProvider;
+    public $cardProvider = "FLUTTERWAVE";
     public $invoice;
     public $activeTab = "card";
     public $remitaDetails;
@@ -300,7 +300,7 @@ class PaymentPage extends Component
             "email" => $customer_email,
             "tx_ref" => ""
         ]);
-        $this->cardProvider = isset($this->merchantSettings->values['card_provider']) ? strtoupper($this->merchantSettings->values['card_provider']) : "FLUTTERWAVE";
+        $this->cardProvider = isset($this->merchantSettings->values['card_provider']) ? strtoupper($this->merchantSettings->values['card_provider']) : $this->cardProvider;
 
         $validator = Validator::make($this->cardDetails, [
             "email" => ['required'],
@@ -327,7 +327,7 @@ class PaymentPage extends Component
         //call Flutterwave to charge Card;
         try {
             $trnxId = Str::random(6)."_".$this->invoice->invoice_no;
-            $response = [];
+            $response = ['status' => false];
 
             if ($this->cardProvider === "FLUTTERWAVE"){
                 $this->cardDetails['redirect_url'] = config('app.url') . "/payment/card/validate/{$this->invoice->invoice_no}";
@@ -521,6 +521,9 @@ class PaymentPage extends Component
                 $flwave = getFlwave(isset($this->merchantGateways['card']['flwave_percent']));
                 $response = $flwave->validateTransaction($this->cc_Otp, $this->cardDetails['flw_ref'], 'card');
                 $this->verifyFlwaveResponse($response);
+                if (strtoupper($response['status']) === "SUCCESS"){
+                    $details['status'] = true;
+                }
             }
 
 

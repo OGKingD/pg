@@ -525,7 +525,7 @@ class PaymentController extends Controller
         if (strtoupper($blusaltPayload['status']) === self::successful) {
             $details['flag'] = strtolower(self::successful);
         }
-        $payment_provider_message = $blusaltPayload['metadata']['response']['message'];
+        $payment_provider_message = $blusaltPayload['metadata']['response']['message'] ?? $blusaltPayload['status'];
         $trnx_details = array_merge($blusaltPayload['metadata']['card'], [
             "narration" => $blusaltPayload['narration'],
             "id" => $blusaltPayload['reference'],

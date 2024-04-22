@@ -387,7 +387,7 @@ class WebhookController extends Controller
                     if(str_contains($invoiceNo,'INVL04CH')){
                         $transactionExists = DynamicAccount::with(['invoice','transaction'])->where("initiationTranRef", $settlementId)->first();
                     }
-                    
+
                     if(!str_contains($invoiceNo,'INVL04CH')){
                         $transactionExists = DynamicAccount::with(['invoice', 'transaction'])->where("invoice_no", $invoiceNo)->first();
                     }
@@ -614,5 +614,13 @@ class WebhookController extends Controller
         $transactionTotal = $transaction->computeChargeAndTotal($gateway_id);
         $transaction->total = $transactionTotal['total'];
         $transaction->fee = $transactionTotal['charge'];
+    }
+
+    public function blusalt(Request $request)
+    {
+        $data = $request->all();
+        info("Blusalt request from {$request->ip()} is ", $data);
+
+
     }
 }
