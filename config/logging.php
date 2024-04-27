@@ -73,6 +73,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
         ],
+        'error_404_log' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel-error-404.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 7,
+        ],
 
         'slack' => [
             'driver' => 'slack',

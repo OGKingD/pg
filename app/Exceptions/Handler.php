@@ -104,7 +104,12 @@ class Handler extends ExceptionHandler
             //report internal error to Admin;
             logger()->error("Error in file: {$e->getFile()} ", ['path' => $request->url(), 'statusCode' => $statusCode, 'cause'=>$e->getMessage(), 'trace'=>$e->getTraceAsString()]);
         }
-        logger()->error("Error in file: {$e->getFile()} ", ['statusCode' => $statusCode, 'path' => $request->url(), 'cause'=>$e->getMessage(), 'trace'=>$e->getTraceAsString()]);
+        if ($statusCode === 404){
+            //separate logging;
+            \Log::channel('error_404_log')->error("Page Not Found Error", [
+                'ip' => $request->ip(), 'path' => $request->url(), 'headers' =>$request->headers,
+                'statusCode' => $statusCode, ]);
+        }
 
         return $this->shouldReturnJson($request, $e)
             ? response()->json([
