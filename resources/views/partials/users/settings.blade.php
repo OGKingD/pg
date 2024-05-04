@@ -233,22 +233,27 @@
                                     <button class="btn btn-dark mt-3 " wire:click="updateWebhook">Update</button>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="row">
+                            <div class="col-10 my-auto ">
+                                <label class="form-label" for="api_key">API Key:</label>
 
-                            <div class="col-10 my-auto">
-                                <div class="card-header">
-                                    <h5>API KEYS!</h5>
+                                <div class="form-group d-inline-block ">
                                     <p class="text-sm ">Here you can reset the API key of {{$selectedUserName}}.
-                                        Once you reset the API Key Please copy it and store in a safe place as it can only be viewed once. </p>
-                                    <button class="btn btn-dark mt-3 " onclick="resetApiKey">Reset</button>
-
+                                        Once you reset the API Key Please copy it and store in a safe place as it can only be viewed once.
+                                    </p>
+                                    <input class="form-control" type="text" placeholder="**************"
+                                           onfocus="focused(this)" onfocusout="defocused(this)"
+                                           value="{{$merchantWebhook}}" wire:model.defer="api_key">
                                 </div>
-
+                                <button class="btn d-inline-flex btn-dark mt-1" onclick="resetApiKey()" >Reset</button>
 
                             </div>
+
+
+
+
                         </div>
+
 
 
 

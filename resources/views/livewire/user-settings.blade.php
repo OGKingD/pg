@@ -65,6 +65,36 @@
 
                 }
 
+                function resetApiKey() {
+                    Swal.fire({
+                        title: "Are you sure you want to reset API Key for {{$selectedUserName}}?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: 'rgba(226,24,24,0.83)',
+                        confirmButtonText: 'Yes, Reset!',
+                        allowEscapeKey: false,
+                        allowOutsideClick: false,
+                        allowEnterKey: false,
+
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Reset in progress. Please Wait!',
+                                html:'  <span class="spinner-border spinner-border-lg text-primary"></span>\n',
+                                allowEscapeKey: false,
+                                showConfirmButton:false,
+                                allowOutsideClick: false,
+                                allowEnterKey: false,
+                            });
+                            Livewire.emit('resetApiKey');
+                        }
+                    });
+                }
+
+                window.addEventListener('apiKeyReset', event => {
+                    copyTextToClipboard("api_key");
+                });
 
                 window.addEventListener('merchantGatewayUpdated', event => {
 

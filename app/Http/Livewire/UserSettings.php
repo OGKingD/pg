@@ -23,9 +23,9 @@ UserSettings extends Component
     public $selectedUser;
     public $userId,$userSettings,$selectedUserName,$merchantGateways,$bank_transfer_provider,
         $first_name,$last_name,$email,$avatar, $pageReloading, $editedUsersGateways,
-        $merchantAvatar, $merchantWebhook;
+        $merchantAvatar, $merchantWebhook, $api_key;
 
-    protected $listeners = ['editUserPaymentGateways'];
+    protected $listeners = ['editUserPaymentGateways', 'resetApiKey',];
 
     use WithFileUploads;
 
@@ -37,6 +37,16 @@ UserSettings extends Component
         $this->getUserData();
 
     }
+
+    public function resetApiKey()
+    {
+        $this->api_key = $this->selectedUser->createToken('api_key')->plainTextToken;
+        $this->dispatchBrowserEvent('apiKeyReset');
+    }
+
+
+
+
     public function render()
     {
         $this->layout = 'layouts.admin.admin_dashboardapp';

@@ -167,7 +167,6 @@
                                                for="btncheck2"
                                                onclick="generateRRR()">
                                             <svg class="text-dark" width="20px" height="20px" viewBox="0 0 42 42"
-                                                 version="1.1"
                                                  xmlns="http://www.w3.org/2000/svg">
                                                 <title>box-3d-50</title>
                                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -208,7 +207,7 @@
                             </span>
 
                                         <h6> OR </h6>
-                                        <a href="javascript:;" class="btn btn-outline-dark mb-2 px-5 up" id="rrrLink">
+                                        <a href="javascript:" class="btn btn-outline-dark mb-2 px-5 up" id="rrrLink">
                                             <i class="fas fa-rocket"></i>
                                             Go to Remita
                                             <i class="fas fa-rocket"></i>
@@ -248,7 +247,7 @@
                                                            inputmode="numeric">
                                                     <svg id="ccicon" class="ccicon" width="750" height="471"
                                                          viewBox="0 0 750 471"
-                                                         version="1.1" xmlns="http://www.w3.org/2000/svg"
+                                                          xmlns="http://www.w3.org/2000/svg"
                                                     >
 
                                                     </svg>
@@ -275,7 +274,7 @@
                                             <div class="creditcard">
                                                 <div class="front">
                                                     <div id="ccsingle"></div>
-                                                    <svg version="1.1" id="cardfront" xmlns="http://www.w3.org/2000/svg"
+                                                    <svg  id="cardfront" xmlns="http://www.w3.org/2000/svg"
                                                          x="0px" y="0px" viewBox="0 0 750 471"
                                                          style="enable-background:new 0 0 750 471;"
                                                          xml:space="preserve">
@@ -388,7 +387,7 @@
                                                                         </svg>
                                                 </div>
                                                 <div class="back">
-                                                    <svg version="1.1" id="cardback" xmlns="http://www.w3.org/2000/svg"
+                                                    <svg  id="cardback" xmlns="http://www.w3.org/2000/svg"
                                                          x="0px" y="0px" viewBox="0 0 750 471"
                                                          style="enable-background:new 0 0 750 471;"
                                                          xml:space="preserve">
@@ -525,7 +524,7 @@
                         <div class="text-center mt-3">
                             <h3 class="text-secondary font-weight-normal">Pay Using Bank Transfer.</h3>
 
-                            @if(empty($virtualAccDetails) &&  !isset($virtualAccDetails['status']))
+                            @if(empty($virtualAccDetails)))
                                 <div id="genVirtualAccstep1">
                                     <div class="col-sm-3 mx-auto mt-4">
                                         <input type="button" class="btn-check" id="generateAcc">
@@ -533,7 +532,7 @@
                                                for="btncheck2"
                                                onclick="generateVirtualACC()">
                                             <svg class="text-dark" width="20px" height="20px" viewBox="0 0 42 42"
-                                                 version="1.1"
+
                                                  xmlns="http://www.w3.org/2000/svg">
                                                 <title>box-3d-50</title>
                                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -602,7 +601,7 @@
                                                                    class="text-xl font-weight-bolder text-secondary mb-0 ">
                                                                     <span
                                                                         id="bankAccountNumber"> {{$virtualAccDetails['accountNumber']}} </span>
-                                                                    @if(!empty($virtualAccDetails) && $virtualAccDetails['status'])
+                                                                    @if($virtualAccDetails['status'])
                                                                         <span
                                                                             class="badge badge-sm bg-gradient-dark "
                                                                             role="button"
@@ -714,7 +713,7 @@
                                                for="btncheck2"
                                                onclick="generateQRCode()">
                                             <svg class="text-dark" width="20px" height="20px" viewBox="0 0 42 42"
-                                                 version="1.1"
+
                                                  xmlns="http://www.w3.org/2000/svg">
                                                 <title>box-3d-50</title>
                                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
