@@ -126,14 +126,12 @@
         <div class="col-md-9">
             <!-- Tab panes -->
             <div class="container">
-                <ul class="nav mt-4 pb-3 border-bottom">
-                    <li class="nav-item">
+                <ul class="nav mt-3 border-bottom">
+
+                    <li class="nav-item mx-auto">
 
                     </li>
-                    <li class="mx-auto">
-
-                    </li>
-                    <li class="nav-item mr-3 text-end">
+                    <li class="nav-item ">
                             <span>
                             <b class="fa fa-envelope-open-text "
                                style="font-size: 11px; line-height: 3px;"> {{$invoice->customer_email}}</b><br>
@@ -440,9 +438,9 @@
                                         <hr class="mb-4">
 
                                         <div class="col-12 text-center">
-                                            <button class="btn btn-success btn-lg btn-block"
-                                                    type="submit">Pay &#{{$invoice->currency_symbol}}
-                                                ;{{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}
+                                            <button class="btn btn-success btn-lg btn-block" type="submit">
+                                                Pay &#{{$invoice->currency_symbol}};
+                                                {{number_format($merchantGateways[$activeTab]['invoiceTotal'],2)}}
                                                 ({{$invoice->transaction->currency}})
                                             </button>
                                         </div>
@@ -683,7 +681,13 @@
                                                 </div>
 
                                             </div>
-
+                                            @if($virtualAccDetails['status'])
+                                                <div class="mt-4 text-center">
+                                                    <button class="btn btn-outline-info btn-sm text-dark" wire:click="confirmPayment">
+                                                        Confirm Payment
+                                                    </button>
+                                                </div>
+                                            @endif
                                         @endif
                                         <br>
 
@@ -950,14 +954,8 @@
 
 
             function generateVirtualACC() {
-                Swal.fire({
-                    title: 'Generating Virtual Account ! Please wait!',
-                    html: '  <span class="spinner-border spinner-border-lg text-primary"></span>\n',
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    allowEnterKey: false,
-                });
+
+                salert('Generating Virtual Account !', 'Please wait!', 'info',false,false,false,false,'<span class="spinner-border spinner-border-lg text-primary"></span>\n');
 
                 Livewire.emit('generateVirtualAccountNumber');
             }
@@ -1237,6 +1235,19 @@
 
             }
 
+            addEventListener('paymentConfirmation', event => {
+                let response = event.detail;
+
+                if (response.status === true) {
+                    location.assign(response.redirect_url);
+                    let htmlMessage = '<span class="spinner-border spinner-border-lg text-primary"></span>\n';
+                    salert('Payment Confirmation Successful!', 'Redirecting!', 'success',false,false,false,false,htmlMessage);
+
+                }
+                else {
+                    salert('Payment is still Pending!', 'Please Retry after a little while!', 'info',true,false,false,false);
+                }
+            })
 
         </script>
 
