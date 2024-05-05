@@ -178,6 +178,18 @@ class PaymentPage extends Component
         ]);
     }
 
+    public function confirmPayment()
+    {
+        $status = false;
+        if ($this->invoice->transaction->status === "successful") {
+            $status = true;
+        }
+        $data = ['status' => $status, 'redirect_url' => route('receipt', ['id' => $this->invoice->invoice_no])];
+
+        $this->dispatchBrowserEvent('paymentConfirmation', $data);
+
+    }
+
     /**
      * @throws \JsonException
      */
@@ -192,13 +204,9 @@ class PaymentPage extends Component
             $transferProvider = strtoupper(Settings::firstWhere("name", 'bank_transfer_provider')->value);
             $result = null;//check table to see if virtual Account Exists;
             $virtualAcc = DynamicAccount::firstWhere('invoice_no', $this->invoice->invoice_no);
-            if ($virtualAcc) {
+            if (isset($virtualAcc)) {
                 $status = true;
                 //check if virtual Account has expired;
-                if (Carbon::parse()->diffInHours($virtualAcc->updated_at) >= 1) {
-                    //regenerate another account;
-                    $generateDynamic = true;
-                }
                 if (Carbon::parse()->diffInHours($virtualAcc->updated_at) < 1) {
                     $generateDynamic = false;
                     $this->virtualAccDetails = ["status" => $status, "accountNumber" => $virtualAcc->account_number, "accountName" => $virtualAcc->account_name, "bankName" => $virtualAcc->bank_name, "endtime" => Carbon::parse($virtualAcc->updated_at)->addHours(1)];

@@ -1,14 +1,21 @@
-function salert(title, text, icon,showConfirmButton = false, allowOutsideClick = true,allowEnterKey = false, allowEscapeKey = false) {
-    Swal.fire({
+function salert(title, text, icon,showConfirmButton = false, allowOutsideClick = true,allowEnterKey = false, allowEscapeKey = false, htmlMessage=null) {
+    let alertObject = {
         title: title,
-        text: text,
         icon: icon,
         allowOutsideClick: allowOutsideClick,
         allowEnterKey: allowEnterKey,
         allowEscapeKey: allowEscapeKey,
         showConfirmButton: showConfirmButton,
+    };
 
-    });
+
+    if (htmlMessage == null){
+        alertObject.text = text;
+    }
+    if (htmlMessage != null){
+        alertObject.html = htmlMessage;
+    }
+    Swal.fire(alertObject);
 }
 
 function sclose() {
