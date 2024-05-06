@@ -563,19 +563,20 @@
                                         @if(!empty($virtualAccDetails))
                                             <div class="row" id="bankTransferDisplayContent">
                                                 @if(!in_array($invoice->user->id, config('bankTransfer.initiate4merchants')))
-                                                    <div
-                                                        class="alert alert-warning alert-dismissible fade show  text-white "
-                                                        role="alert">
+                                                    @if($virtualAccDetails['status'])
+                                                        <div class="alert alert-warning alert-dismissible fade show  text-white "
+                                                             role="alert">
                                                         <span class="alert-icon"><i
                                                                 class="fa fa-info-circle"></i></span>
-                                                        <span class="alert-text font-weight-bold">
+                                                            <span class="alert-text font-weight-bold">
                                                                 This account is valid only for this transaction and expires in  !
                                                                 <div id="countdown"
                                                                      class=" text-danger text-center text-bold"
                                                                      style="font-size: 25px"></div>
                                                             </span>
 
-                                                    </div>
+                                                        </div>
+                                                    @endif
                                                 @endif
                                                 <div class="card" tabindex="0">
                                                     <ul class="list-group " style="font-size: 14px">
@@ -683,6 +684,13 @@
                                             </div>
                                             @if($virtualAccDetails['status'])
                                                 <div class="mt-4 text-center">
+                                                    <div class="mb-2">
+                                                        <span class="text-danger text-sm text-bold">Note:</span>
+                                                        <span class="text-sm">
+                                                        <b>Click only</b> when you have made a successful transfer and your bank has issued you receipt!
+                                                    </span>
+                                                    </div>
+
                                                     <button class="btn btn-outline-info btn-sm text-dark" wire:click="confirmPayment">
                                                         Confirm Payment
                                                     </button>

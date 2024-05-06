@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\InvoiceCollection;
+use App\Lib\Services\Blusalt;
 use App\Models\Gateway;
 use App\Models\Invoice;
 use App\Models\Transaction;
@@ -68,6 +69,7 @@ class PaymentController extends Controller
         $data['merchantGateways'] = $merchantGatewayDetails;
         $data['activeTab'] = array_key_first($merchantGatewayDetails);
         $merchantSettings = UserSettings::firstWhere('user_id',$invoice->user->id);
+        $data['merchantSettings'] = $merchantSettings;
         $data['merchantAvatar'] = false;
         if ($merchantSettings){
             $data['merchantAvatar'] = $merchantSettings->values['avatar'] ?? null;
@@ -335,55 +337,34 @@ class PaymentController extends Controller
     /**
      * @param $id //Invoice ID/ Transaction Id;
      * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \JsonException
      */
     public function validateCardPayment($id, Request $request)
     {
-        $payload = $request->get('response');
-        /** @var object $data */
-        $data = json_decode($payload, false, 512, JSON_THROW_ON_ERROR);
-        $details = ['status' => true, 'flag' => self::pending];
-        //validate Payment;
-        $flutterwaveId = $data->id;
         /** @var Invoice $invoice */
         $invoice = $this->checkIfInvoiceExist($id);
         if ($invoice) {
             /** @var Transaction $transaction */
             $transaction = $invoice->transaction;
+            $details = ['flag' => self::pending];
+            $payment_provider_message = null;
+            $trnx_details = [];
 
             //make sure invoice status is not successful;
             if (strtoupper($invoice->status) !== self::successful) {
-                //call flutterwave to validate transaction;
+
                 $provider = strtoupper($transaction->provider);
-                $flwave = getFlwave(false);
-                if ($provider === "FLWAVEPERCENT"){
-                    $flwave = getFlwave(true);
+
+                if ( $provider === "BLUSALT"){
+                    list($details, $payment_provider_message, $trnx_details) = $this->validateBlusaltRedirect($transaction, $details);
                 }
 
-                $fromFlutterwave = $flwave->verifyTransaction($flutterwaveId);
-                info("Transaction Verified :", $fromFlutterwave);
-
-                //check transaction status;
-                $flwavePayload = $fromFlutterwave['data'];
-                if (strtoupper($flwavePayload["status"]) === self::successful) {
-                    $details['flag'] = strtolower(self::successful);
-                }
-                if (strtoupper($flwavePayload["status"]) === self::failed) {
-                    $details['flag'] = strtolower(self::failed);
+                if (in_array($provider,['FLUTTERWAVE','FLWAVEPERCENT','FLWAVEFLAT'])){
+                    list($details, $payment_provider_message, $trnx_details) = $this->validateFlutterwaveRedirect($request, $provider, $details);
                 }
 
-                /** @var Gateway $gateway */
                 $gateway = Gateway::select(['id', 'name'])->where('name', "Card")->first();
-
-
-                $payment_provider_message = $flwavePayload['flw_ref'] . " " . $flwavePayload['processor_response'];
-
-                $trnx_details = array_merge($flwavePayload['customer'], [
-                    "narration" => $flwavePayload['narration'],
-                    "id" => $flutterwaveId,
-                    "tx_ref" => $flwavePayload['tx_ref'],
-                    "ip" => $flwavePayload['ip'],
-                    "payment_type" => $flwavePayload['payment_type']
-                ]);
 
                 //Transaction Successful;
                 if (strtoupper($details['flag']) === self::successful) {
@@ -525,6 +506,76 @@ class PaymentController extends Controller
 
         }
         return array($merchantGatewayDetails, $uiDetails);
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @param array $details
+     * @return array
+     */
+    public function validateBlusaltRedirect(Transaction $transaction, array $details): array
+    {
+//verify transaction;
+        $blusalt = new Blusalt();
+        $blusaltPayload = $blusalt->verifyTransaction($transaction->spay_ref);
+        if (strtoupper($blusaltPayload['status']) === self::failed) {
+            $details['flag'] = strtolower(self::failed);
+        }
+
+        if (strtoupper($blusaltPayload['status']) === self::successful) {
+            $details['flag'] = strtolower(self::successful);
+        }
+        $payment_provider_message = $blusaltPayload['metadata']['response']['message'] ?? $blusaltPayload['status'];
+        $trnx_details = array_merge($blusaltPayload['metadata']['card'], [
+            "narration" => $blusaltPayload['narration'],
+            "id" => $blusaltPayload['reference'],
+            "tx_ref" => $blusaltPayload['client_reference'],
+            "payment_type" => $blusaltPayload['type']
+        ]);
+        return array($details, $payment_provider_message, $trnx_details);
+    }
+
+    /**
+     * @param Request $request
+     * @param $provider
+     * @param $details
+     * @return array
+     * @throws \JsonException
+     */
+    public function validateFlutterwaveRedirect(Request $request, $provider, $details): array
+    {
+        $payload = $request->get('response');
+        /** @var object $data */
+        $data = json_decode($payload, false, 512, JSON_THROW_ON_ERROR);
+        //validate Payment;
+        $flutterwaveId = $data->id;
+        //call flutterwave to validate transaction;
+        $flwave = getFlwave();
+        if ($provider === "FLWAVEPERCENT") {
+            $flwave = getFlwave(true);
+        }
+
+        $fromFlutterwave = $flwave->verifyTransaction($flutterwaveId);
+        info("Transaction Verified :", $fromFlutterwave);
+
+        //check transaction status;
+        $flwavePayload = $fromFlutterwave['data'];
+        if (strtoupper($flwavePayload["status"]) === self::successful) {
+            $details['flag'] = strtolower(self::successful);
+        }
+        if (strtoupper($flwavePayload["status"]) === self::failed) {
+            $details['flag'] = strtolower(self::failed);
+        }
+        $payment_provider_message = $flwavePayload['flw_ref'] . " " . $flwavePayload['processor_response'];
+
+        $trnx_details = array_merge($flwavePayload['customer'], [
+            "narration" => $flwavePayload['narration'],
+            "id" => $flutterwaveId,
+            "tx_ref" => $flwavePayload['tx_ref'],
+            "ip" => $flwavePayload['ip'],
+            "payment_type" => $flwavePayload['payment_type']
+        ]);
+        return array($details, $payment_provider_message, $trnx_details);
     }
 
 }
