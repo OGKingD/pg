@@ -250,7 +250,7 @@
                                     </p>
                                     <input class="form-control" type="text" placeholder="**************"
                                            onfocus="focused(this)" onfocusout="defocused(this)"
-                                           value="{{$merchantWebhook}}" wire:model.defer="api_key">
+                                           value="{{$merchantWebhook}}" wire:model.defer="api_key" id="api_key">
                                 </div>
                                 <button class="btn d-inline-flex btn-dark mt-1" onclick="resetApiKey()" >Reset</button>
 
