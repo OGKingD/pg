@@ -12,21 +12,13 @@
         </title>
 
 
-
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-
-        <link href="{{asset('assets/css/nucleo-icons.css')}}" rel="stylesheet" />
-        <link href="{{asset('assets/css/nucleo-svg.css')}}" rel="stylesheet" />
-
-
-        <link id="pagestyle" href="{{asset('assets/css/datatables.css')}}" rel="stylesheet" />
         <link id="pagestyle" href="{{asset('assets/css/soft-ui-dashboard.min.css')}}" rel="stylesheet" />
 
         <style>
             body{
-                font-family: 'Open Sans', serif;
+                font-family: 'Open Sans', SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
                 font-style: normal;
-                font-weight: 300;
+                font-weight: 600;
                 font-stretch: 100%;
             }
             .async-hide {
@@ -38,30 +30,16 @@
         @livewireStyles
         <script src="{{asset('assets/js/plugins/jquery.js')}}"></script>
 
-        <script src="{{asset('assets/js/core/popper.min.js')}}"></script>
         <script src="{{asset('assets/js/core/bootstrap.min.js')}}"></script>
         <!-- Latest BS-Select compiled and minified CSS/JS -->
         <link rel="stylesheet" href="{{asset('assets/css/bootstrap-select.min.css')}}">
         <script src="{{asset('assets/js/core/bootstrap-select.min.js')}}"></script>
 
-        <script src="{{asset('assets/js/jquery.datatables.js')}}"></script>
 
-
-
-        <script src="{{asset('assets/js/plugins/perfect-scrollbar.min.js')}}"></script>
-        <script src="{{asset('assets/js/plugins/smooth-scrollbar.min.js')}}"></script>
         <script src="{{asset('assets/js/core/axios.js')}}"></script>
 
-
-        <script src="{{asset('assets/js/plugins/dragula/dragula.min.js')}}"></script>
-        <script src="{{asset('assets/js/plugins/chartjs.min.js')}}"></script>
-        <script src="{{asset('assets/js/plugins/countup.min.js')}}"></script>
         <script src="{{asset('assets/js/plugins/sweetalert.min.js')}}"></script>
-        <script src="{{asset('assets/js/plugins/flatpickr.min.js')}}"></script>
-
         <script src="{{asset('assets/js/fontawesome.js')}}"></script>
-
-
 
         @livewireScripts
 
