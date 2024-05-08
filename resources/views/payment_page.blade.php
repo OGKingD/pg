@@ -1,4 +1,4 @@
-@include('partials.admin.admin_header')
+@include('partials.admin.payment_page')
 <style>
     .nav.nav-pills .nav-link.active {
         animation: .2s ease;
@@ -88,8 +88,8 @@
     .creditcard svg#cardfront,
     .creditcard svg#cardback {
         width: 100%;
-        -webkit-box-shadow: 1px 5px 6px 0px black;
-        box-shadow: 1px 5px 6px 0px black;
+        -webkit-box-shadow: 1px 5px 6px 0 black;
+        box-shadow: 1px 5px 6px 0 black;
         border-radius: 22px;
     }
 
