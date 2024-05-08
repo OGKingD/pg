@@ -89,11 +89,11 @@ class Invoice extends Model
         //check if the invoice has expired on UI;
         $url = "https://pgcollege.ui.edu.ng/payment/saana/payment_status.php";
         $data['type'] = $this->transaction->type;
-//        if (strtolower(str_replace(" ", "", $data['type'])) === "undergraduatetranscript"){
-//            $url = "http://academic.ui.edu.ng/payment/saana/payment_status.php";
-//        }
+        if (strtolower(str_replace(" ", "", $data['type'])) === "undergraduatetranscript"){
+            $url = "http://academic.ui.edu.ng/payment/saana/payment_status.php";
+        }
         if ( in_array(strtolower(str_replace(" ", "", $data['type'])),['cmd_applicationfee','cmd_tuitionfee','cmd_acceptancefee']) ){
-//            $url = "http://registration.cmdportals.com/payment/saana/payment_status.php";
+            $url = "http://registration.cmdportals.com/payment/saana/payment_status.php";
             $data['type'] = str_replace("CMD_", "", $data['type']);
         }
         $data['invoiceno'] = $this->transaction->merchant_transaction_ref;
