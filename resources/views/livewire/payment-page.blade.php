@@ -604,8 +604,9 @@
                                                                         <span
                                                                             class="badge badge-sm bg-gradient-dark "
                                                                             role="button"
-                                                                            onclick="copyTextToClipboard('bankAccountNumber')"><i
-                                                                                class="fas fa-copy"></i>
+                                                                            onclick="copyTextToClipboard('bankAccountNumber')">
+                                                                            Copy
+                                                                            <i class="fas fa-copy">  </i>
                                                                                             </span>
                                                                     @endif
                                                                     @if(in_array($invoice->user->id, config('bankTransfer.initiate4merchants')))
