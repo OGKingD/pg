@@ -6,6 +6,7 @@
 
         @section('scripts')
             <script>
+
                 addEventListener('openSettingsModal', function () {
                     openSettingsModal()
                 });
@@ -19,14 +20,8 @@
 
                 function openSettingsModal() {
 
-                    Swal.fire({
-                        title: 'Fetching Settings!',
-                        html: '<span class="spinner-border text-primary"></span>',
-                        allowEscapeKey: false,
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        allowEnterKey: false,
-                    })
+                    let htmlMessage = '<span class="spinner-border text-primary"></span>';
+                    salert('Fetching Settings!','','info',false,false,false,false,htmlMessage);
 
                 }
 
@@ -46,22 +41,16 @@
                     event.preventDefault();
                     const formData = new FormData(element);
                     let formValues = {};
-                    formData.forEach(function (value, key) {
+                    formData.forEach( (value, key) => {
                         formValues[key] = value;
-                    });
+                    })
                     //bind value;
                     @this.
                     editedUsersGateways = JSON.stringify(formValues);
                     //trigger method;
                     Livewire.emit('editUserPaymentGateways');
-                    Swal.fire({
-                        title: 'Updating  Gateway Details!',
-                        html: '<span class="spinner-border text-primary"></span>',
-                        allowEscapeKey: false,
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        allowEnterKey: false,
-                    });
+                    let htmlMessage = '<span class="spinner-border text-primary"></span>';
+                    salert('Updating Gateway Details!','','info',false,false,false,false,htmlMessage);
 
                 }
 
@@ -79,14 +68,8 @@
 
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'Reset in progress. Please Wait!',
-                                html:'  <span class="spinner-border spinner-border-lg text-primary"></span>\n',
-                                allowEscapeKey: false,
-                                showConfirmButton:false,
-                                allowOutsideClick: false,
-                                allowEnterKey: false,
-                            });
+                            let htmlMessage = '<span class="spinner-border spinner-border-lg text-primary"></span>\n';
+                            salert('Reset in progress. Please Wait!','','info',false,false,false,false,htmlMessage);
                             Livewire.emit('resetApiKey');
                         }
                     });
@@ -96,16 +79,13 @@
                     copyTextToClipboard("api_key");
                 });
 
-                window.addEventListener('merchantGatewayUpdated', event => {
+                window.addEventListener('settingsUpdated', event => {
 
-                    Swal.fire({
-                        title: 'Settings Updated',
-                        text: "Success!",
-                        icon: 'success',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'Ok'
-                    })
+                    let message = event.detail.message ?? 'Settings Updated';
+                    salert('Settings Updated!',message,'success',true);
+
                 });
+
 
                 function uploadAvatar(element) {
                     event.preventDefault();
@@ -113,20 +93,15 @@
                     let formValues = {};
                     formData.forEach(function (value, key) {
                         formValues[key] = value;
-                    });
+                    })
                     //bind value;
                     @this.
                     avatar = JSON.stringify(formValues);
                     //trigger method;
                     Livewire.emit('uploadAvatar');
-                    Swal.fire({
-                        title: 'Uploading!',
-                        html: '<span class="spinner-border text-primary"></span>',
-                        allowEscapeKey: false,
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        allowEnterKey: false,
-                    });
+
+                    let htmlMessage = '<span class="spinner-border text-primary"></span>';
+                    salert('Uploading!','','info',false,false,false,false,htmlMessage);
 
                 }
 
