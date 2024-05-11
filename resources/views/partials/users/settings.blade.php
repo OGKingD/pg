@@ -139,6 +139,8 @@
                             <button class="btn bg-gradient-dark btn-sm mt-2 mb-0" type="submit">Upload</button>
 
                         </form>
+                        <hr>
+
                         <div class="row">
                             <div class="col-6">
                                 <label class="form-label" for="firstName">First Name</label>
@@ -170,6 +172,9 @@
                                 </div>
                             </div>
                         </div>
+                        <button wire:click="updateUserBasicInfo" class="btn bg-gradient-dark btn-sm mt-2 mb-0">
+                            Update Basic Info
+                        </button>
 
                     </div>
                 </div>
@@ -255,9 +260,6 @@
                                 <button class="btn d-inline-flex btn-dark mt-1" onclick="resetApiKey()" >Reset</button>
 
                             </div>
-
-
-
 
                         </div>
 

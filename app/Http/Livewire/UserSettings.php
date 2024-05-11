@@ -41,7 +41,7 @@ UserSettings extends Component
     public function resetApiKey()
     {
         $this->api_key = $this->selectedUser->createToken('api_key')->plainTextToken;
-        $this->dispatchBrowserEvent('apiKeyReset');
+        $this->fireBrowserEvent('Api Key Reset!','apiKeyReset');
     }
 
 
@@ -53,10 +53,21 @@ UserSettings extends Component
         return view('livewire.user-settings',['selectedUser' => $this->selectedUser])->extends($this->layout, ["title" => "Settings"]);
     }
 
+    public function updateUserBasicInfo()
+    {
+        $this->pageReloading = true;
+        $this->selectedUser->update([
+           'email' => $this->email,
+           'first_name' => $this->first_name,
+           'last_name' => $this->last_name
+        ]);
+        $this->fireBrowserEvent('Basic Info Updated!');
+    }
+
     public function getUserData()
     {
         if (!$this->pageReloading) {
-            $this->dispatchBrowserEvent('openSettingsModal');
+            $this->fireBrowserEvent('openSettingsModal');
         }
         $config_details = [];
 
@@ -93,7 +104,7 @@ UserSettings extends Component
         $this->merchantGateways = $config_details;
 
         if (!$this->pageReloading){
-            $this->dispatchBrowserEvent('settingsFetched');
+            $this->fireBrowserEvent();
         }
 
     }
@@ -128,7 +139,7 @@ UserSettings extends Component
 
         if ($merchantGatewayUpdated) {
             $this->pageReloading = true;
-            $this->dispatchBrowserEvent('merchantGatewayUpdated');
+            $this->fireBrowserEvent('Gateways Updated!');
         }
     }
 
@@ -153,7 +164,7 @@ UserSettings extends Component
                 'values' => json_encode($values, JSON_THROW_ON_ERROR)
             ]);
             $this->pageReloading = true;
-            $this->dispatchBrowserEvent('merchantGatewayUpdated');
+            $this->fireBrowserEvent();
         }
 
     }
@@ -194,8 +205,7 @@ UserSettings extends Component
             ], [
                 'values' => json_encode($values, JSON_THROW_ON_ERROR)
             ]);
-            $this->pageReloading = true;
-            $this->dispatchBrowserEvent('merchantGatewayUpdated');
+            $this->fireBrowserEvent("Avatar Image Uploaded!");
 
         }
 
@@ -209,7 +219,7 @@ UserSettings extends Component
         $user->update([
             "status" => ($status === 1) ? 0 : 1
         ]);
-        $this->setPageReloading();
+        $this->fireBrowserEvent('User Status Changed!');
 
     }
 
@@ -219,13 +229,17 @@ UserSettings extends Component
         MerchantWebhook::updateOrCreate(['user_id' => $this->userId],[
             'url' => $this->merchantWebhook
         ])->update();
-        $this->setPageReloading();
+        $this->fireBrowserEvent("Webhook Updated!");
     }
 
-    private function setPageReloading($status=true): void
+    /**
+     * @param string $message
+     * @param mixed $event
+     * @return void
+     */
+    public function fireBrowserEvent(string $message="Settings Updated!", $event='settingsUpdated'): void
     {
-        $this->pageReloading = $status;
-        $this->dispatchBrowserEvent('merchantGatewayUpdated');
+        $this->dispatchBrowserEvent($event, ['message' => $message]);
     }
 
 }
