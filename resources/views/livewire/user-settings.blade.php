@@ -1,11 +1,30 @@
 <div class="container-fluid py-4 ">
     <div class="d-sm-flex justify-content-between">
+        <style>
+            .side-by-side-input{
+                width: 78%;
+                display: inline;
+            }
+
+        </style>
         @if($selectedUser)
             @include('partials.users.settings')
         @endif
 
         @section('scripts')
             <script>
+
+                // Get all button elements
+                const buttons = document.querySelectorAll('.actionButton');
+
+                // Loop through all buttons and add click event listener
+                buttons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Code to execute when the button is clicked
+                        let htmlMessage = '<span class="spinner-border text-primary"></span>';
+                        salert('Please Wait!','','',false,false,false,false,htmlMessage);
+                    });
+                });
 
                 addEventListener('openSettingsModal', function () {
                     openSettingsModal()

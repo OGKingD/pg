@@ -154,7 +154,7 @@ UserSettings extends Component
 
         $values  = $data;
 
-        if (!empty($this->bank_transfer_provider)) {
+        if (!empty($this->bank_transfer_provider) || !empty($this->card_provider)) {
             if ($this->settings) {
                 $values = array_merge($this->settings->values, $data);
             }
@@ -163,9 +163,8 @@ UserSettings extends Component
             ], [
                 'values' => json_encode($values, JSON_THROW_ON_ERROR)
             ]);
-            $this->pageReloading = true;
-            $this->fireBrowserEvent();
         }
+        $this->fireBrowserEvent();
 
     }
 
