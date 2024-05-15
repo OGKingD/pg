@@ -127,7 +127,7 @@
     </div>
     <div class="modal-footer">
         <div class="text-center">
-            <button type="submit" class="btn btn-round bg-gradient-info btn-sm mb-0">
+            <button type="submit" class="btn bg-gradient-dark btn-sm mb-0 actionButton">
                 Update
             </button>
         </div>

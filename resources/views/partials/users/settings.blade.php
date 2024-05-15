@@ -123,11 +123,11 @@
                             <div class="row">
                                 <div class="col">
                                     <label class="form-label mt-4">Avatar/Image</label>
-                                    <div class="input-group">
-
-                                        <input id="avatar" name="avatar" class="form-control" type="file"
+                                    <div class="form-group">
+                                        <input id="avatar" name="avatar" class="form-control side-by-side-input" type="file"
                                                onfocus="focused(this)" wire:model.defer="avatar"
                                                onfocusout="defocused(this)">
+                                        <button class="btn bg-gradient-dark mt-2" type="submit">Upload</button>
                                     </div>
                                     <label hidden>
                                         <input type="number" hidden="" value="{{$selectedUser['id']}}" name="user_id">
@@ -136,7 +136,6 @@
                                 </div>
                             </div>
 
-                            <button class="btn bg-gradient-dark btn-sm mt-2 mb-0" type="submit">Upload</button>
 
                         </form>
                         <hr>
@@ -160,8 +159,6 @@
                                            onfocusout="defocused(this)" value="{{$selectedUser['last_name']}}">
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-6">
                                 <label class="form-label mt-4" for="email">Email</label>
                                 <div class="input-group">
@@ -171,8 +168,9 @@
                                            onfocusout="defocused(this)" value="{{$selectedUser['email']}}">
                                 </div>
                             </div>
+
                         </div>
-                        <button wire:click="updateUserBasicInfo" class="btn bg-gradient-dark btn-sm mt-2 mb-0">
+                        <button wire:click="updateUserBasicInfo" class="btn bg-gradient-dark btn-sm mt-2 mb-0 actionButton">
                             Update Basic Info
                         </button>
 
@@ -217,7 +215,7 @@
                                 <span class="text-sm">Change it often</span>
                             </li>
                         </ul>
-                        <button class="btn bg-gradient-dark btn-sm float-end mt-6 mb-0">Update password</button>
+                        <button class="btn bg-gradient-dark btn-sm float-end mt-6 mb-0 actionButton">Update password</button>
                     </div>
                 </div>
 
@@ -230,54 +228,34 @@
 
                         <div class="row">
 
-                            <div class="col-10 my-auto">
+                            <div>
                                 <label class="form-label" for="password">Merchant Webhook </label>
                                 <div class="form-group">
-                                    <input class="form-control" type="url" placeholder="Current webhook"
+                                    <input class="form-control side-by-side-input" type="url" placeholder="Current webhook"
                                            onfocus="focused(this)" onfocusout="defocused(this)"
-                                           value="{{$merchantWebhook}}" wire:model.defer="merchantWebhook"
-                                    >
+                                           value="{{$merchantWebhook}}" wire:model.defer="merchantWebhook">
+                                    <button class="btn mt-2 btn-dark actionButton" wire:click="updateWebhook">Update</button>
+
                                 </div>
-                            </div>
-                            <div class="col-auto ">
-                                <label class="form-label" for="password"> </label>
-                                <div class="form-group">
-                                    <button class="btn btn-dark mt-3 " wire:click="updateWebhook">Update</button>
-                                </div>
+
                             </div>
 
-                            <div class="col-10 my-auto ">
+                            <div>
                                 <label class="form-label" for="api_key">API Key:</label>
 
                                 <div class="form-group d-inline-block ">
                                     <p class="text-sm ">Here you can reset the API key of {{$selectedUserName}}.
                                         Once you reset the API Key Please copy it and store in a safe place as it can only be viewed once.
                                     </p>
-                                    <input class="form-control" type="text" placeholder="**************"
+                                    <input class="form-control side-by-side-input" type="text" placeholder="**************"
                                            onfocus="focused(this)" onfocusout="defocused(this)"
                                            value="{{$merchantWebhook}}" wire:model.defer="api_key" id="api_key">
+                                    <button class="btn btn-dark mt-2 " onclick="resetApiKey()" >Reset</button>
                                 </div>
-                                <button class="btn d-inline-flex btn-dark mt-1" onclick="resetApiKey()" >Reset</button>
-
                             </div>
 
                         </div>
 
-
-
-
-                        <label class="form-label">New password</label>
-                        <div class="form-group">
-                            <input class="form-control" type="password" placeholder="New password"
-                                   onfocus="focused(this)" onfocusout="defocused(this)">
-                        </div>
-                        <label class="form-label">Confirm new password</label>
-                        <div class="form-group">
-                            <input class="form-control" type="password" placeholder="Confirm password"
-                                   onfocus="focused(this)" onfocusout="defocused(this)">
-                        </div>
-
-                        <button class="btn bg-gradient-dark btn-sm float-end mt-6 mb-0">Update</button>
                     </div>
                 </div>
 
@@ -303,22 +281,21 @@
                     </div>
                     <div class="card-body pt-0">
                         <div class="row">
-                            <div class="col-8">
+                            <div class="col-10">
                                 <label class="form-label" for="bank_transfer_provider"> Virtual Account/ Bank
                                     Transfer Provider: </label>
-                                <div class="input-group">
-                                    <select class="form-control form-select " id="virtual_account_provider"
+                                <div class="form-group ">
+                                    <select class="form-control form-select side-by-side-input" id="virtual_account_provider" required
                                             title="Virtual Account" name="bank_transfer_provider"
                                             wire:model.defer="bank_transfer_provider">
                                         <option value="">Choose Provider</option>
                                         <option value="9PSB">9PSB</option>
                                         <option value="PROVIDUS">PROVIDUS</option>
                                     </select>
+                                    <button class="btn bg-gradient-dark mt-2  actionButton"
+                                            wire:click="updateBankCardTransferProvider">Update
+                                    </button>
                                 </div>
-                                <button class="btn bg-gradient-dark btn-sm mt-2 mb-0"
-                                        wire:click="updateBankCardTransferProvider">Update
-                                </button>
-
                             </div>
 
                         </div>
@@ -338,22 +315,21 @@
                     </div>
                     <div class="card-body pt-0">
                         <div class="row">
-                            <div class="col-8">
+                            <div class="col-10">
                                 <label class="form-label" for="card_provider"> Card
                                     Transfer Provider: </label>
-                                <div class="input-group">
-                                    <select class="form-control form-select " id="card_provider"
-                                            title="Card Provider " name="card_provider"
-                                            wire:model.defer="card_provider">
+                                <div class="form-group">
+                                    <select class="form-control form-select side-by-side-input" id="card_provider"
+                                            title="Card Provider " name="card_provider" required
+                                            wire:model.defer="card_provider" >
                                         <option value="">Choose Provider</option>
                                         <option value="BLUSALT">BLUSALT</option>
                                         <option value="FLUTTERWAVE">FLUTTERWAVE</option>
                                     </select>
+                                    <button class="btn bg-gradient-dark mt-2 actionButton"
+                                            wire:click="updateBankCardTransferProvider">Update
+                                    </button>
                                 </div>
-                                <button class="btn bg-gradient-dark btn-sm mt-2 mb-0"
-                                        wire:click="updateBankCardTransferProvider">Update
-                                </button>
-
                             </div>
 
                         </div>
@@ -524,7 +500,7 @@
                             </div>
                         </div>
                         @if($selectedUser['status'])
-                            <button class="btn btn-outline-secondary btn-warning mb-0 ms-auto" type="button"
+                            <button class="btn btn-outline-secondary btn-warning mb-0 ms-auto actionButton" type="button"
                                     name="button"
                                     wire:click="blockUser({{$selectedUser['status']}})">
                                 Deactivitate
