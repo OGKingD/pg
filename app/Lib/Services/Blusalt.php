@@ -66,7 +66,6 @@ class Blusalt
                 "pan" => $cardPan,
                 "cvv" => $cvv,
                 "expiry" => $expiry,
-                "card_holder" => "John Doe",
             ],
             "user_information" => [
                 "device_signature" => "dafd-dfad-dfa",
@@ -84,7 +83,7 @@ class Blusalt
         }
 
         $response = $this->callEndPoint($url, "POST", $payload);
-        return $this->handleResponse($response,'charge_card');
+        return $this->handleResponse($response,'charge_card', $redirectUrl);
 
     }
 
@@ -97,7 +96,7 @@ class Blusalt
 
     }
 
-    public function handleResponse(array $response, $callType = null): array
+    public function handleResponse(array $response, $callType = null, $redirectUrl = null): array
     {
         //cast callType to UpperCase;
         $callType = strtoupper($callType);
@@ -117,7 +116,7 @@ class Blusalt
                     $result['reference'] = $data['reference'];
                     unset($data['ok'], $data['card']);
                     $result['data'] = $data;
-                    if ($data['status'] === "PENDING_AUTH"){
+                    if (in_array($data['status'],["PENDING_AUTH","SUCCESS"]) ){
                         $result['redirect_required'] = true;
                         $result['flag'] = "redirect_required";
                         $result['otp'] = false;
@@ -128,6 +127,9 @@ class Blusalt
                         $result['flag'] = "otp_required";
                         $result['otp'] = true;
 
+                    }
+                    if ($data['status'] === "SUCCESS"){
+                        $result['url'] = $redirectUrl;
                     }
                 }
 

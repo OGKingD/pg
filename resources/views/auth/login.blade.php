@@ -3,9 +3,9 @@
 @section('content')
     @include('layouts.navigation')
 
-    <section class="mt-1">
-        <div class="page-header min-vh-80">
-            <div class="container">
+    <section>
+        <div class="page-header ">
+            <div class="container mt-4">
 
                 <div class="row">
                     <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">

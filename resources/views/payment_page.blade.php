@@ -341,17 +341,8 @@
     @endif
 
 </main>
-<script>
-    Swal.fire({
-        title: 'Loading Payment Gateways ! Please wait!',
-        html: '  <span class="spinner-border spinner-border-lg text-primary"></span>\n',
-        allowEscapeKey: false,
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        allowEnterKey: false,
-    });
-</script>
-<script src="{{asset('assets/js/soft-ui-dashboard.min.js')}}"></script>
+
+<script defer src="{{asset('assets/js/soft-ui-dashboard.min.js')}}"></script>
 <script src="{{asset('assets/js/app.js')}}"></script>
 </body>
 
