@@ -454,14 +454,17 @@ class PaymentPage extends Component
             if ($this->cardProvider === "BLUSALT"){
 
                 $blusalt = new Blusalt();
-                $trnxRef = Str::random(6)."_".$this->transaction->id;
+                $trnxRef = Str::random(6)."_".$this->transaction->invoice_no;
                 $response = $blusalt->initiatePayment($cardNo, $cvv,$this->cardDetails['cc_expiration'], $pin,$customer_email,$invoiceTotal,$this->cardDetails['redirect_url'],$trnxRef);
                 $provider_ref = $this->transaction->provider_ref;
 
                 if ($response['status']){
                     $details = $response;
                     $provider_ref['blusalt'] = $response['data']['reference'];
-                    $this->transaction->update(['provider_ref' => $provider_ref]);
+                    $this->transaction->update([
+                        'provider_ref' => $provider_ref,
+                        'spay_ref' => $trnxRef
+                    ]);
                 }
             }
 
