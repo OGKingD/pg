@@ -102,7 +102,9 @@ class UserController extends Controller
                 ->selectRaw("SUM( CASE WHEN flag = 'debit' AND  status = 'pending' AND gateway_id = $gateway->id THEN total END) as pending_{$channel}_transactions_total");
         }
 
-        $transactionsQuery->selectRaw("SUM( CASE WHEN type = 'Withdrawal' AND status = 'successful' THEN total END) as withdrawal");
+        $transactionsQuery->selectRaw("SUM( CASE WHEN type = 'Withdrawal' AND status = 'successful' THEN total END) as withdrawal")
+        //filter by date range to keep result set small;
+        ->whereDate('transactions.created_at',date('Y-m-d'));
 
         if (!$user->isAdmin()) {
             $transactionsQuery = $transactionsQuery
@@ -113,35 +115,11 @@ class UserController extends Controller
         if ($user->isAdmin()) {
             $data['title'] = "Administrative Dashboard";
 
-            $walletTable = $db->table('wallets');
-            /** @var object $walletQuery */
-            $walletQuery = $walletTable
-                ->selectRaw("SUM(balance) as total_wallet_balance")
-                ->selectRaw("COUNT(wallets.id) as wallet_count")->first();
-
-            //set Result for Wallet
-            $data['wallet_count'] = $walletQuery->wallet_count;
-            $data['total_wallet_balance'] = $walletQuery->total_wallet_balance;
-
-            $userTable = $db->table('users');
-            /** @var object $userQuery */
-            $userQuery = $userTable
-                ->selectRaw("COUNT( CASE WHEN type = 5 THEN true END) as total_merchants")
-                ->selectRaw("COUNT( CASE WHEN status = 0 and type = 5 THEN true END) as total_active_merchants")
-                ->selectRaw("COUNT( CASE WHEN status = 1 and type = 5 THEN true END) as total_inactive_merchants")->first();
-
-            //set Result for Users
-            $data['total_merchants'] = $userQuery->total_merchants;
-            $data['total_active_merchants'] = $userQuery->total_active_merchants;
-            $data['total_inactive_merchants'] = $userQuery->total_inactive_merchants;
-            $data['total_api_merchants'] = PersonalAccessToken::count();
-
             $transactionsQuery = $transactionsQuery->first();
 
         }
 
 
-        $data['latest_transactions'] = $transactionsTable->select(['merchant_transaction_ref', 'updated_at', 'total', 'flag'])->latest()->limit(10)->get();
 
         //set Result for Transactions;
         $data['transactions_count'] = $transactionsQuery->total_bills_generated;

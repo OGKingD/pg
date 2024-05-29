@@ -96,49 +96,56 @@ class Blusalt
 
     }
 
-    public function handleResponse(array $response, $callType = null, $redirectUrl = null): array
+    public function handleResponse( $response, $callType = null, $redirectUrl = null): array
     {
         //cast callType to UpperCase;
         $callType = strtoupper($callType);
         $result = [
             "status" => false,
         ];
-        $result['message'] = $response['message'] ?? "";
         $result['reference'] = null;
+        $message = "Empty response! Ensure Details are correct!";
+        if (!is_array($response)){
+            $result['message'] = $message;
+        }
 
-        if (isset($response['status'])) {
-            //successful call;
-            if ($response['status']) {
-                $result['status'] = $response['status'];
-                //check Type;
-                if ($callType === "CHARGE_CARD"){
-                    $data = $response['data'];
-                    $result['reference'] = $data['reference'];
-                    unset($data['ok'], $data['card']);
-                    $result['data'] = $data;
-                    if (in_array($data['status'],["PENDING_AUTH","SUCCESS"]) ){
-                        $result['redirect_required'] = true;
-                        $result['flag'] = "redirect_required";
-                        $result['otp'] = false;
-                        $result['url'] = $data['redirect_url'];
-                    }
-                    if ($data['status'] === "PENDING_AUTH_CAPTURE"){
-                        $result['redirect_required'] = false;
-                        $result['flag'] = "otp_required";
-                        $result['otp'] = true;
+        if (is_array($response)) {
+            $result['message'] = $response['message'] ?? $message;
 
+            if (isset($response['status'])) {
+                //successful call;
+                if ($response['status']) {
+                    $result['status'] = $response['status'];
+                    //check Type;
+                    if ($callType === "CHARGE_CARD") {
+                        $data = $response['data'];
+                        $result['reference'] = $data['reference'];
+                        unset($data['ok'], $data['card']);
+                        $result['data'] = $data;
+                        if (in_array($data['status'], ["PENDING_AUTH", "SUCCESS"])) {
+                            $result['redirect_required'] = true;
+                            $result['flag'] = "redirect_required";
+                            $result['otp'] = false;
+                            $result['url'] = $data['redirect_url'];
+                        }
+                        if ($data['status'] === "PENDING_AUTH_CAPTURE") {
+                            $result['redirect_required'] = false;
+                            $result['flag'] = "otp_required";
+                            $result['otp'] = true;
+
+                        }
+                        if ($data['status'] === "SUCCESS") {
+                            $result['url'] = $redirectUrl;
+                        }
                     }
-                    if ($data['status'] === "SUCCESS"){
-                        $result['url'] = $redirectUrl;
+
+                    if ($callType === "VERIFY_TRANSACTION") {
+                        $result = $response['data'];
                     }
                 }
-
-                if ($callType === "VERIFY_TRANSACTION"){
-                    $result = $response['data'];
+                if (!$response['status']) {
+                    $result['errors'] = $response['message'];
                 }
-            }
-            if (!$response['status']){
-                $result['errors'] = $response['message'];
             }
         }
         return $result;

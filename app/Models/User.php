@@ -122,7 +122,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isAdmin()
     {
-        return in_array($this->userType->id, [1, 2, 3, 4], true);
+        return in_array($this->type, [1, 2, 3, 4], true);
 
     }
 
