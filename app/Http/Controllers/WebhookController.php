@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Lib\Services\Blusalt;
 use App\Lib\Services\Flutterwave;
 use App\Lib\Services\NinePSB;
 use App\Lib\Services\Providus;
@@ -616,10 +617,122 @@ class WebhookController extends Controller
         $transaction->fee = $transactionTotal['charge'];
     }
 
-    public function blusalt(Request $request)
+    public function blusalt(Request $request, Webhooks $webhooks)
     {
         $data = $request->all();
         info("Blusalt request from {$request->ip()} is ", $data);
+        $requestSuccessful = $settlementId = $responseMessage = false;
+        $responseCode = 500;
+        try {
+            if (isset($data['data'])){
+
+                $payload = $data['data'];
+                if (isset($payload['reference'])){
+                    $requestSuccessful = true;
+                    $settlementId = $payload['reference'];
+                    //check Blusalt for transaction;
+                    $response = (new Blusalt())->verifyTransaction($settlementId);
+
+                    if (isset($response['status'])){
+                        $gateway = Gateway::where('name', "Card")->get()->pluck("id", "name");
+                        //check if transaction Exists on Saanapay
+                        /** @var Transaction $transactionExists */
+                        $transactionExists = Transaction::where("flutterwave_ref", $settlementId)->first();
+
+                        if (!$transactionExists){
+                            $responseMessage = "Transaction Not Found On Saana.";
+                            $responseCode = 404;
+                        }
+                        if ($transactionExists){
+                            /**
+                             * @var User $user
+                             * @var User $company
+                             * @var Wallet $wallet
+                             **/
+                            $user = $transactionExists->user;
+                            $userRef = $user->id;
+                            $company = company();
+                            $wallet = $user->wallet;
+                            $responseCode = 200;
+
+
+                            //check if transaction is successful
+                            if ($transactionExists->status === "successful") {
+                                $responseMessage = "Duplicate Transaction";
+                            }
+
+                            if ($transactionExists->status === "pending"){
+                                if ( $response['amount'] < $transactionExists->total){
+                                    $responseMessage = "Amount Paid less than Transaction Amount";
+                                }
+
+                                if ($response['amount'] >= $transactionExists->total){
+
+                                    $details = [
+                                        "id" => $response['reference'],
+                                        "metadata" => $response['metadata'],
+                                        "narration" => $response['narration'],
+                                        "client_reference" => $response['client_reference'],
+                                        "external_reference" => $response['external_reference'],
+                                        "reference" => $response['reference'],
+                                        "card_transaction_reference" => $response['card_transaction_reference'] ?? null,
+
+                                    ];
+                                    $gateway_id = $gateway['Card'];
+                                    $payment_provider_message = $response['status'];
+
+                                    if (strtoupper($response['status']) === "SUCCESSFUL"){
+                                        $responseMessage = "successful";
+                                        $requestSuccessful = true;
+
+                                        DB::transaction(function () use ($details, $gateway_id, $payment_provider_message, $transactionExists, $wallet, $user, $company) {
+
+                                            $transactionExists->handleSuccessfulPayment($transactionExists, $gateway_id, $payment_provider_message, $details, $wallet, $user, $company);
+
+                                        });
+                                    }
+
+                                    if (strtoupper($response['status']) === "FAILED"){
+                                        $responseMessage = "failed";
+                                        $requestSuccessful = true;
+                                        DB::transaction(function () use ($details, $gateway_id, $payment_provider_message, $transactionExists, $wallet, $user, $company) {
+
+                                            $transactionExists->handleFailedPayment($transactionExists,$gateway_id,$payment_provider_message,$details);
+
+                                        });
+                                    }
+
+                                }
+                            }
+
+                            $webhookResponse = [
+                                "status_code" => $responseCode,
+                                "message" => $responseMessage
+                            ];
+
+                            $webhooks->logWebhook($settlementId,$userRef,$data,$webhookResponse);
+
+                        }
+
+                    }
+
+                }
+            }
+            return response()->json([
+                "requestSuccessful" => $requestSuccessful,
+                "settlementId" => $settlementId,
+                "responseMessage" => $responseMessage,
+                "responseCode" => $responseCode
+            ]);
+
+        }catch (\Exception $e){
+            return response()->json([
+                "requestSuccessful" => $requestSuccessful,
+                "settlementId" => $settlementId,
+                "responseMessage" => $responseMessage,
+                "responseCode"=> $responseCode
+            ]);
+        }
 
 
     }

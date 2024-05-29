@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Lib\Services\Blusalt;
 use App\Lib\Services\Flutterwave;
 use App\Lib\Services\NinePSB;
 use App\Lib\Services\Providus;
@@ -153,6 +154,60 @@ class RequeryTool extends Component
                 }
             }
 
+        }
+
+        if ($provider === "BLUSALT"){
+            $transactionExists = Transaction::firstWhere('flutterwave_ref',$trnx);
+            if (is_null($transactionExists)){
+                $processTransaction = false;
+                $this->message = "Transaction  : $trnx cannot be processed, transaction Not Found";
+                $this->messageType = "danger";
+            }
+            if ($transactionExists){
+                if ($transactionExists->status === "successful"){
+                    $processTransaction = false;
+                    $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
+                    $this->messageType = "info";
+                }
+                $this->message = " $this->transaction_ref Cannot be Processed!";
+                $this->messageType = "info";
+                //check Blusalt for transaction;
+                $response = (new Blusalt())->verifyTransaction($trnx);
+
+                if (isset($response['status'])){
+                    //when transaction not found;
+                    if (!$response['status']){
+                        $this->message = "Transaction  : $trnx cannot be processed, {$response['errors']}";
+                        $this->messageType = "danger";
+                    }
+
+                    if (is_string($response['status'])) {
+                        $providerStatus = strtoupper($response['status']);
+                        if ($providerStatus === "SUCCESSFUL") {
+                            $this->message = false;
+                            $this->messageType = false;
+
+                            $this->transactionDetails = [
+                                "transaction_ref" => $response['reference'],
+                                "invoice_no" => $transactionExists->invoice_no,
+                                "amount" => $response['amount'],
+                                "date" => $response['updatedAt'],
+                                "remarks" => $response['narration'],
+                                "data" => [
+                                    "reference" => $response['reference'],
+                                    "client_reference" => $response['client_reference']
+                                    ]
+                            ];
+
+                        }
+                        if ($providerStatus === "FAILED") {
+                            $this->message = "Transaction  : $trnx cannot be processed, \n" . $response['status'];
+                            $this->messageType = "danger";
+                        }
+                    }
+                }
+
+            }
         }
         if ($provider === "FLUTTERWAVE") {
 
@@ -342,7 +397,13 @@ class RequeryTool extends Component
             $this->messageType = "success";
             $this->dispatchBrowserEvent('alertBox', ['type' => 'success', 'message' => $this->message]);
 
+        }
 
+        if ($provider === "BLUSALT"){
+            Http::withoutVerifying()->post(route('webhook.blusalt'),$this->transactionDetails)->json();
+            $this->message = "Transaction  $this->transaction_ref Pushed for requery!";
+            $this->messageType = "success";
+            $this->dispatchBrowserEvent('alertBox', ['type' => 'success', 'message' => $this->message]);
 
         }
 
