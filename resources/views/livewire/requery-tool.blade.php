@@ -50,6 +50,7 @@
                                                                 </option>
                                                                 <option value="9psb">9PSB
                                                                 </option>
+                                                                <option value="blusalt">BLUSALT</option>
                                                                 <option value="remita">REMITA</option>
 
                                                             </select>
