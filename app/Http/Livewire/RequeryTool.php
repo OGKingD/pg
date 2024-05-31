@@ -157,53 +157,67 @@ class RequeryTool extends Component
         }
 
         if ($provider === "BLUSALT"){
-            $transactionExists = Transaction::firstWhere('flutterwave_ref',$trnx);
-            if (is_null($transactionExists)){
-                $processTransaction = false;
-                $this->message = "Transaction  : $trnx cannot be processed, transaction Not Found";
+
+            $processTransaction = false;
+            $this->message = "Transaction  : $trnx cannot be processed, transaction Not Found from Provider";
+            $this->messageType = "danger";
+
+            //check Blusalt for transaction;
+            $response = (new Blusalt())->verifyTransaction($trnx);
+            $invoiceString = explode('_', $response['client_reference']);
+            $invoiceNo = $invoiceString[1] ?? null;
+            if (empty($invoiceNo)){
+                $this->message = "Transaction  : $trnx cannot be processed, transaction Not Found on Saana";
                 $this->messageType = "danger";
             }
-            if ($transactionExists){
-                if ($transactionExists->status === "successful"){
-                    $processTransaction = false;
-                    $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
-                    $this->messageType = "info";
-                }
-                $this->message = " $this->transaction_ref Cannot be Processed!";
-                $this->messageType = "info";
-                //check Blusalt for transaction;
-                $response = (new Blusalt())->verifyTransaction($trnx);
 
-                if (isset($response['status'])){
-                    //when transaction not found;
-                    if (!$response['status']){
-                        $this->message = "Transaction  : $trnx cannot be processed, {$response['errors']}";
+            if ( !empty($invoiceNo) ){
+                if ($response['status']){
+                    $transactionExists = Transaction::firstWhere('invoice_no',$invoiceNo);
+                    if (is_null($transactionExists)){
+                        $this->message = "Transaction  : $trnx cannot be processed, transaction Not Found on Saana";
                         $this->messageType = "danger";
                     }
-
-                    if (is_string($response['status'])) {
-                        $providerStatus = strtoupper($response['status']);
-                        if ($providerStatus === "SUCCESSFUL") {
-                            $this->message = false;
-                            $this->messageType = false;
-
-                            $this->transactionDetails = [
-                                "transaction_ref" => $response['reference'],
-                                "invoice_no" => $transactionExists->invoice_no,
-                                "amount" => $response['amount'],
-                                "date" => $response['updatedAt'],
-                                "remarks" => $response['narration'],
-                                "data" => [
-                                    "reference" => $response['reference'],
-                                    "client_reference" => $response['client_reference']
-                                    ]
-                            ];
-
+                    if ($transactionExists){
+                        if ($transactionExists->status === "successful"){
+                            $processTransaction = false;
+                            $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
+                            $this->messageType = "info";
                         }
-                        if ($providerStatus === "FAILED") {
-                            $this->message = "Transaction  : $trnx cannot be processed, \n" . $response['status'];
+                        $this->message = " $this->transaction_ref Cannot be Processed!";
+                        $this->messageType = "info";
+
+                        //when status if false;
+                        if (!$response['status']){
+                            $this->message = "Transaction  : $trnx cannot be processed, {$response['errors']}";
                             $this->messageType = "danger";
                         }
+
+                        if (is_string($response['status'])) {
+                            $providerStatus = strtoupper($response['status']);
+                            if ($providerStatus === "SUCCESSFUL") {
+                                $this->message = false;
+                                $this->messageType = false;
+
+                                $this->transactionDetails = [
+                                    "transaction_ref" => $response['reference'],
+                                    "invoice_no" => $transactionExists->invoice_no,
+                                    "amount" => $response['amount'],
+                                    "date" => $response['updatedAt'],
+                                    "remarks" => $response['narration'],
+                                    "data" => [
+                                        "reference" => $response['reference'],
+                                        "client_reference" => $response['client_reference']
+                                    ]
+                                ];
+
+                            }
+                            if ($providerStatus === "FAILED") {
+                                $this->message = "Transaction  : $trnx cannot be processed, \n" . $response['status'];
+                                $this->messageType = "danger";
+                            }
+                        }
+
                     }
                 }
 
