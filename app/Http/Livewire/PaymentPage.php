@@ -382,6 +382,7 @@ class PaymentPage extends Component
                 }
             }
 
+            $blusaltRef = $response['reference'] ?? null;
             $tranxAtrributes = [
                 "spay_ref" => $trnxId,
                 'gateway_id' => $this->merchantGateways[$this->activeTab]['gateway_id'],
@@ -389,8 +390,9 @@ class PaymentPage extends Component
                 'fee' => $this->merchantGateways[$this->activeTab]['invoiceCharge'],
                 'total' => $invoiceTotal,
                 'provider' => $this->cardProvider,
+                'flutterwave_ref' => $blusaltRef,
                 'provider_ref' => [
-                    'blusalt' => $response['reference'] ?? null,
+                    'blusalt' => $blusaltRef,
                     'flutterwave' => $trnxId,
                 ]
             ];
@@ -460,8 +462,10 @@ class PaymentPage extends Component
 
                 if ($response['status']){
                     $details = $response;
-                    $provider_ref['blusalt'] = $response['data']['reference'];
+                    $blusaltRef = $response['data']['reference'];
+                    $provider_ref['blusalt'] = $blusaltRef;
                     $this->transaction->update([
+                        'flutterwave_ref' => $blusaltRef,
                         'provider_ref' => $provider_ref,
                         'spay_ref' => $trnxRef
                     ]);
