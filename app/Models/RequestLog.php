@@ -6,6 +6,17 @@ namespace App\Models;
 class RequestLog extends Model
 {
 protected $casts = ['response' => 'json', 'payload' => 'json'];
+
+    public function transaction(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Transaction::class,'request_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id');
+
+    }
     public static function logRequest($trnxRef, $url, $merchant_id, $payload, $request_response): void
     {
         $request = self::firstOrCreate(

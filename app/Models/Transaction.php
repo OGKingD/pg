@@ -278,6 +278,13 @@ class Transaction extends Model
         return $this->hasOne(DynamicAccount::class,'invoice_no','invoice_no');
 
     }
+
+
+    public function requestLog()
+    {
+        return $this->hasOne(RequestLog::class,'request_id','merchant_transaction_ref');
+
+    }
     /**
      * @param Transaction $transaction
      * @param mixed $gateway_id
@@ -425,7 +432,6 @@ class Transaction extends Model
     }
 
     /**
-     * @param Transaction $transaction
      * @return array
      */
     public function transactionToPayload(): array
@@ -438,6 +444,15 @@ class Transaction extends Model
         $payload['updated_at'] = str_replace("T"," ",Carbon::parse($payload['updated_at'])->toDateTimeLocalString());
         $payload['created_at'] = str_replace("T"," ",Carbon::parse($payload['updated_at'])->toDateTimeLocalString());
         unset($payload['gateway_id'], $payload['gateway'], $payload['details']);
+        /** @var RequestLog $paymentRequest */
+        $paymentRequest = $this->requestLog;
+        if ($paymentRequest){
+            $paymentRequestPayload = $paymentRequest->payload[0];
+            if (isset($paymentRequestPayload['metadata'])){
+                $payload['metadata'] = $paymentRequestPayload['metadata'];
+
+            }
+        }
         return $payload;
     }
 
