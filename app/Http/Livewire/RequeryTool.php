@@ -164,10 +164,20 @@ class RequeryTool extends Component
 
             //check Blusalt for transaction;
             $response = (new Blusalt())->verifyTransaction($trnx);
-            $invoiceString = explode('_', $response['client_reference']);
-            $invoiceNo = $invoiceString[1] ?? null;
+            //when client_reference not set;
+            $message = "Transaction  : $trnx cannot be processed, transaction Not Found on Saana";
+            if (!isset($response['client_reference'])){
+                $invoiceNo = null;
+                $message = $response['message'];
+
+            }
+            if (isset($response['client_reference'])){
+                $invoiceString = explode('_', $response['client_reference']);
+                $invoiceNo = $invoiceString[1] ?? null;
+            }
+
             if (empty($invoiceNo)){
-                $this->message = "Transaction  : $trnx cannot be processed, transaction Not Found on Saana";
+                $this->message = $message;
                 $this->messageType = "danger";
             }
 
