@@ -78,12 +78,14 @@ class PaymentPage extends Component
 
         $status = false;
         //check if transaction has RRR already;
-        if ($rrr) {
-            $remitaUrl = config('remita.redirect_url') . "/remita/onepage/biller/$rrr->rrr/payment.spa";
-            $status = true;
-            $this->remitaDetails = ["status" => $status, 'RRR' => $rrr->rrr, 'url' => $remitaUrl];
+        if ($rrr){
+            if (!empty($rrr->rrr)) {
+                $remitaUrl = config('remita.redirect_url') . "/remita/onepage/biller/$rrr->rrr/payment.spa";
+                $status = true;
+                $this->remitaDetails = ["status" => $status, 'RRR' => $rrr->rrr, 'url' => $remitaUrl];
 
-        } else {
+            }
+        }else {
             //Get Merchant Charge;
             $amount = $this->merchantGateways[$this->activeTab]['invoiceTotal'];
             $charge = $this->merchantGateways[$this->activeTab]['invoiceCharge'];
