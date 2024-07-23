@@ -163,11 +163,13 @@ class PaymentController extends Controller
             $data['transaction'] = $transaction;
             $data['redirect']  = false;
 
-            if (isset($transaction->redirect_url)){
-                $data['redirect'] = true;
-                $urlQuery = $transaction->transactionToPayload();
-                $url = $transaction->redirect_url;
-                $data['redirect_url']  = $url ."?" . http_build_query($urlQuery);
+            if ($transaction->status === "successful") {
+                if (isset($transaction->redirect_url)) {
+                    $data['redirect'] = true;
+                    $urlQuery = $transaction->transactionToPayload();
+                    $url = $transaction->redirect_url;
+                    $data['redirect_url'] = $url . "?" . http_build_query($urlQuery);
+                }
             }
 
         }
