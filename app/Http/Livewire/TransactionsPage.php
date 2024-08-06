@@ -66,7 +66,7 @@ class TransactionsPage extends Component
     {
         //check if is admin return admin layout else return default;
         $this->gateways = Gateway::select(['name','id'])->get();
-        $this->user = auth()->user();
+        $this->user = bootStrapLinkedMerchant(auth()->user());
         $this->userId = $this->user->id;
         $this->isAdmin = $this->user->type < 5;
         $data['isAdmin'] = $this->isAdmin;

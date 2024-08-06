@@ -447,7 +447,7 @@ class Transaction extends Model
         /** @var RequestLog $paymentRequest */
         $paymentRequest = $this->requestLog;
         if ($paymentRequest){
-            $paymentRequestPayload = $paymentRequest->payload[0];
+            $paymentRequestPayload = array_key_exists(0, $paymentRequest->payload) ? $paymentRequest->payload[0] : $paymentRequest->payload;
             if (isset($paymentRequestPayload['metadata'])){
                 $payload['metadata'] = $paymentRequestPayload['metadata'];
 

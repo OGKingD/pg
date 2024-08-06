@@ -147,3 +147,29 @@ function httpRequestWithoutVerifying(): PendingRequest
         "Content-Type" => "application/json",
     ])->withoutVerifying();
 }
+
+function isLinkedMerchant(){
+    $status = false;
+    if (session()->has('isLinkedMerchant')){
+        $status = session()->get('isLinkedMerchant');
+    }
+    return $status;
+}
+
+
+function linkedMerchantId(){
+    return session()->get('linkedMerchantId');
+}
+
+/**
+ * @param User $user
+ * @return User
+ */
+function bootStrapLinkedMerchant(User $user): User
+{
+    //check if user is linkedMerchant and swap the userId only;
+    if (isLinkedMerchant()) {
+        $user->id = linkedMerchantId();
+    }
+    return $user;
+}
