@@ -24,7 +24,7 @@ class UserController extends Controller
     {
         //check if user is an admin or normal user
         /** @var User $user */
-        $user = auth()->user();
+        $user = bootStrapLinkedMerchant(request()->user());
         $data['title'] = "Dashboard";
         $data = $this->dashboardData($user);
         if (!is_null($user)) {

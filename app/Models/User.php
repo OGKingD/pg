@@ -181,4 +181,39 @@ class User extends Authenticatable implements MustVerifyEmail
 
     }
 
+    public function merchantLinked(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(LinkedMerchant::class,'id','user_id');
+    }
+
+    public function linkedMerchants(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(LinkedMerchant::class,'merchant_id');
+
+    }
+
+    public function setLinkedMerchant()
+    {
+        //check if sessionExists;
+        $sessionHasLinkedMerchant = session()->has('isLinkedMerchant');
+
+        if ($sessionHasLinkedMerchant){
+            if (session()->get('isLinkedMerchant')){
+                $this->id = session()->get('linkedMerchantId');
+            }
+        }
+
+        if(!$sessionHasLinkedMerchant){
+            $merchantLinked = $this->merchantLinked;
+            //check if user is linkedMerchant;
+            if ($merchantLinked){
+                $status = boolval($merchantLinked->status);
+                session()->put('isLinkedMerchant', $status);
+                session()->put('linkedMerchantId', $merchantLinked->merchant_id);
+                session()->put('merchant_id', $this->id);
+            }
+        }
+
+    }
+
 }

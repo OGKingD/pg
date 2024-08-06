@@ -35,7 +35,9 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
         $ip_address = $request->ip();
-        $user = User::whereid(auth()->user()->id)->first();
+        /** @var User $user */
+        $user = $request->user();
+        $user->setLinkedMerchant();
 //        if ($ip_address != $user->ip_address) {
 //            send_email($user->email, $user->username, 'Suspicious Login Attempt', ' Your account was just accessed from an unknown IP address<br> <b> ' . $ip_address . '</b><br>If this was you, please you can ignore this message or reset your account password.', [], 'error');
 //        }
