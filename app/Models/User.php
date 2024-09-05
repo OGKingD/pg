@@ -192,28 +192,5 @@ class User extends Authenticatable implements MustVerifyEmail
 
     }
 
-    public function setLinkedMerchant()
-    {
-        //check if sessionExists;
-        $sessionHasLinkedMerchant = session()->has('isLinkedMerchant');
-
-        if ($sessionHasLinkedMerchant){
-            if (session()->get('isLinkedMerchant')){
-                $this->id = session()->get('linkedMerchantId');
-            }
-        }
-
-        if(!$sessionHasLinkedMerchant){
-            $merchantLinked = $this->merchantLinked;
-            //check if user is linkedMerchant;
-            if ($merchantLinked){
-                $status = boolval($merchantLinked->status);
-                session()->put('isLinkedMerchant', $status);
-                session()->put('linkedMerchantId', $merchantLinked->merchant_id);
-                session()->put('merchant_id', $this->id);
-            }
-        }
-
-    }
 
 }

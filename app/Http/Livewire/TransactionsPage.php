@@ -45,7 +45,12 @@ class TransactionsPage extends Component
 
         if (!$this->isAdmin) {
             //add user_id;
+            //check if is linked merchant;
+            $merchantLinked = $this->user->merchantLinked;
             $this->searchQuery['user_id'] = $this->userId;
+            if ($merchantLinked) {
+                $this->searchQuery['user_id'] = $merchantLinked->merchant_id;
+            }
             $this->builder = Transaction::reportQuery($this->searchQuery);
             $this->layout = 'layouts.merchant_dashboardapp';
 
@@ -66,7 +71,7 @@ class TransactionsPage extends Component
     {
         //check if is admin return admin layout else return default;
         $this->gateways = Gateway::select(['name','id'])->get();
-        $this->user = bootStrapLinkedMerchant(auth()->user());
+        $this->user = auth()->user();
         $this->userId = $this->user->id;
         $this->isAdmin = $this->user->type < 5;
         $data['isAdmin'] = $this->isAdmin;

@@ -22,9 +22,10 @@ class Transaction extends Model
         //5,6,7
         $totalFee= $totalAmount = $totalSum = $totalStampDuty = $totalCustomerServiceChargeAmount =
         $totalMerchantServiceChargeAmount =0;
+        //Define Headers;
+        fputcsv($file, $csvHeaders);
         $query->chunk(3000, function ($results) use ($file, $csvHeaders, &$totalFee, &$totalAmount, &$totalSum, &$totalStampDuty, &$totalCustomerServiceChargeAmount, &$totalMerchantServiceChargeAmount) {
-            //Define Headers;
-            fputcsv($file, $csvHeaders);
+            $contents = [];
             foreach ($results as $result) {
                 $totalFee += $result->fee;
                 $totalAmount += $result->amount;
@@ -33,38 +34,103 @@ class Transaction extends Model
                 $totalCustomerServiceChargeAmount+= $result->customer_service_charge_amount;
                 $totalMerchantServiceChargeAmount+= $result->merchant_service_charge_amount;
                 //Define Content;
-                $contents = [
-                    $result->user->first_name. " ". $result->user->last_name,
-                    $result->merchant_transaction_ref,
-                    $result->status,
-                    $result->gateway->name ?? "N/A",
-                    $result->currency,
-                    $result->provider ?? "N/A",
-                    $result->type,
-                    $result->stamp_duty,
-                    number_format($result->fee, 2),
-                    number_format($result->amount, 2),
-                    number_format($result->total, 2),
-                    $result->customer_service_charge,
-                    $result->customer_service_charge_amount,
-                    $result->merchant_service_charge,
-                    $result->merchant_service_charge_amount,
-                    $result->invoice->customer_name ?? "N/A",
-                    $result->invoice->customer_email ?? "N/A",
-                    $result->flag,
-                    $result->updated_at,
-                ];
+                foreach ($csvHeaders as $csvHeader) {
+                    $contents[$csvHeader] = $this->mapRowWithHeaders($csvHeader, $result);
+                }
+
                 fputcsv($file, $contents);
             }
         });
-        fputcsv($file,["","","","","","","",number_format($totalStampDuty, 2),number_format($totalFee, 2),
-            number_format($totalAmount, 2),
-            number_format($totalSum, 2),"",number_format($totalCustomerServiceChargeAmount, 2),
-            "",number_format($totalMerchantServiceChargeAmount, 2)
-        ]);
+        $reportFooter = $this->setReportFooter($csvHeaders, $totalStampDuty, $totalFee, $totalAmount, $totalSum, $totalCustomerServiceChargeAmount, $totalMerchantServiceChargeAmount);
+        fputcsv($file,$reportFooter);
         fclose($file);
 
     }
+
+    public function mapRowWithHeaders($header, $result)
+    {
+        //General format header is as follows
+        //  [ 0 => "Merchant Name" 1 => "Merchant Ref" 2 => "Status" 3 => "Channel" 4 => "Currency" 5 =>
+        //  "Provider" 6 => "Type" 7 => "StampDuty" 8 => "Fee" 9 => "Amount" 10 => "Total" 11 => "customer_service_charge"
+        // 12 => "customer_service_charge_amount" 13 => "merchant_service_charge" 14  => "merchant_service_charge_amount"
+        // 15 => "Customer Name" 16 => "Customer Email" 17 => "Flag" 18 => "Date" ]
+        switch ($header) {
+            case "Merchant Name":
+                return $result->user->first_name. " ". $result->user->last_name;
+            case "Merchant Ref":
+                return $result->merchant_transaction_ref;
+            case "Status":
+                return $result->status;
+            case "Channel":
+                return $result->gateway->name ?? "N/A";
+            case "Currency":
+                return $result->currency;
+            case "Provider":
+                return $result->provider ?? "N/A";
+            case "Type":
+                return $result->type;
+            case "StampDuty":
+                return $result->stamp_duty;
+            case "Fee":
+                return number_format($result->fee, 2);
+            case "Amount":
+                return number_format($result->amount, 2);
+            case "Total":
+                return number_format($result->total, 2);
+            case "customer_service_charge":
+                return $result->customer_service_charge;
+            case "customer_service_charge_amount":
+                return $result->customer_service_charge_amount;
+            case "merchant_service_charge":
+                return $result->merchant_service_charge;
+            case "merchant_service_charge_amount":
+                return $result->merchant_service_charge_amount;
+            case "Customer Name":
+                return $result->invoice->customer_name ?? "N/A";
+            case "Customer Email":
+                return $result->invoice->customer_email ?? "N/A";
+            case "Flag":
+                return $result->flag;
+            case "Date":
+                return $result->updated_at;
+            default:
+                return "";
+        }
+
+    }
+
+    /**
+     * @param array $csvHeaders
+     * @param $totalStampDuty
+     * @param $totalFee
+     * @param $totalAmount
+     * @param $totalSum
+     * @param $totalCustomerServiceChargeAmount
+     * @param $totalMerchantServiceChargeAmount
+     * @return array
+     */
+    public function setReportFooter(array $csvHeaders, $totalStampDuty, $totalFee, $totalAmount, $totalSum, $totalCustomerServiceChargeAmount, $totalMerchantServiceChargeAmount): array
+    {
+        return array_map(function ($header) use ($totalStampDuty, $totalFee, $totalAmount, $totalSum, $totalCustomerServiceChargeAmount, $totalMerchantServiceChargeAmount) {
+            switch ($header) {
+                case "StampDuty":
+                    return number_format($totalStampDuty, 2);
+                case "Fee":
+                    return number_format($totalFee, 2);
+                case "Amount":
+                    return number_format($totalAmount, 2);
+                case "Total":
+                    return number_format($totalSum, 2);
+                case "customer_service_charge_amount":
+                    return number_format($totalCustomerServiceChargeAmount, 2);
+                case "merchant_service_charge_amount":
+                    return number_format($totalMerchantServiceChargeAmount, 2);
+                default:
+                    return "";
+            }
+        }, $csvHeaders);
+    }
+
 
     /**
      * @param $query

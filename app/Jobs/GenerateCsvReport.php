@@ -48,9 +48,7 @@ class GenerateCsvReport implements ShouldQueue
         $transaction = new $this->model;
         $filename = "{$this->user->first_name}_{$this->user->id}_Transaction Report.csv";
         $this->payload["filename"] = $filename;
-        if (!$this->user->isAdmin()) {
-            $this->payload['user_id'] = $this->user->id;
-        }
+
         //check if group_by is set and call summary report;
         if (isset($this->payload['group_by'])) {
             $this->payload["filename"] = "Summary_Report_{$this->user->id}.csv";
@@ -59,7 +57,10 @@ class GenerateCsvReport implements ShouldQueue
 
         if (!isset($this->payload['group_by'])) {
             //when it's a detailed report
-            $headers = ["Merchant Name","Merchant Ref","Status","Channel","Currency","Provider","Type","StampDuty","Fee","Amount","Total", "customer_service_charge","customer_service_charge_amount","merchant_service_charge","merchant_service_charge_amount", "Customer Name", "Customer Email","Flag", "Date" ];
+            $headers = ["Merchant Name","Merchant Ref","Status","Channel","Currency","Type","StampDuty","Fee","Amount","Total", "Customer Name", "Customer Email","Flag", "Date" ];
+            if ($this->user->isAdmin()) {
+                $headers = [...$headers,"Provider", "customer_service_charge","customer_service_charge_amount","merchant_service_charge","merchant_service_charge_amount",];
+            }
             $transaction->generateCsvReport($this->payload, $headers);
         }
         //send Mail insert to Notification DB;
