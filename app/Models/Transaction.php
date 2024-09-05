@@ -409,7 +409,7 @@ class Transaction extends Model
                 }
                 if ((int)$gateway_id === 3){
                     $values['provider'] = "REMITA";
-                    $values['remita_ref'] = $details['RRR'];
+                    $values['remita_ref'] = $details['RRR'] ?? $details['rrr'];
 
                 }
                 if ((int)$gateway_id === 6){
