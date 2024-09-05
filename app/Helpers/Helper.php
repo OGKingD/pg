@@ -148,17 +148,28 @@ function httpRequestWithoutVerifying(): PendingRequest
     ])->withoutVerifying();
 }
 
-function isLinkedMerchant(){
+function isLinkedMerchant(User $user): bool
+{
     $status = false;
-    if (session()->has('isLinkedMerchant')){
-        $status = session()->get('isLinkedMerchant');
+    $merchantLinked = getLinkedMerchant($user);
+    if ($merchantLinked) {
+        $status = boolval($merchantLinked->status);
     }
     return $status;
 }
 
+/**
+ * @param User $user
+ * @return \App\Models\LinkedMerchant|mixed
+ */
+function getLinkedMerchant(User $user)
+{
+    return $user->merchantLinked;
+}
 
-function linkedMerchantId(){
-    return session()->get('linkedMerchantId');
+
+function linkedMerchantId($user){
+    return $user->merchantLinked->merchant_id;
 }
 
 /**
@@ -168,8 +179,8 @@ function linkedMerchantId(){
 function bootStrapLinkedMerchant(User $user): User
 {
     //check if user is linkedMerchant and swap the userId only;
-    if (isLinkedMerchant()) {
-        $user->id = linkedMerchantId();
+    if (isLinkedMerchant($user)) {
+        $user->id = linkedMerchantId($user);
     }
     return $user;
 }

@@ -189,19 +189,14 @@ class RequeryTool extends Component
                         $this->messageType = "danger";
                     }
                     if ($transactionExists){
+                        $this->message = " $this->transaction_ref Cannot be Processed!";
+                        $this->messageType = "info";
                         if ($transactionExists->status === "successful"){
-                            $processTransaction = false;
                             $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
                             $this->messageType = "info";
                         }
-                        $this->message = " $this->transaction_ref Cannot be Processed!";
-                        $this->messageType = "info";
 
                         //when status if false;
-                        if (!$response['status']){
-                            $this->message = "Transaction  : $trnx cannot be processed, {$response['errors']}";
-                            $this->messageType = "danger";
-                        }
 
                         if (is_string($response['status'])) {
                             $providerStatus = strtoupper($response['status']);
@@ -337,12 +332,13 @@ class RequeryTool extends Component
                     }
 
                     if ($paymentStatus ===  "00"){
+                        $RRR = $remita['data']['RRR'] ?? $remita['data']['rrr'];
                         $this->transactionDetails = [
-                            "transaction_ref" =>  $remita['data']['RRR'],
+                            "transaction_ref" =>  $RRR ,
                             "invoice_no" => $transactionExists->invoice_no,
                             "orderRef" =>  $remita['data']['orderId'],
                             "orderId" =>  $remita['data']['orderId'],
-                            "rrr" =>  $remita['data']['RRR'],
+                            "rrr" => $RRR,
                             "amount" => $remita['data']['amount'],
                             "date" => $remita['data']['paymentDate'],
                             "remarks" => $remita['message'],
@@ -354,7 +350,7 @@ class RequeryTool extends Component
                 }
 
                 if (!$remita['status']) {
-                    $this->message = "Transaction  : $trnx cannot be processed, {$remita['message']}";
+                    $this->message = "Transaction  : $trnx cannot be processed, {$remita['message']} ".json_encode($remita);
                     $this->messageType = "danger";
                 }
             }
