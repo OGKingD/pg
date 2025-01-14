@@ -10,5 +10,6 @@ return [
     'percent_encryption_key' => env('PERCENT_SECRET_HASH'),
     'google_pay_url' => env('FLW_GOOGLE_PAY_URL'),
     'apple_pay_url' => env('FLW_APPLE_PAY_URL'),
+    'base_url' => env('FLW_BASE_URL'),
     'env' => env('ENVIRONMENT'),
 ];

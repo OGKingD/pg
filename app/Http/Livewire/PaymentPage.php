@@ -528,7 +528,7 @@ class PaymentPage extends Component
 
             if (in_array($this->cardProvider,['FLUTTERWAVE','FLWAVEPERCENT','FLWAVEFLAT'])){
                 $flwave = getFlwave(isset($this->merchantGateways['card']['flwave_percent']));
-                $response = $flwave->validateTransaction($this->cc_Otp, $this->cardDetails['flw_ref'], 'card');
+                $response = $flwave->validateTransaction($this->cc_Otp, $this->cardDetails['flw_ref']);
                 $this->verifyFlwaveResponse($response);
                 if (strtoupper($response['status']) === "SUCCESS"){
                     $details['status'] = true;
