@@ -736,4 +736,13 @@ class WebhookController extends Controller
 
 
     }
+
+
+    public function globus(Request $request)
+    {
+        logger()->info("Globus request from {$request->ip()} is ", $request->all());
+        logger()->info("Globus Headers from {$request->ip()} is ", $request->headers->all());
+        return response()->json(['status' => true, 'ip' => $request->ip()]);
+
+    }
 }

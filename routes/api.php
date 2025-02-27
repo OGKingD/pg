@@ -43,5 +43,6 @@ Route::middleware(['terminate'])->group(function () {
         Route::any('remita',[WebhookController::class,'remitaSettlement'])->name('webhook.remita-settlement');
         Route::post('ninepsbvirtual',[WebhookController::class,'ninePsbSettlement'])->name('webhook.nine-psb-settlement');
         Route::any('blusalt',[WebhookController::class,'blusalt'])->name('webhook.blusalt');
+        Route::any('globus',[WebhookController::class,'globus'])->name('webhook.globus');
     });
 });
