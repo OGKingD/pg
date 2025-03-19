@@ -56,7 +56,7 @@ class CashAtBankController extends Controller
                 $transaction->handleSuccessfulPayment($transaction, $gateway->id, '', [], $wallet, $user, $company);
 
                 $status = true;
-                $data = $transaction->transactionToPayload();
+                $data = $transaction->refresh()->transactionToPayload();
             }
 
             return response()->json([
