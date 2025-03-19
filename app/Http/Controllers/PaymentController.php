@@ -601,7 +601,7 @@ class PaymentController extends Controller
         $channel = ucwords(str_replace('_', ' ', $request->input('channel')));
         $gateway = Gateway::where('name', $channel)->select(['id', 'name'])->first();
         $transactionTotal = $transaction->computeChargeAndTotal($gateway->id);
-        return ["amount" => $transactionTotal['total'], "breakdown" => ["charge" => $transactionTotal['charge'], 'face_value' => $transactionTotal['total'] - $transactionTotal['charge']]];
+        return ["status" => true, "amount" => $transactionTotal['total'], "breakdown" => ["charge" => $transactionTotal['charge'], 'face_value' => $transactionTotal['total'] - $transactionTotal['charge']]];
     }
 
     public function processBankTransfer(BankTransferRequest $request)
@@ -638,8 +638,9 @@ class PaymentController extends Controller
         /** @var Wallet $wallet */
         $wallet = $user->wallet;
         $company = company();
-        $transaction->handleSuccessfulPayment($transaction, $gateway->id, '', [], $wallet, $user, $company);
-        $data = $transaction->transactionToPayload();
+        $details = ['session_id' => Str::random(32), 'settlement_id' => Str::random(32), 'bank_transfer_ref' => $request->input('request_id'), 'provider' => 'DUMMY'];
+        $transaction->handleSuccessfulPayment($transaction, $gateway->id, '', $details, $wallet, $user, $company);
+        $data = $transaction->refresh()->transactionToPayload();
 
         return response()->json([
             "status" => true,
