@@ -173,12 +173,11 @@ class NinePSB
 
     }
 
-    public function reserveDynamicAccount($trnx_id,$amount)
+    public function reserveDynamicAccount($trnx_id,$amount,$hours=1,$spayPrefix=false): array
     {
         $message = "Failed to Reserve Dynamic Account! ";
-        $status = false;
         $resp = [
-            "status" => $status,
+            "status" => false,
             "message" => $message
         ];
         if ($trnx_id > 30){
@@ -186,6 +185,7 @@ class NinePSB
         }
         $url = $this->dynamicAccBaseUrl."vmw-api/v1/merchant/account/generate";
         $spayRef = $trnx_id."_".microtime(true);
+        $accountName = (empty($spayPrefix) ? "SAANAPAY-" :"$spayPrefix-" ). $trnx_id;
         $payload = [
             "transaction" => [
                 "reference" => $spayRef
@@ -198,10 +198,10 @@ class NinePSB
             ],
             "customer" => [
                 "account" => [
-                    "name" => "SAANAPAY-$trnx_id",
+                    "name" => $accountName,
                     "type" => "DYNAMIC",
                     "expiry" => [
-                        "hours" => 1
+                        "hours" => $hours,
                     ],
                 ],
             ],
@@ -223,7 +223,6 @@ class NinePSB
                 $resp = [
                     "status" => true,
                     "data" => $data,
-                    "message" => $result['message']
                 ];
 
             }
@@ -366,6 +365,35 @@ class NinePSB
             }
         }
         return  $resp;
+
+    }
+
+    public function mockDynamicAccount($amount, $account_name, $spayRef): array
+    {
+        $factory = \Faker\Factory::create('en_NG');
+        return [
+            "transaction" => [
+                "reference" => $spayRef,
+                "linkingreference" => "9PSB".$factory->unixTime()
+            ],
+            "order" => [
+                "amount" => floatval($amount),
+                "currency" => "NGN"
+            ],
+            "customer" => [
+                "account" => [
+                    "number" => $factory->randomNumber(1).$factory->randomNumber(9),
+                    "bank" => "9PSB",
+                    "name" => $account_name,
+                    "type" => "DYNAMIC",
+                    "expiry" => [
+                        "date" => $factory->time('Y-m-d H:i:s P')
+                    ]
+                ]
+            ],
+            "code" => "S20",
+            "message" => "Account created"
+        ];
 
     }
 

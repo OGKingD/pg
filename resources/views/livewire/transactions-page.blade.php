@@ -38,11 +38,11 @@
 
             </div>
             <!-- Nav pills -->
-            @if($isAdmin)
+{{--            @if($isAdmin)--}}
                 <button type="button" class="btn btn-primary" onclick="toggleEssentialReportFilters('detailed')">Detailed Report</button>
                 <button type="button" class="btn  btn-warning info-hover-primary" onclick="toggleEssentialReportFilters('summary')">Summary Report</button>
 
-            @endif
+{{--            @endif--}}
 
 
             <!-- Tab panes -->
@@ -388,10 +388,12 @@
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter">Currency</a>
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                                data-sortable="">
-                                <a href="#" class="dataTable-sorter">Provider</a>
-                            </th>
+                            @if($isAdmin)
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                                    data-sortable="">
+                                    <a href="#" class="dataTable-sorter">Provider</a>
+                                </th>
+                            @endif
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                                 data-sortable="">
                                 <a href="#" class="dataTable-sorter">Amount</a>
@@ -461,7 +463,9 @@
                                 <td class="text-sm font-weight-normal">{{ $val->type }}</td>
                                 <td class="text-sm font-weight-normal">{{ $val->gateway->name??  "N/A"}}</td>
                                 <td class="text-sm font-weight-normal">{{ $val->currency}}</td>
-                                <td class="text-sm font-weight-normal">{{ $val->provider ??  "N/A"}}</td>
+                                @if($isAdmin)
+                                    <td class="text-sm font-weight-normal">{{ $val->provider ??  "N/A"}}</td>
+                                @endif
                                 <td> &#{{nairaSymbol()}} {{number_format($val->amount,'2','.',',')}}</td>
                                 <td>&#{{nairaSymbol()}} {{number_format($val->fee,'2','.',',')}}</td>
                                 <td>&#{{nairaSymbol()}} {{number_format($val->total,'2','.',',')}}</td>
