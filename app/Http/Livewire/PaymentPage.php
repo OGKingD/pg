@@ -195,10 +195,12 @@ class PaymentPage extends Component
     }
 
     /**
-     * @throws \JsonException
      */
-    public function generateVirtualAccountNumber(Providus $providus)
+    public function generateVirtualAccountNumber($spayPrefix, $minutes=30): void
     {
+        $providus = new Providus();
+        $created_at = Carbon::now();
+        $endTime = Carbon::parse()->addMinutes($minutes)->format('Y-m-d H:i:s T');
 
         try {
             $status = false;
@@ -211,9 +213,11 @@ class PaymentPage extends Component
             if (isset($virtualAcc)) {
                 $status = true;
                 //check if virtual Account has expired;
-                if (Carbon::parse()->diffInHours($virtualAcc->updated_at) < 1) {
+                if (Carbon::parse()->diffInMinutes($virtualAcc->created_at) < $virtualAcc->expires_at) {
                     $generateDynamic = false;
-                    $this->virtualAccDetails = ["status" => $status, "accountNumber" => $virtualAcc->account_number, "accountName" => $virtualAcc->account_name, "bankName" => $virtualAcc->bank_name, "endtime" => Carbon::parse($virtualAcc->updated_at)->addHours(1)];
+                    $created_at = $virtualAcc->created_at;
+                    $endTime = Carbon::parse($virtualAcc->created_at)->addMinutes($virtualAcc->expires_at)->format('Y-m-d H:i:s T');
+                    $this->virtualAccDetails = ["status" => $status, "accountNumber" => $virtualAcc->account_number, "accountName" => $virtualAcc->account_name, "bankName" => $virtualAcc->bank_name, "endtime" => $endTime];
 
                 }
 
@@ -231,13 +235,13 @@ class PaymentPage extends Component
 
                 // if provider = NINEPSB
                 if ($transferProvider === "9PSB") {
-                    $gateway = Gateway::where('name', "Bank Transfer")->get()->pluck("id", "name");
+                    $gateway = Gateway::where('name', "Bank Transfer")->select(['id','name'])->get()->pluck("id", "name");
                     $gateway_id = $gateway["Bank Transfer"];
                     /** @var Transaction $transaction */
                     $transaction = $this->invoice->transaction;
                     $transactionTotal = $transaction->computeChargeAndTotal($gateway_id);
 
-                    $result = (object)(new NinePSB())->reserveDynamicAccount($this->invoice->invoice_no, $transactionTotal['total']);
+                    $result = (object)(new NinePSB())->reserveDynamicAccount($this->invoice->invoice_no, $transactionTotal['total'],$minutes/60,$spayPrefix);
                     $result->requestSuccessful = false;
 
                     if ($result->status) {
@@ -256,6 +260,8 @@ class PaymentPage extends Component
                         ['invoice_no' => $this->invoice->invoice_no],
                         [
                             'invoice_no' => $this->invoice->invoice_no,
+                            'expires_at' => $minutes,
+                            'created_at' => $created_at,
                             'account_number' => $result->account_number,
                             'account_name' => $result->account_name,
                             'bank_name' => $accountName,
@@ -265,7 +271,7 @@ class PaymentPage extends Component
                     );
 
                 }
-                $this->virtualAccDetails = ["status" => $status, "accountNumber" => $result->account_number ?? "N/A", "accountName" => $result->account_name ?? "N/A", "bankName" => $accountName, "endtime" => Carbon::parse()->addHours(1)];
+                $this->virtualAccDetails = ["status" => $status, "accountNumber" => $result->account_number ?? "N/A", "accountName" => $result->account_name ?? "N/A", "bankName" => $accountName, "endtime" => $endTime];
 
             }
         } catch (Exception $e) {

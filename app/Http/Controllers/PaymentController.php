@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Livewire\PaymentPage;
+use App\Http\Requests\BankTransferRequest;
+use App\Http\Requests\ChargeAndTotalRequest;
+use App\Http\Requests\ChargeRequest;
 use App\Http\Resources\InvoiceCollection;
 use App\Lib\Services\Blusalt;
 use App\Models\Gateway;
@@ -43,13 +47,13 @@ class PaymentController extends Controller
         $data['invoice'] = $invoice;
         $merchRef = $invoice->transaction->merchant_transaction_ref;
         //declare other variables for the payment page;
-        $merchantGatewayDetails= $this->getMerchantGatewayDetails($invoice);
+        $merchantGatewayDetails = $this->getMerchantGatewayDetails($invoice);
         $tranx_details = $invoice->transaction->details;
         //check for UIGatewayRules;
         [$merchantGatewayDetails, $details] = $this->uiGatewayRules($invoice, $merchRef, $merchantGatewayDetails);
-        if (!$details['status']){
+        if (!$details['status']) {
             //redirect to information page showing student should make payment
-            return  view('invoice.notavailable',[
+            return view('invoice.notavailable', [
                 'message' => $details['message']
             ]);
         }
@@ -60,18 +64,18 @@ class PaymentController extends Controller
             return redirect()->route('receipt', ['id' => $id])->with('status', 'Invoice Paid!');
         }
 
-        if (isset($tranx_details['channel'])){
-            if (array_key_exists($tranx_details['channel'],$merchantGatewayDetails)){
+        if (isset($tranx_details['channel'])) {
+            if (array_key_exists($tranx_details['channel'], $merchantGatewayDetails)) {
                 $temp[$tranx_details['channel']] = $merchantGatewayDetails[$tranx_details['channel']];
                 $merchantGatewayDetails = $temp;
             }
         }
         $data['merchantGateways'] = $merchantGatewayDetails;
         $data['activeTab'] = array_key_first($merchantGatewayDetails);
-        $merchantSettings = UserSettings::firstWhere('user_id',$invoice->user->id);
+        $merchantSettings = UserSettings::firstWhere('user_id', $invoice->user->id);
         $data['merchantSettings'] = $merchantSettings;
         $data['merchantAvatar'] = false;
-        if ($merchantSettings){
+        if ($merchantSettings) {
             $data['merchantAvatar'] = $merchantSettings->values['avatar'] ?? null;
         }
 
@@ -86,7 +90,7 @@ class PaymentController extends Controller
     public function checkIfInvoiceExist($id)
     {
         //check if Invoice exists;
-        $invoice = Invoice::where('invoice_no', $id)->with(['transaction','gateway'])->first();
+        $invoice = Invoice::where('invoice_no', $id)->with(['transaction', 'gateway'])->first();
 
         if (!$invoice) {
             abort(404);
@@ -109,21 +113,21 @@ class PaymentController extends Controller
         if ($merchantGateways) {
             array_walk($merchantGateways, function ($item, $key) use (&$freshArr, $invoice) {
 
-                if ($item['status']){
+                if ($item['status']) {
 
-                    if (strtolower($item['name']) === "card"){
+                    if (strtolower($item['name']) === "card") {
                         //check if percentage is set use flwavePercent Channel;
-                        if ((int) $item['customer_service']['charge_factor'] === 1){
+                        if ((int)$item['customer_service']['charge_factor'] === 1) {
                             $item['flwave_percent'] = true;
                         }
-                        $item = $this->setCardMerchantCharge($invoice,$item);
+                        $item = $this->setCardMerchantCharge($invoice, $item);
                     }
                     $item['gateway_id'] = $key;
-                    $item["invoiceCharge"] = $item['customer_service']['charge_factor'] ?  ($item['customer_service']['charge'] / 100) * $invoice->amount : $item['customer_service']['charge'];
+                    $item["invoiceCharge"] = $item['customer_service']['charge_factor'] ? ($item['customer_service']['charge'] / 100) * $invoice->amount : $item['customer_service']['charge'];
                     $item["invoiceTotal"] = $invoice->amount + $item['invoiceCharge'];
                     //check if it's intlPayment
-                    if (strtoupper($invoice->transaction->currency) !== "NGN"){
-                        if (str_replace(' ', '',strtolower($item['name'])) === "intcard"){
+                    if (strtoupper($invoice->transaction->currency) !== "NGN") {
+                        if (str_replace(' ', '', strtolower($item['name'])) === "intcard") {
                             $item['name'] = $freshArr['card']['name'];
                             $item['gateway_id'] = $freshArr['card']['gateway_id'];
                         }
@@ -138,10 +142,10 @@ class PaymentController extends Controller
         return $freshArr;
     }
 
-    public function setCardMerchantCharge(Invoice $invoice,$item)
+    public function setCardMerchantCharge(Invoice $invoice, $item)
     {
         //above 22500 => flatrate
-        if ($invoice->amount <= 22500){
+        if ($invoice->amount <= 22500) {
             $item['flwave_percent'] = true;
         }
         return $item;
@@ -161,7 +165,7 @@ class PaymentController extends Controller
             $transaction = $invoice->transaction;
 
             $data['transaction'] = $transaction;
-            $data['redirect']  = false;
+            $data['redirect'] = false;
 
             if ($transaction->status === "successful") {
                 if (isset($transaction->redirect_url)) {
@@ -188,23 +192,23 @@ class PaymentController extends Controller
         $trn_details = [];
         $trn_channelId = $request->channel;
 
-        if ($request->has('channel')){
-            $gateways = Gateway::all()->pluck('id','name')->toArray();
-            $trn_details['channel'] = strtolower(str_replace(" ","",array_search($request->channel, $gateways, false)));
+        if ($request->has('channel')) {
+            $gateways = Gateway::all()->pluck('id', 'name')->toArray();
+            $trn_details['channel'] = strtolower(str_replace(" ", "", array_search($request->channel, $gateways, false)));
         }
-        if ($request->has('currency')){
-            $currencies = ["NGN","USD","GBP","EUR"];
+        if ($request->has('currency')) {
+            $currencies = ["NGN", "USD", "GBP", "EUR"];
             $currency = strtoupper($request->currency);
-            $request->offsetSet('currency',$currency);
+            $request->offsetSet('currency', $currency);
         }
         $request->validate([
             "name" => "required",
             "amount" => ["required", "numeric", ($currency === "NGN") ? "min:100" : "min:1"],
-            "email" => ["required",'email:rfc'],
+            "email" => ["required", 'email:rfc'],
             "quantity" => ["required", "numeric", "min:1"],
-            'request_id' => ["required", "min:5","max:32"],
-            "channel" => ['sometimes',Rule::in($gateways)],
-            "currency" => ['sometimes',Rule::in($currencies)],
+            'request_id' => ["required", "min:5", "max:32"],
+            "channel" => ['sometimes', Rule::in($gateways)],
+            "currency" => ['sometimes', Rule::in($currencies)],
             "redirect_url" => ["sometimes", "url"]
 
         ], $request->all());
@@ -218,20 +222,20 @@ class PaymentController extends Controller
         $request_id = $request->request_id;
 
         //check if invoice Exists;
-        $transaction = Transaction::firstWhere('merchant_transaction_ref',$request_id);
-        if ($transaction){
+        $transaction = Transaction::firstWhere('merchant_transaction_ref', $request_id);
+        if ($transaction) {
             //check for UI merchant and apply custom rule;
-            if ($user->id === 3){
-               return  $this->UIpaymentRule($transaction,$request);
+            if ($user->id === 3) {
+                return $this->UIpaymentRule($transaction, $request);
             }
             $error = [
                 "request_id" => ["Payment Request already Exists, Please Use a Unique Request ID!"],
             ];
-            return response()->json(errorResponseJson('Payment Request Failed',$error),404);
+            return response()->json(errorResponseJson('Payment Request Failed', $error), 404);
 
         }
 
-        DB::transaction(function () use ($trn_channelId, $request,$request_id, $user, &$data, &$trn_details, &$currency) {
+        DB::transaction(function () use ($trn_channelId, $request, $request_id, $user, &$data, &$trn_details, &$currency) {
             $redirect_url = $request->redirect_url;
             $amount = $request->amount;
             /** @var Invoice $invoiceAdded */
@@ -293,16 +297,16 @@ class PaymentController extends Controller
 
         //check if invoice Exists;
         /** @var Transaction $transaction */
-        $transaction = Transaction::firstWhere('merchant_transaction_ref',$request_id);
+        $transaction = Transaction::firstWhere('merchant_transaction_ref', $request_id);
         $message = ['status' => false, "message" => "Payment Request Not Found", "data" => $data,];
 
-        if ($transaction){
+        if ($transaction) {
             $tStatus = strtoupper($transaction->status);
             $message = ['status' => false, "message" => "Payment Request already $tStatus", "data" => $data,];
 
             //only allow update on pending transactions
-            if ($tStatus === "PENDING"){
-                DB::transaction(function () use ($request,$transaction, &$data) {
+            if ($tStatus === "PENDING") {
+                DB::transaction(function () use ($request, $transaction, &$data) {
                     //update invoice;
 
                     /** @var Invoice $invoice */
@@ -358,11 +362,11 @@ class PaymentController extends Controller
 
                 $provider = strtoupper($transaction->provider);
 
-                if ( $provider === "BLUSALT"){
+                if ($provider === "BLUSALT") {
                     list($details, $payment_provider_message, $trnx_details) = $this->validateBlusaltRedirect($transaction, $details);
                 }
 
-                if (in_array($provider,['FLUTTERWAVE','FLWAVEPERCENT','FLWAVEFLAT'])){
+                if (in_array($provider, ['FLUTTERWAVE', 'FLWAVEPERCENT', 'FLWAVEFLAT'])) {
                     list($details, $payment_provider_message, $trnx_details) = $this->validateFlutterwaveRedirect($request, $provider, $details);
                 }
 
@@ -401,29 +405,29 @@ class PaymentController extends Controller
         ], $request->all());
         /** @var Transaction $transaction */
         $transaction = Transaction::firstWhere([
-            ['user_id','=',$userId],
-            ['merchant_transaction_ref','=', $request->request_id]
+            ['user_id', '=', $userId],
+            ['merchant_transaction_ref', '=', $request->request_id]
         ]);
-        if (is_null($transaction)){
+        if (is_null($transaction)) {
 
             $error = [
                 "request_id" => ["The request id does not exist"],
             ];
-            return response()->json(errorResponseJson('Invalid Request ID',$error),404);
+            return response()->json(errorResponseJson('Invalid Request ID', $error), 404);
         }
 
         return response()->json(['status' => true, "message" => "Detail Retrieved Successfully", "data" => new InvoiceCollection($transaction),]);
 
     }
 
-    public function UIpaymentRule(Transaction $transaction,$request)
+    public function UIpaymentRule(Transaction $transaction, $request)
     {
         $status = strtoupper($transaction->status);
 
         $isSuccessful = false;
         $message = "Transaction Already Processed";
 
-        if ($status === "FAILED"){
+        if ($status === "FAILED") {
             //change transaction to pending
             logger("Changing transaction {$transaction->merchant_transaction_ref} from $status to PENDING ");
             $transaction->update([
@@ -434,7 +438,7 @@ class PaymentController extends Controller
         }
         //check if amount differs and update
         //only allow update on pending transactions
-        if ($status === "PENDING"){
+        if ($status === "PENDING") {
             DB::transaction(function () use ($request, $transaction) {
                 //update invoice;
 
@@ -477,7 +481,7 @@ class PaymentController extends Controller
     {
         $temp = [];
         $status = true;
-        $uiDetails['status'] = $status ;
+        $uiDetails['status'] = $status;
         if ($invoice->user->id === 3) {
             $response = $invoice->statusOnUI();
             $message = "This invoice <b> $merchRef </b> is not available for payment, Kindly generate another record to solve this issue.";
@@ -496,7 +500,7 @@ class PaymentController extends Controller
             if (!str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)), "undergraduatetranscript")) {
                 unset($merchantGatewayDetails['remita']);
             }
-            if (str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)), "undergraduatetranscript")){
+            if (str_contains(strtolower(str_replace(" ", "", $invoice->transaction->type)), "undergraduatetranscript")) {
                 //use only remita channel;
                 if (array_key_exists("remita", $merchantGatewayDetails)) {
                     $temp['remita'] = $merchantGatewayDetails['remita'];
@@ -578,6 +582,69 @@ class PaymentController extends Controller
             "payment_type" => $flwavePayload['payment_type']
         ]);
         return array($details, $payment_provider_message, $trnx_details);
+    }
+
+
+    public function getPaymentChannels(Request $request)
+    {
+        return Gateway::whereIn('name', ['Bank Transfer', 'Card'])->select(['name'])->get()->each(function (Gateway $gateway) {
+            $gateway->name = strtolower(str_replace(' ', '_', $gateway->name));
+        });
+
+    }
+
+    public function computeChargeAndTotal(ChargeAndTotalRequest $request)
+    {
+        /** @var Transaction $transaction */
+        $transaction = $request->input('transaction');
+        $channel = ucwords(str_replace('_', ' ', $request->input('channel')));
+        $gateway = Gateway::where('name', $channel)->select(['id', 'name'])->first();
+        $transactionTotal = $transaction->computeChargeAndTotal($gateway->id);
+        return ["amount" => $transactionTotal['total'], "breakdown" => ["charge" => $transactionTotal['charge'], 'face_value' => $transactionTotal['total'] - $transactionTotal['charge']]];
+    }
+
+    public function processBankTransfer(BankTransferRequest $request)
+    {
+        $result = ["status" => false, "account_name" => null, "account_number" => null, "bank_name" => null, "expires_at" => null];
+        $pp = new PaymentPage();
+        /** @var Transaction $transaction */
+        $transaction = $request->transaction;
+        $pp->invoice = $transaction->invoice;
+        $hours = $request->input('expires_at');
+        $prefix = $request->input('account_name_prefix');
+        $expires_at = max(min($hours, 180), 30);
+        $pp->generateVirtualAccountNumber($prefix, $expires_at);
+        $virtualAccDetails = $pp->virtualAccDetails;
+        if ($virtualAccDetails['status']) {
+            $result['status'] = true;
+            $result['account_number'] = $virtualAccDetails['accountNumber'];
+            $result['account_name'] = $virtualAccDetails['accountName'];
+            $result['bank_name'] = $virtualAccDetails['bankName'];
+            $result['expires_at'] = $virtualAccDetails['endtime'];
+
+        }
+        return $result;
+
+
+    }
+
+    public function consumatePayment(BankTransferRequest $request)
+    {
+        /** @var Transaction $transaction */
+        $transaction = $request->transaction;
+        $gateway = Gateway::where('name', "Bank Transfer")->select(['id', 'name'])->first(); /** @var User $user */
+        $user = $transaction->user;
+        /** @var Wallet $wallet */
+        $wallet = $user->wallet;
+        $company = company();
+        $transaction->handleSuccessfulPayment($transaction, $gateway->id, '', [], $wallet, $user, $company);
+        $data = $transaction->transactionToPayload();
+
+        return response()->json([
+            "status" => true,
+            "data"  => $data
+        ]);
+
     }
 
 }
