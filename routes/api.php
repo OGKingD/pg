@@ -31,6 +31,11 @@ Route::middleware(['terminate'])->group(function () {
             Route::get('validate', [PaymentController::class, 'details']);
             Route::get('details/{id}',[\App\Http\Controllers\CashAtBankController::class,'show']);
             Route::post('pay',[\App\Http\Controllers\CashAtBankController::class, 'store']);
+            Route::get('channels',[PaymentController::class,'getPaymentChannels']);
+            Route::get('get_charge',[PaymentController::class,'computeChargeAndTotal']);
+            Route::prefix("process")->group(function (){
+                Route::post('bank_transfer',[PaymentController::class,'processBankTransfer']);
+            });
         });
     });
 
