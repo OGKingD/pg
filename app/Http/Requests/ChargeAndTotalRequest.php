@@ -2,13 +2,12 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Gateway;
-use App\Traits\RequestIsValidForMerchant;
+use App\Traits\PaymentRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ChargeAndTotalRequest extends FormRequest
 {
-    use RequestIsValidForMerchant;
+    use PaymentRequest;
 
     public function rules(): array
     {

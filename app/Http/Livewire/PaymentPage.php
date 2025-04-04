@@ -196,7 +196,7 @@ class PaymentPage extends Component
 
     /**
      */
-    public function generateVirtualAccountNumber($spayPrefix, $minutes=30): void
+    public function generateVirtualAccountNumber($spayPrefix='SAANAPAY', $minutes=30): void
     {
         $providus = new Providus();
         $created_at = Carbon::now();

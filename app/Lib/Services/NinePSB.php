@@ -185,7 +185,7 @@ class NinePSB
         }
         $url = $this->dynamicAccBaseUrl."vmw-api/v1/merchant/account/generate";
         $spayRef = $trnx_id."_".microtime(true);
-        $accountName = (empty($spayPrefix) ? "SAANAPAY-" :"$spayPrefix-" ). $trnx_id;
+        $accountName = "$spayPrefix-$trnx_id";
         $payload = [
             "transaction" => [
                 "reference" => $spayRef
