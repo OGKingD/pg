@@ -4,12 +4,12 @@ namespace App\Http\Requests;
 
 use App\Models\Gateway;
 use App\Models\Transaction;
-use App\Traits\RequestIsValidForMerchant;
+use App\Traits\PaymentRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
 class BankTransferRequest extends FormRequest
 {
-    use RequestIsValidForMerchant;
+    use PaymentRequest;
     public function rules(): array
     {
         return [
@@ -30,21 +30,6 @@ class BankTransferRequest extends FormRequest
     }
 
 
-    public function amountTalliesWithTotal($amount): \Closure
-    {
-        return function ($attribute, $value, \Closure $fail) use ($amount) {
-            /** @var Transaction $transaction */
-            $transaction = $this->input('transaction');
-            $gateway_id = $this->input('gateway_id');
-            if ($transaction) {
-                $transactionTotal = $transaction->computeChargeAndTotal($gateway_id);
-                if ((float)$transactionTotal['total'] != floatval($amount)) {
-                    $fail("The amount does not tally! Please use the compute charge endpoint to get the breakdown of the transaction amount");
-                }
-            }
-        };
-
-    }
 
 
 
