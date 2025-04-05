@@ -46,4 +46,17 @@ trait PaymentRequest
 
     }
 
+    public function cardValidationRules(): array
+    {
+        return [
+            'currency' => ['sometimes'],
+            'request_id' => ['required',$this->isRequestIdValid($this->input('request_id'))],
+            'amount' => ['required',$this->amountTalliesWithTotal($this->input('amount'))],
+            "card_number" => ['required', 'between:16,19', 'string'],
+            "cvv" => ['required', 'size:3',],
+            "card_expiration" => ['required','regex:/^(0[1-9]|1[0-2])\/\d{2}$/'],
+        ];
+
+    }
+
 }

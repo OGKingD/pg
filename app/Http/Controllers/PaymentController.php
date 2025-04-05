@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Livewire\PaymentPage;
+use App\Http\Requests\authorizeCardWithOtpRequest;
+use App\Http\Requests\authorizeCardWithPinRequest;
 use App\Http\Requests\BankTransferRequest;
+use App\Http\Requests\CardTransferRequest;
 use App\Http\Requests\ChargeAndTotalRequest;
-use App\Http\Requests\ChargeRequest;
 use App\Http\Resources\InvoiceCollection;
 use App\Lib\Services\Blusalt;
 use App\Models\Gateway;
@@ -15,6 +17,7 @@ use App\Models\User;
 use App\Models\UserSettings;
 use App\Models\Wallet;
 use Carbon\Carbon;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -557,10 +560,12 @@ class PaymentController extends Controller
         //validate Payment;
         $flutterwaveId = $data->id;
         //call flutterwave to validate transaction;
-        $flwave = getFlwave();
-        if ($provider === "FLWAVEPERCENT") {
-            $flwave = getFlwave(true);
+        $isFlwavePercent = false;
+        if ($provider === "FLWAVEPERCENT"){
+            $isFlwavePercent = true;
         }
+        $flwave = getFlwave($isFlwavePercent);
+
 
         $fromFlutterwave = $flwave->verifyTransaction($flutterwaveId);
         info("Transaction Verified :", $fromFlutterwave);
@@ -626,6 +631,63 @@ class PaymentController extends Controller
         }
         return $result;
 
+    }
+
+
+    /**
+     * @throws \JsonException
+     */
+    public function processCardTransaction(CardTransferRequest $request)
+    {
+        $pp = $this->bootstrapCardPayment($request);
+        $pp->processCardTransaction();
+        return $pp->details;
+
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function authorizeCardWithPin(authorizeCardWithPinRequest $request)
+    {
+        $pp = $this->bootstrapCardPayment($request);
+        $pp->cc_Pin = $request->pin;
+        $pp->cardDetails = json_decode($pp->cardDetails,true);
+        $pp->cardDetails['authorization']['pin']  = $pp->cc_Pin;
+        $pp->cardDetails['authorization']['mode']  = "pin";
+        $pp->cardAuthorizationWithPin();
+        $result =  $pp->details;
+        if (isset($result['flag'])){
+            if (strtoupper($result['flag']) === "PAYMENT_COMPLETED"){
+                $flwave = getFlwave(isset($pp->merchantGateways['card']['flwave_percent']));
+                $pp->verifyFlwaveResponse($flwave->verifyTansactionByRef($pp->transaction->spay_ref));
+                $result = ['status' => true, 'authorization' => null, 'data' => $pp->transaction->refresh()->transactionToPayload()];
+            }
+        }
+        return $result;
+
+    }
+
+    public function authorizeCardWithOtp(authorizeCardWithOtpRequest $request)
+    {
+        /** @var Transaction $transaction */
+        $transaction = $request->transaction;
+        $result = ['status' => false, 'authorization' => null, 'data' => $transaction->refresh()->transactionToPayload()];
+
+        $pp = $this->bootstrapCardPayment($request);
+        $pp->user = $request->user();
+        $pp->cc_Otp = $request->otp;
+
+        $pp->transaction = $transaction;
+        $pp->cardDetails = json_decode($pp->cardDetails,true);
+        $pp->cardAuthorizationWithOtp();
+
+        if (isset($pp->details['status'])){
+            $result['status'] = true;
+            $result['authorization'] = null;
+            $result['data'] = $pp->transaction->refresh()->transactionToPayload();
+        }
+        return $result;
 
     }
 
@@ -647,6 +709,44 @@ class PaymentController extends Controller
             "data"  => $data
         ]);
 
+    }
+
+    /**
+     * @param mixed $request
+     * @return PaymentPage
+     */
+    public function bootstrapCardPayment(FormRequest $request): PaymentPage
+    {
+        $pp = app(PaymentPage::class);
+        /** @var Transaction $transaction */
+        $transaction = $request->transaction;
+        $pp->invoice = $transaction->invoice;
+        $pp->activeTab = "card";
+        $pp->merchantGateways = $this->getMerchantGatewayDetails($transaction->invoice);
+
+        $cardDetails = [
+            "card_number" => $request->card_number,
+            "cvv" => $request->cvv,
+            "cc_expiration" => $request->card_expiration,
+            "email" => $pp->invoice->customer_email,
+            "currency" => $pp->invoice->transaction->currency,
+            "amount" => $pp->merchantGateways[$pp->activeTab]['invoiceTotal'],
+            "tx_ref" => '',
+            "redirect_url" => config('app.url') . "/payment/card/validate/{$pp->invoice->invoice_no}",
+        ];
+
+        if ($request->has('card_expiration')) {
+            $pp->cardDetails['cc_expiration'] = $request->card_expiration;
+            $expiry = explode("/", $pp->cardDetails['cc_expiration']);
+            [$expiry_month, $expiry_year] = $expiry;
+            $cardDetails['expiry_month'] = $expiry_month;
+            $cardDetails['expiry_year'] = $expiry_year;
+        }
+
+
+        $pp->cardDetails = json_encode($cardDetails);
+
+        return $pp;
     }
 
 }

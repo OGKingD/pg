@@ -252,13 +252,13 @@ class RequeryTool extends Component
                     $this->message = "Transaction with settlementId : $this->transaction_ref Already Processed.";
                     $this->messageType = "info";
                 }
-                $flwaveInstance = new Flutterwave(config('flutterwave.secret_key'));
                 $isFlwavePercent = false;
 
                 if ($transactionExists->provider === "FLWAVEPERCENT"){
                     $isFlwavePercent = true;
-                    $flwaveInstance = getFlwave(true);
                 }
+                $flwaveInstance = getFlwave($isFlwavePercent);
+
                 if ($byTranxRef){
                     $flutterwave = ($flwaveInstance)->verifyTansactionByRef($trnx);
                 }

@@ -13,11 +13,21 @@ class Flutterwave
      * @var Repository|\Illuminate\Contracts\Foundation\Application|mixed
      */
     private mixed $baseUrl;
+    /**
+     * @var mixed
+     */
+    private $secretKey;
+    /**
+     * @var mixed
+     */
+    private $encryptionKey;
 
 
-    public function __construct()
+    public function __construct($secretKey,$encryptionKey)
     {
         $this->baseUrl = config('flutterwave.base_url');
+        $this->secretKey = $secretKey;
+        $this->encryptionKey = $encryptionKey;
     }
 
     public function setTxRef($ref): void
@@ -105,10 +115,11 @@ class Flutterwave
      */
     public function formatChargeCardResponse(array $response): array
     {
-        $result = ['status' => false,];
+        $result = ['status' => false, "errors" => "Cannot Authorize Card!", "message" => $response['message']?? "", ];
 
         if (isset($response['meta']['authorization'])) {
             $result['status'] = true;
+            $result['errors'] = null;
 
             $authorizationMode = $response['meta']['authorization']['mode'];
             $result['authorization']['mode'] = $authorizationMode;
@@ -138,10 +149,19 @@ class Flutterwave
 
         //when OTP is required;
         if (isset($response['data'])){
-            if (isset($response['data']['auth_mode'])){
-                if ($response['data']['auth_mode'] === "otp"){
+            $data = $response['data'];
+            $result['errors'] = null;
+            if (isset($data['auth_mode'])){
+                if ($data['auth_mode'] === "otp"){
                     $result['flag'] = "otp_required";
                     $result['status'] = true;
+                }
+            }
+
+            if (isset($data['status'])){
+                if (strtoupper($data['status']) === "SUCCESSFUL"){
+                    $result['status'] = true;
+                    $result['flag'] = "payment_completed";
                 }
             }
         }
@@ -181,7 +201,7 @@ class Flutterwave
     public function callEndpoint($url,$httpVerb,$payload)
     {
         return Http::withHeaders([
-            'Authorization' => config('flutterwave.secret_key'),
+            'Authorization' => $this->secretKey,
             'content-type' => 'application/json'])->{strtolower($httpVerb)}($url, $payload)->json();
 
     }
@@ -190,7 +210,7 @@ class Flutterwave
     //verify transaction;
     function encryptPayload(array $payload): string
     {
-        $encryptionKey = config('flutterwave.encryption_key');
+        $encryptionKey = $this->encryptionKey;
         $encrypted = openssl_encrypt(json_encode($payload), 'DES-EDE3', $encryptionKey, OPENSSL_RAW_DATA);
         return base64_encode($encrypted);
     }
