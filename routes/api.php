@@ -35,6 +35,11 @@ Route::middleware(['terminate'])->group(function () {
             Route::get('get_charge',[PaymentController::class,'computeChargeAndTotal']);
             Route::prefix("process")->group(function (){
                 Route::post('bank_transfer',[PaymentController::class,'processBankTransfer']);
+                Route::prefix('card')->group(function (){
+                    Route::post('',[PaymentController::class,'processCardTransaction']);
+                    Route::post('authorization_pin',[PaymentController::class,'authorizeCardWithPin']);
+                    Route::post('authorization_otp',[PaymentController::class,'authorizeCardWithOtp']);
+                });
             });
             if (strtoupper(config('app.env')) != "PRODUCTION"){
                 Route::post('consumate',[PaymentController::class,'consumatePayment']);

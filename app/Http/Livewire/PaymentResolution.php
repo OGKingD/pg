@@ -26,15 +26,25 @@ class PaymentResolution extends Component
     {
         if ((int)$this->channel === 1){
             //card
-            if (str_contains($this->transaction_ref,"RV_") || str_contains($this->transaction_ref,"SPAY")){
-                $this->transactionExists = Transaction::firstWhere('spay_ref',$this->transaction_ref);
-                $this->paymentProviderDetails = (new Flutterwave(config('flutterwave.secret_key')))->verifyTansactionByRef($this->transactionExists->spay_ref);
+            $useInternalRef = str_contains($this->transaction_ref, "RV_") || str_contains($this->transaction_ref, "SPAY");
+            $referenceField = 'flutterwave_ref';
+            $verifyMethod = 'verifyTransaction';
 
-            }else{
-                $this->transactionExists = Transaction::firstWhere('flutterwave_ref',$this->transaction_ref);
-                $this->paymentProviderDetails = (new Flutterwave(config('flutterwave.secret_key')))->verifyTransaction($this->transaction_ref);
-
+            if ($useInternalRef){
+                $referenceField = 'spay_ref';
+                $verifyMethod = 'verifyTansactionByRef';
             }
+
+            $this->transactionExists = Transaction::firstWhere($referenceField,$this->transaction_ref);
+
+            $isFlwavePercent = false;
+            if ($this->transactionExists->provider === "FLWAVEPERCENT"){
+                $isFlwavePercent = true;
+            }
+
+            $this->paymentProviderDetails = (getFlwave($isFlwavePercent))->$verifyMethod($this->transactionExists->spay_ref);
+
+
             $this->message .= "Provider Details :  ". json_encode($this->paymentProviderDetails['data'], JSON_THROW_ON_ERROR);
             $this->messageType = "info";
 

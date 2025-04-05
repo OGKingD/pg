@@ -43,6 +43,7 @@ class PaymentPage extends Component
     public $hideCardFields;
     public $user;
     public $transaction;
+    public $details = [];
 
     protected $listeners = ['generateRRR', 'processCardTransaction',
         'cardAuthorizationWithPin', 'cardAuthorizationWithOtp', 'cardAuthorizationWithAvs',
@@ -297,7 +298,7 @@ class PaymentPage extends Component
 
         list($expiry_month, $expiry_year, $cardNo, $cvv, $pin, $customer_email, $invoiceTotal) = $this->getCardDetails();
         //check for the authorization
-        $details = ['status' => false, 'errors' => "Cannot Authorize Card!"];
+        $this->details = ['status' => false,];
         $this->cardDetails = array_merge($this->cardDetails, [
             "card_number" => $cardNo,
             "cvv" => $cvv,
@@ -326,8 +327,8 @@ class PaymentPage extends Component
                 $error.=  "$message \n";
             }
 
-            $details['errors'] = $error;
-            $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
+            $this->details['errors'] = $error;
+            $this->dispatchBrowserEvent('cardPaymentProcessed', $this->details);
             return;
 
         }
@@ -380,9 +381,9 @@ class PaymentPage extends Component
                 }
 
             }
+            $this->details = $response;
 
             if ($response['status']){
-                $details = $response;
                 $this->cardDetails['authorization'] = $response['authorization'];
                 if ( strtoupper($response['flag']) === "PIN_REQUIRED"){
                     $this->isPinRequired = true;
@@ -433,10 +434,10 @@ class PaymentPage extends Component
 
         } catch (Exception $e) {
             logger("An Error Occurred while trying to Process Card Payment : \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
-            $details = ['status' => false, 'errors' => $e->getMessage()];
+            $this->details = ['status' => false, 'errors' => $e->getMessage()];
         }
 
-        $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
+        $this->dispatchBrowserEvent('cardPaymentProcessed', $this->details);
 
 
     }
@@ -457,7 +458,7 @@ class PaymentPage extends Component
     public function cardAuthorizationWithPin()
     {
         list($expiry_month, $expiry_year, $cardNo, $cvv, $pin, $customer_email, $invoiceTotal) = $this->getCardDetails();
-        $details = [];
+        $this->details = [];
         $response['status'] = false;
 
         try {
@@ -469,7 +470,7 @@ class PaymentPage extends Component
                 $provider_ref = $this->transaction->provider_ref;
 
                 if ($response['status']){
-                    $details = $response;
+                    $this->details = $response;
                     $blusaltRef = $response['data']['reference'];
                     $provider_ref['blusalt'] = $blusaltRef;
                     $this->transaction->update([
@@ -488,21 +489,23 @@ class PaymentPage extends Component
                 /** @var Flutterwave $flwave */
                 [$flwave, $response] = $this->flwChargeCard();
                 //format response;
-                $data = $response['data'];
+                $data = $response['data'] ?? null;
                 $response = $flwave->formatChargeCardResponse($response);
+                logger(json_encode($response));
 
-                $this->transaction->update([
-                    'flutterwave_ref' => $data['id'],
-                ]);
-                $this->cardDetails['flw_ref'] = $data['flw_ref'];
+                if ($response['status']) {
+                    $this->transaction->update([
+                        'flutterwave_ref' => $data['id'],
+                    ]);
+                    $this->cardDetails['flw_ref'] = $data['flw_ref'];
+                }
 
             }
-            $details['errors'] = $response['message'] ?? "";
+            $this->details = $response;
 
             if ($response['status']){
-                $details = $response;
                 //check if it's otp required;
-                if ($details['flag'] === "otp_required"){
+                if ($this->details['flag'] === "otp_required"){
                     $this->isOtpRequired = true;
                     $this->isPinRequired = false;
                     $this->hideCardFields = true;
@@ -510,34 +513,43 @@ class PaymentPage extends Component
             }
         } catch (Exception $e) {
             logger("An Error Occurred while trying to Authorize with PIN: \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
-            $details = ['status' => false, 'errors' => "Connection Lost."];
+            $this->details = ['status' => false, 'errors' => "Connection Lost."];
         }
 
-        $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
+        $this->dispatchBrowserEvent('cardPaymentProcessed', $this->details);
 
     }
 
     public function cardAuthorizationWithOtp()
     {
-        $details = [];
+        $this->details = [];
 
         try {
 
             if ($this->cardProvider === "BLUSALT"){
                 $otpVerified = (new Blusalt())->otpVerify($this->cc_Otp,$this->transaction->provider_ref['blusalt']);
                 if (!$otpVerified){
-                    $details['status'] = false;
-                    $details['errors'] = "Could not Verify OTP, Possibly wrong OTP!";
+                    $this->details['status'] = false;
+                    $this->details['errors'] = "Could not Verify OTP, Possibly wrong OTP!";
                 }
 
             }
 
             if (in_array($this->cardProvider,['FLUTTERWAVE','FLWAVEPERCENT','FLWAVEFLAT'])){
                 $flwave = getFlwave(isset($this->merchantGateways['card']['flwave_percent']));
+                //forApi;
+                if (!isset($this->cardDetails['flw_ref'])){
+                    //get the id;
+                    $verifyTransactionByRef = $flwave->verifyTansactionByRef($this->transaction->spay_ref);
+                    if ($verifyTransactionByRef['status'] === "success"){
+                        $this->cardDetails['flw_ref'] = $verifyTransactionByRef['data']['flw_ref'];
+                    }
+
+                }
                 $response = $flwave->validateTransaction($this->cc_Otp, $this->cardDetails['flw_ref']);
                 $this->verifyFlwaveResponse($response);
                 if (strtoupper($response['status']) === "SUCCESS"){
-                    $details['status'] = true;
+                    $this->details['status'] = true;
                 }
             }
 
@@ -545,11 +557,11 @@ class PaymentPage extends Component
         } catch (Exception $e) {
             logger("An Error Occurred while trying to Authorize with OTP: \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
 
-            $details = ['status' => false, 'errors' => $e->getMessage()];
-            $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
+            $this->details = ['status' => false, 'errors' => $e->getMessage()];
+            $this->dispatchBrowserEvent('cardPaymentProcessed', $this->details);
 
         }
-        $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
+        $this->dispatchBrowserEvent('cardPaymentProcessed', $this->details);
 
     }
 
