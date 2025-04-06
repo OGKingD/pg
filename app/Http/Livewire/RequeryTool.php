@@ -260,7 +260,7 @@ class RequeryTool extends Component
                 $flwaveInstance = getFlwave($isFlwavePercent);
 
                 if ($byTranxRef){
-                    $flutterwave = ($flwaveInstance)->verifyTansactionByRef($trnx);
+                    $flutterwave = ($flwaveInstance)->verifyTransactionByRef($trnx);
                 }
                 if (!$byTranxRef){
                     $flutterwave = ($flwaveInstance)->verifyTransaction($trnx);

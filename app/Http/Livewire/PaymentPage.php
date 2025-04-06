@@ -540,7 +540,7 @@ class PaymentPage extends Component
                 //forApi;
                 if (!isset($this->cardDetails['flw_ref'])){
                     //get the id;
-                    $verifyTransactionByRef = $flwave->verifyTansactionByRef($this->transaction->spay_ref);
+                    $verifyTransactionByRef = $flwave->verifyTransactionByRef($this->transaction->spay_ref);
                     if ($verifyTransactionByRef['status'] === "success"){
                         $this->cardDetails['flw_ref'] = $verifyTransactionByRef['data']['flw_ref'];
                     }
