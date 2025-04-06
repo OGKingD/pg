@@ -382,8 +382,7 @@ class PaymentPage extends Component
 
             }
             $this->details = $response;
-
-            if ($response['status']){
+            if ($response['status'] === true){
                 $this->cardDetails['authorization'] = $response['authorization'];
                 if ( strtoupper($response['flag']) === "PIN_REQUIRED"){
                     $this->isPinRequired = true;
@@ -484,21 +483,7 @@ class PaymentPage extends Component
             if (in_array($this->cardProvider,['FLUTTERWAVE','FLWAVEPERCENT','FLWAVEFLAT'])){
                 //add pin to cardDetails
                 $this->cardDetails['authorization']['pin'] = $this->cc_Pin;
-
-                //charge card finally
-                /** @var Flutterwave $flwave */
-                [$flwave, $response] = $this->flwChargeCard();
-                //format response;
-                $data = $response['data'] ?? null;
-                $response = $flwave->formatChargeCardResponse($response);
-                logger(json_encode($response));
-
-                if ($response['status']) {
-                    $this->transaction->update([
-                        'flutterwave_ref' => $data['id'],
-                    ]);
-                    $this->cardDetails['flw_ref'] = $data['flw_ref'];
-                }
+                $response = $this->bootstrapGetCharge();
 
             }
             $this->details = $response;
@@ -568,9 +553,27 @@ class PaymentPage extends Component
     public function cardAuthorizationWithAvs()
     {
         try {
-            $flwave = getFlwave(isset($this->merchantGateways['card']['flwave_percent']));
-            $response = $flwave->cardCharge($this->cardDetails);
-            $this->verifyFlwaveResponse($response);
+            //charge card finally
+            /** @var Flutterwave $flwave */
+            $response = $this->bootstrapGetCharge();
+
+            $this->details = $response;
+
+            if ($response['status']){
+                //check if it's otp required;
+                if ($this->details['flag'] === "otp_required"){
+                    $this->isOtpRequired = true;
+                    $this->isPinRequired = false;
+                    $this->hideCardFields = true;
+                }
+            }
+
+            if (isset($response['flag'])) {
+                if (strtoupper($response['flag']) === "PAYMENT_COMPLETED") {
+                    $this->verifyFlwaveResponse($response);
+                }
+            }
+
         } catch (Exception $e) {
             logger("An Error Occurred while trying to Authorize with AVS: \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
 
@@ -625,10 +628,7 @@ class PaymentPage extends Component
 
     /**
      * @param $response
-     * @param Transaction $transaction
-     * @param $wallet
-     * @param User $user
-     * @param User $company
+     * @throws \JsonException
      */
     public function verifyFlwaveResponse($response): void
     {
@@ -717,5 +717,26 @@ class PaymentPage extends Component
         $invoiceTotal = $this->merchantGateways[$this->activeTab]['invoiceTotal'];
         $this->transaction = $this->invoice->transaction;
         return array($expiry_month, $expiry_year, $cardNo, $cvv, $pin, $customer_email, $invoiceTotal);
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function bootstrapGetCharge(): array
+    {
+        /** @var Flutterwave $flWave */
+        [$flWave, $response] = $this->flwChargeCard();
+        //format response;
+        $data = $response['data'] ?? null;
+        $response = $flWave->formatChargeCardResponse($response);
+
+        if ($response['status']) {
+            $this->transaction->update([
+                'flutterwave_ref' => $data['id'],
+            ]);
+            $this->cardDetails['flw_ref'] = $data['flw_ref'];
+        }
+        return $response;
     }
 }
