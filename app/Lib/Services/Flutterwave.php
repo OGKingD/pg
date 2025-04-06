@@ -190,12 +190,19 @@ class Flutterwave
      * @param string $ref transaction reference
      * @return array
      */
-    public function verifyTansactionByRef($ref): array
+    public function verifyTransactionByRef($ref): array
     {
         $url = $this->baseUrl.'/transactions/verify_by_reference';
         $payload = ['tx_ref' => $ref];
 
         return $this->callEndpoint($url,"GET",$payload);
+    }
+
+    public function verifyTransaction($ref): array
+    {
+        $url = "$this->baseUrl/transactions/$ref/verify";
+
+        return $this->callEndpoint($url,"GET",[]);
     }
 
     public function callEndpoint($url,$httpVerb,$payload)

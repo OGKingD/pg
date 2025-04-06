@@ -660,7 +660,7 @@ class PaymentController extends Controller
         if (isset($result['flag'])){
             if (strtoupper($result['flag']) === "PAYMENT_COMPLETED"){
                 $flwave = getFlwave(isset($pp->merchantGateways['card']['flwave_percent']));
-                $pp->verifyFlwaveResponse($flwave->verifyTansactionByRef($pp->transaction->spay_ref));
+                $pp->verifyFlwaveResponse($flwave->verifyTransactionByRef($pp->transaction->spay_ref));
                 $result = ['status' => true, 'authorization' => null, 'data' => $pp->transaction->refresh()->transactionToPayload()];
             }
         }

@@ -67,7 +67,7 @@ class WebhookController extends Controller
                     $isFlwavePercent = true;
                 }
                 $flwave = getFlwave($isFlwavePercent);
-                $fromFlutterwave = $flwave->verifyTansactionByRef($flutterwaveId);
+                $fromFlutterwave = $flwave->verifyTransactionByRef($flutterwaveId);
                 info("Transaction Verified :",$fromFlutterwave??[]);
                 $responseMessage = "Transaction Not Found on Flutterwave!";
 
