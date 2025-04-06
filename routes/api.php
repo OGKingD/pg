@@ -39,6 +39,7 @@ Route::middleware(['terminate'])->group(function () {
                     Route::post('',[PaymentController::class,'processCardTransaction']);
                     Route::post('authorization_pin',[PaymentController::class,'authorizeCardWithPin']);
                     Route::post('authorization_otp',[PaymentController::class,'authorizeCardWithOtp']);
+                    Route::post('authorization_avs',[PaymentController::class,'authorizeCardWithAvs']);
                 });
             });
             if (strtoupper(config('app.env')) != "PRODUCTION"){

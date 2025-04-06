@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Livewire\PaymentPage;
+use App\Http\Requests\authorizeCardWithAvsRequest;
 use App\Http\Requests\authorizeCardWithOtpRequest;
 use App\Http\Requests\authorizeCardWithPinRequest;
 use App\Http\Requests\BankTransferRequest;
@@ -640,6 +641,12 @@ class PaymentController extends Controller
     {
         $pp = $this->bootstrapCardPayment($request);
         $pp->processCardTransaction();
+        //check for if flag is charge_card and map to avs authorization;
+        if (isset($pp->details['flag'])){
+            if ( strtolower($pp->details['flag']) === "charge_card") {
+                $pp->details['flag'] = "avs_required";
+            }
+        }
         return $pp->details;
 
     }
@@ -655,15 +662,7 @@ class PaymentController extends Controller
         $pp->cardDetails['authorization']['pin']  = $pp->cc_Pin;
         $pp->cardDetails['authorization']['mode']  = "pin";
         $pp->cardAuthorizationWithPin();
-        $result =  $pp->details;
-        if (isset($result['flag'])){
-            if (strtoupper($result['flag']) === "PAYMENT_COMPLETED"){
-                $flwave = getFlwave(isset($pp->merchantGateways['card']['flwave_percent']));
-                $pp->verifyFlwaveResponse($flwave->verifyTransactionByRef($pp->transaction->spay_ref));
-                $result = ['status' => true, 'authorization' => null, 'data' => $pp->transaction->refresh()->transactionToPayload()];
-            }
-        }
-        return $result;
+        return $this->checkPaymentCompletedFlag($pp);
 
     }
 
@@ -688,6 +687,28 @@ class PaymentController extends Controller
         }
         return $result;
 
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function authorizeCardWithAvs(authorizeCardWithAvsRequest $request)
+    {
+        /** @var Transaction $transaction */
+        $transaction = $request->transaction;
+
+        $pp = $this->bootstrapCardPayment($request);
+        $pp->user = $request->user();
+        $pp->transaction = $transaction;
+        $pp->cardDetails = json_decode($pp->cardDetails,true);
+        $pp->cardDetails['authorization']['mode']  = "avs_noauth";
+        $pp->cardDetails['authorization']['city']  = $request->input('city');
+        $pp->cardDetails['authorization']['address']  = $request->input('address');
+        $pp->cardDetails['authorization']['state']  = $request->input('state');
+        $pp->cardDetails['authorization']['country']  = $request->input('country');
+        $pp->cardDetails['authorization']['zipcode']  = $request->input('zipcode');
+        $pp->cardAuthorizationWithAvs();
+        return $this->checkPaymentCompletedFlag($pp);
     }
 
     public function consumatePayment(BankTransferRequest $request)
@@ -746,6 +767,25 @@ class PaymentController extends Controller
         $pp->cardDetails = json_encode($cardDetails);
 
         return $pp;
+    }
+
+    /**
+     * @param PaymentPage $pp
+     * @return array|mixed
+     * @throws \JsonException
+     */
+    public function checkPaymentCompletedFlag(PaymentPage $pp)
+    {
+        $result = $pp->details;
+
+        if (isset($result['flag'])) {
+            if (strtoupper($result['flag']) === "PAYMENT_COMPLETED") {
+                $flWave = getFlwave(isset($pp->merchantGateways['card']['flwave_percent']));
+                $pp->verifyFlwaveResponse($flWave->verifyTransactionByRef($pp->transaction->spay_ref));
+                $result = ['status' => true, 'authorization' => null, 'data' => $pp->transaction->refresh()->transactionToPayload()];
+            }
+        }
+        return $result;
     }
 
 }
