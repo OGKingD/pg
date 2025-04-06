@@ -207,8 +207,13 @@ class NinePSB
             ],
         ];
 
-        $result = $this->getWithRestfulHeaders($url, "post", $payload, $this->generateTokenVirtualAccounts());
-
+        $call_production = strtoupper(config('app.env')) === "PRODUCTION";
+        if ($call_production) {
+            $result = $this->getWithRestfulHeaders($url, "post", $payload, $this->generateTokenVirtualAccounts());
+        }
+        if (!$call_production) {
+            $result = $this->mockDynamicAccount($amount, $accountName, $spayRef);
+        }
 
         if (isset($result['code'])){
             if ($result['code'] === "S20"){
