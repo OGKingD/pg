@@ -40,6 +40,8 @@ class PaymentPage extends Component
     public $cc_Otp;
     public $isPinRequired;
     public $isOtpRequired;
+    public $isAvsRequired;
+    public $address, $state, $country, $zipcode, $city;
     public $hideCardFields;
     public $user;
     public $transaction;
@@ -384,10 +386,7 @@ class PaymentPage extends Component
             $this->details = $response;
             if ($response['status'] === true){
                 $this->cardDetails['authorization'] = $response['authorization'];
-                if ( strtoupper($response['flag']) === "PIN_REQUIRED"){
-                    $this->isPinRequired = true;
-                    $this->hideCardFields = true;
-                }
+                $this->checkAuthorizationType($response['flag']);
             }
 
             $blusaltRef = $response['reference'] ?? null;
@@ -489,12 +488,7 @@ class PaymentPage extends Component
             $this->details = $response;
 
             if ($response['status']){
-                //check if it's otp required;
-                if ($this->details['flag'] === "otp_required"){
-                    $this->isOtpRequired = true;
-                    $this->isPinRequired = false;
-                    $this->hideCardFields = true;
-                }
+                $this->checkAuthorizationType($this->details['flag']);
             }
         } catch (Exception $e) {
             logger("An Error Occurred while trying to Authorize with PIN: \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
@@ -561,11 +555,7 @@ class PaymentPage extends Component
 
             if ($response['status']){
                 //check if it's otp required;
-                if ($this->details['flag'] === "otp_required"){
-                    $this->isOtpRequired = true;
-                    $this->isPinRequired = false;
-                    $this->hideCardFields = true;
-                }
+                $this->checkAuthorizationType($this->details['flag']);
             }
 
             if (isset($response['flag'])) {
@@ -577,9 +567,9 @@ class PaymentPage extends Component
         } catch (Exception $e) {
             logger("An Error Occurred while trying to Authorize with AVS: \n {$e->getMessage()} \n {$e->getTraceAsString()} ");
 
-            $details = ['status' => false, 'errors' => $e->getMessage()];
-            $this->dispatchBrowserEvent('cardPaymentProcessed', $details);
+            $this->details = ['status' => false, 'errors' => $e->getMessage()];
         }
+        $this->dispatchBrowserEvent('cardPaymentProcessed', $this->details);
     }
 
     public function payWith($processor)
@@ -738,5 +728,29 @@ class PaymentPage extends Component
             $this->cardDetails['flw_ref'] = $data['flw_ref'];
         }
         return $response;
+    }
+
+    /**
+     * @param $flag
+     * @return void
+     */
+    public function checkAuthorizationType($flag): void
+    {
+        $flag = strtoupper($flag);
+        $this->isOtpRequired = false;
+        $this->isPinRequired = false;
+        $this->hideCardFields = true;
+        $this->isAvsRequired = false;
+
+        $authorizationTypes = [
+            'OTP_REQUIRED' => 'isOtpRequired',
+            'PIN_REQUIRED' => 'isPinRequired',
+            'AVS_REQUIRED' => 'isAvsRequired',
+        ];
+
+        if (isset($authorizationTypes[$flag])) {
+            $property = $authorizationTypes[$flag];
+            $this->$property = true;
+        }
     }
 }

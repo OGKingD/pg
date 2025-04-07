@@ -131,8 +131,7 @@ class Flutterwave
                 $result['authorization']['pin'] = "";
             }
             if ($authorizationMode === 'avs_noauth') {
-                $result["authorization"] = array("mode" => "avs_noauth", "city" => "Sampleville", "address" => "", "state" => "Simplicity", "country" => "Nigeria", "zipcode" => "000000",);
-                $result['flag'] = "charge_card";
+                $result['flag'] = "avs_required";
 
             }
             if ($authorizationMode === 'redirect') {

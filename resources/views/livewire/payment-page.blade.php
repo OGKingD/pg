@@ -505,6 +505,46 @@
                                         </div>
                                     @endif
 
+                                    @if($isAvsRequired)
+                                        <div id="addressField">
+                                            <div class="col-md-6 mb-3 field-container">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="card py-lg-3">
+
+                                            <div class="card-body ">
+                                                <h4 class="mb-0 font-weight-bolder">Address Information</h4>
+                                                <div class="mb-3">
+                                                    <label for="address">Address</label>
+                                                    <input class="form-control" placeholder="Enter Address" id="address" type="text" name="address" wire:model.lazy="address">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="city">City</label>
+                                                    <input class="form-control" placeholder="Enter City" id="city" type="text" name="city" wire:model.lazy="city">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="state">State</label>
+                                                    <input class="form-control" placeholder="Enter State" id="state" type="text" name="state" wire:model.lazy="state">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="country">Country</label>
+                                                    <input class="form-control" placeholder="Enter Country" id="country" type="text" name="country" wire:model.lazy="country">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="zipcode">Zip Code</label>
+                                                    <input class="form-control" placeholder="Enter Zip Code" id="zipcode" type="text" name="zipcode" wire:model.lazy="zipcode">
+                                                </div>
+                                                <div class="text-center">
+                                                    <button type="button" class="btn btn-lg bg-gradient-dark mt-3 mb-0" onclick="authorizeWith('avs')">Submit Address</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    @endif
+
 
                                 </div>
                             </form>
@@ -1140,9 +1180,9 @@
                         });
 
                     }
-                    if (response.flag === "charge_card") {
+                    if (response.flag === "avs_required") {
 
-                        authorizeWith('AVS');
+                        salert('Address verification Required to Proceed!', 'Information Needed', 'info');
 
                     }
 

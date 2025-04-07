@@ -641,12 +641,6 @@ class PaymentController extends Controller
     {
         $pp = $this->bootstrapCardPayment($request);
         $pp->processCardTransaction();
-        //check for if flag is charge_card and map to avs authorization;
-        if (isset($pp->details['flag'])){
-            if ( strtolower($pp->details['flag']) === "charge_card") {
-                $pp->details['flag'] = "avs_required";
-            }
-        }
         return $pp->details;
 
     }
