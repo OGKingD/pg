@@ -9,6 +9,7 @@ use App\Http\Requests\authorizeCardWithPinRequest;
 use App\Http\Requests\BankTransferRequest;
 use App\Http\Requests\CardTransferRequest;
 use App\Http\Requests\ChargeAndTotalRequest;
+use App\Http\Requests\PaymentRequest;
 use App\Http\Resources\InvoiceCollection;
 use App\Lib\Services\Blusalt;
 use App\Models\Gateway;
@@ -188,34 +189,19 @@ class PaymentController extends Controller
 
     }
 
-    public function createPaymentRequest(Request $request)
+    public function createPaymentRequest(PaymentRequest $request)
     {
-        $gateways = [];
-        $currencies = [];
-        $currency = "NGN";
+
+        $currency = $request->currency;
         $trn_details = [];
         $trn_channelId = $request->channel;
 
+        $channel = $request->input('channel');
         if ($request->has('channel')) {
-            $gateways = Gateway::all()->pluck('id', 'name')->toArray();
-            $trn_details['channel'] = strtolower(str_replace(" ", "", array_search($request->channel, $gateways, false)));
+            if (!empty($channel)) {
+                $trn_details['channel'] = $channel;
+            }
         }
-        if ($request->has('currency')) {
-            $currencies = ["NGN", "USD", "GBP", "EUR"];
-            $currency = strtoupper($request->currency);
-            $request->offsetSet('currency', $currency);
-        }
-        $request->validate([
-            "name" => "required",
-            "amount" => ["required", "numeric", ($currency === "NGN") ? "min:100" : "min:1"],
-            "email" => ["required", 'email:rfc'],
-            "quantity" => ["required", "numeric", "min:1"],
-            'request_id' => ["required", "min:5", "max:32"],
-            "channel" => ['sometimes', Rule::in($gateways)],
-            "currency" => ['sometimes', Rule::in($currencies)],
-            "redirect_url" => ["sometimes", "url"]
-
-        ], $request->all());
 
 
         /** @var User $user */
