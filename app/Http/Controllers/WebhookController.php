@@ -62,11 +62,12 @@ class WebhookController extends Controller
                 }
 
                 // check if id exist on flutter and reference belonngs to saana;
-                $flwave = getFlwave(false);
+                $isFlwavePercent = false;
                 if ($flwavePercent){
-                    $flwave = getFlwave(true);
+                    $isFlwavePercent = true;
                 }
-                $fromFlutterwave = $flwave->verifyTansactionByRef($flutterwaveId);
+                $flwave = getFlwave($isFlwavePercent);
+                $fromFlutterwave = $flwave->verifyTransactionByRef($flutterwaveId);
                 info("Transaction Verified :",$fromFlutterwave??[]);
                 $responseMessage = "Transaction Not Found on Flutterwave!";
 

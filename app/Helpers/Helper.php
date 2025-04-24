@@ -133,7 +133,7 @@ function getFlwave(bool $percent = false): Flutterwave
         config()->set('flutterwave.public_key', config('flutterwave.percent_public_key'));
     }
 
-    return new Flutterwave(config('flutterwave.secret_key'));
+    return new Flutterwave(config('flutterwave.secret_key'),config('flutterwave.encryption_key'));
 }
 
 
