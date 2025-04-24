@@ -607,7 +607,7 @@ class PaymentController extends Controller
         $pp->invoice = $transaction->invoice;
         $hours = $request->input('expires_at');
         $prefix = $request->input('account_name_prefix');
-        $expires_at = max(min($hours, 180), 30);
+        $expires_at = max(min($hours, 180), 60);
         $pp->generateVirtualAccountNumber($prefix, $expires_at);
         $virtualAccDetails = $pp->virtualAccDetails;
         if ($virtualAccDetails['status']) {
