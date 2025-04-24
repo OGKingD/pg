@@ -521,7 +521,7 @@ class WebhookController extends Controller
                 if ($response['status']){
                     $statusCode =  200;
                     $details = $response['data'];
-                    $rrr = $details['RRR'];
+                    $rrr = $details['RRR'] ?? $details['rrr'];
                     $responseMessage = "(RRR) $rrr Transaction Not Found on Gateway!";
                     //check if RRR exist on our side
                     $rrrExists  = RRR::firstWhere('rrr',$rrr);
