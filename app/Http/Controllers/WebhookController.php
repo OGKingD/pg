@@ -520,8 +520,9 @@ class WebhookController extends Controller
                 $responseMessage = "Could Not Confirm $rrr Status from Remita";
                 if ($response['status']){
                     $statusCode =  200;
+                    logger("Remita Response for $rrr \n". json_encode($response));
                     $details = $response['data'];
-                    $rrr = $details['RRR'];
+                    $rrr = $details['RRR'] ?? $details['rrr'];
                     $responseMessage = "(RRR) $rrr Transaction Not Found on Gateway!";
                     //check if RRR exist on our side
                     $rrrExists  = RRR::firstWhere('rrr',$rrr);

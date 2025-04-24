@@ -68,7 +68,7 @@ class Blusalt
                 "expiry" => $expiry,
             ],
             "user_information" => [
-                "device_signature" => "dafd-dfad-dfa",
+                "device_signature" => $trnxRef."#".request()->ip(),
                 "ip_address" => request()->ip(),
                 "email_address" => $emailAddress ?? "business@saanapay.ng",
                 "phone_number" => "08166332211",
