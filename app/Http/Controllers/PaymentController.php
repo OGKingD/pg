@@ -210,7 +210,7 @@ class PaymentController extends Controller
         $user = $request->user();
 
         //request passed create Invoice and return link;
-        $data = "";
+        $invoiceAdded = null;
         $request_id = $request->request_id;
 
         //check if invoice Exists;
@@ -227,7 +227,7 @@ class PaymentController extends Controller
 
         }
 
-        DB::transaction(function () use ($trn_channelId, $request, $request_id, $user, &$data, &$trn_details, &$currency) {
+        DB::transaction(function () use ($trn_channelId, $request, $request_id, $user, &$trn_details, &$currency, &$invoiceAdded) {
             $redirect_url = $request->redirect_url;
             $amount = $request->amount;
             /** @var Invoice $invoiceAdded */
@@ -261,10 +261,10 @@ class PaymentController extends Controller
                 "gateway_id" => $trn_channelId,
                 "redirect_url" => $redirect_url
             ]);
-            $data = new InvoiceCollection($invoiceAdded);
         });
+        $data = new InvoiceCollection($invoiceAdded);
         //set flag to indicate it's a paymentRequest;
-        $request->attributes->set('paymentRequest', true);
+        $request->merge(['paymentRequest' => true]);
 
         return response()->json(['status' => true, "message" => "Payment Request Successful", "data" => $data,]);
 

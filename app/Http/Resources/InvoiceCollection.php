@@ -18,7 +18,7 @@ class InvoiceCollection extends JsonResource
     {
 
         if ($request->get('paymentRequest')) {
-            return $this->paymentRequest($request);
+            return $this->paymentRequest();
         }
         return [
             "merchant_transaction_ref" => $this->resource->merchant_transaction_ref,
@@ -39,10 +39,9 @@ class InvoiceCollection extends JsonResource
     /**
      * Transform the resource collection into an array.
      *
-     * @param Request $request
      * @return array
      */
-    public function paymentRequest(Request $request): array
+    public function paymentRequest(): array
     {
         $url = config("app.url") . "/payment/process/$this->invoice_no";
 
