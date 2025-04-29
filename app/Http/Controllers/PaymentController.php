@@ -199,10 +199,8 @@ class PaymentController extends Controller
         $trn_channelId = $request->channel;
 
         $channel = $request->input('channel');
-        if ($request->has('channel')) {
-            if (!empty($channel)) {
-                $trn_details['channel'] = $channel;
-            }
+        if (!empty($channel)) {
+            $trn_details['channel'] = $channel;
         }
 
 
@@ -210,7 +208,7 @@ class PaymentController extends Controller
         $user = $request->user();
 
         //request passed create Invoice and return link;
-        $invoiceAdded = null;
+        $invoice = null;
         $request_id = $request->request_id;
 
         //check if invoice Exists;
@@ -227,11 +225,11 @@ class PaymentController extends Controller
 
         }
 
-        DB::transaction(function () use ($trn_channelId, $request, $request_id, $user, &$trn_details, &$currency, &$invoiceAdded) {
+        DB::transaction(function () use ($trn_channelId, $request, $request_id, $user, $trn_details, $currency, &$invoice) {
             $redirect_url = $request->redirect_url;
             $amount = $request->amount;
-            /** @var Invoice $invoiceAdded */
-            $invoiceAdded = $user->invoice()->create([
+            /** @var Invoice $invoice */
+            $invoice = $user->invoice()->create([
                 'invoice_no' => 'INV' . $request_id,
                 'quantity' => 1,
                 'customer_email' => $request->email,
@@ -240,16 +238,17 @@ class PaymentController extends Controller
                 'amount' => $amount,
                 'name' => $request->name,
             ]);
-            //Add Transaction;
+
             $uuid = Str::orderedUuid();
             //check if merchantRedirectURL is set and add it ;
             if (isset($redirect_url)) {
                 $trn_details['redirect_url'] = $redirect_url;
                 $trn_details['full_name'] = $request->full_name;
             }
-            $invoiceAdded->transaction()->create([
+
+            $invoice->transaction()->create([
                 "transaction_ref" => $uuid,
-                "user_id" => $invoiceAdded->user_id,
+                "user_id" => $invoice->user_id,
                 "merchant_transaction_ref" => $request_id ?? $uuid,
                 "status" => "pending",
                 "type" => $request->service_type ?? "N/A",
@@ -262,7 +261,8 @@ class PaymentController extends Controller
                 "redirect_url" => $redirect_url
             ]);
         });
-        $data = new InvoiceCollection($invoiceAdded);
+
+        $data = new InvoiceCollection($invoice);
         //set flag to indicate it's a paymentRequest;
         $request->merge(['paymentRequest' => true]);
 
