@@ -20,7 +20,7 @@ class PushtoWebhookJob implements ShouldQueue
 
     public function __construct(Transaction $transaction)
     {
-        $this->transaction = $transaction;
+        $this->transaction = $transaction->refresh();
 
         $this->user_id = $transaction->user_id;
     }
@@ -30,9 +30,9 @@ class PushtoWebhookJob implements ShouldQueue
     public function handle(WebhookPush $webhookPush)
     {
         $webhook_url = $this->transaction->user->webhook_url;
+        $payload = $this->transaction->transactionToPayload();
         if ($webhook_url) {
             //log into webhook push table that request has been triggered;
-            $payload = $this->transaction->transactionToPayload();
             $webhookPush = $webhookPush->logWebhookPush($this->transaction->id,$this->transaction->merchant_transaction_ref,$this->user_id,$payload);
             //send request to webhookUrl;
             $url = $webhook_url->url;
@@ -41,7 +41,7 @@ class PushtoWebhookJob implements ShouldQueue
             }
             //send to the URL;
            if ($url){
-               $response = Http::withoutVerifying()->get($url, $payload)->json();
+               $response = Http::withoutVerifying()->post($url, $payload)->json();
                //update with response from webhookUrl;
                $webhookPush->logWebhookResponse($response);
            }

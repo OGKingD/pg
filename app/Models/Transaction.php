@@ -503,8 +503,8 @@ class Transaction extends Model
     public function transactionToPayload(): array
     {
         $payload = $this->only(["gateway","transaction_ref", "merchant_transaction_ref", "invoice_no", "gateway_id", "amount", "description", "status", "flag", "currency","details", "updated_at"]);
-        $payload['customer_name'] = $payload['details']['name'] ?? null;
-        $payload['customer_email'] = $payload['details']['email'] ?? null;
+        $payload['customer_name'] = $payload['details']['name'] ?? $this->invoice->customer_name;
+        $payload['customer_email'] = $payload['details']['email'] ?? $this->invoice->customer_email;
         $payload["channel"] = $payload['gateway']['name'] ?? "N/A";
         $payload["total"] = $payload['amount'];
         $payload['updated_at'] = str_replace("T"," ",Carbon::parse($payload['updated_at'])->toDateTimeLocalString());
