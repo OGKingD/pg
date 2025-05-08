@@ -70,4 +70,4 @@ Route::get('payment/card/validate/{id}',[\App\Http\Controllers\PaymentController
 Route::get('payment/receipt/{id}',[\App\Http\Controllers\PaymentController::class,'receipt'])->name('receipt');
 Route::get('customers/search', \App\Http\Livewire\ReceiptPage::class);
 
-Route::get('trigger_notification/{id}',[\App\Http\Controllers\testController::class,'trigger']);
+Route::get('trigger_notification/{id}',[\App\Http\Controllers\MerchantWebhooksController::class,'trigger']);
