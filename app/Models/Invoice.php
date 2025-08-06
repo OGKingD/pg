@@ -97,7 +97,7 @@ class Invoice extends Model
             $data['type'] = str_replace("CMD_", "", $data['type']);
         }
         $data['invoiceno'] = $this->transaction->merchant_transaction_ref;
-        return \Http::withoutVerifying()->get($url,$data)->json();
+        return \Http::withoutVerifying()->timeout(20)->get($url,$data)->json();
 
     }
 }
