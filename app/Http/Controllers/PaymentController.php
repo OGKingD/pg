@@ -215,7 +215,7 @@ class PaymentController extends Controller
         $transaction = Transaction::firstWhere('merchant_transaction_ref', $request_id);
         if ($transaction) {
             //check for UI merchant and apply custom rule;
-            if ($user->id === 3) {
+            if (in_array($user->id, explode(',', config('app.skip_duplicate_create_payment_request_merchants')))) {
                 return $this->UIpaymentRule($transaction, $request);
             }
             $error = [
