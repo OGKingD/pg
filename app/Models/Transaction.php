@@ -17,7 +17,9 @@ class Transaction extends Model
 
     public  function generateCsvReport(array $payload, array $csvHeaders)
     {
-        $file = fopen(storage_path("logs/{$payload['filename']}"), "wb");
+        $originalFileName = $payload['filename'];
+        $filename = $originalFileName ."_temp";
+        $file = fopen(storage_path("logs/$filename"), "wb");
         $query = self::reportQuery($payload)->orderBy('user_id','desc')->orderBy('updated_at');
         //5,6,7
         $totalFee= $totalAmount = $totalSum = $totalStampDuty = $totalCustomerServiceChargeAmount =
@@ -44,6 +46,8 @@ class Transaction extends Model
         $reportFooter = $this->setReportFooter($csvHeaders, $totalStampDuty, $totalFee, $totalAmount, $totalSum, $totalCustomerServiceChargeAmount, $totalMerchantServiceChargeAmount);
         fputcsv($file,$reportFooter);
         fclose($file);
+        //rename the file
+        rename(storage_path("logs/$filename"), storage_path("logs/". $originalFileName));
 
     }
 

@@ -725,16 +725,16 @@
                                             </div>
                                             @if($virtualAccDetails['status'])
                                                 <div class="mt-4 text-center">
+
+                                                    <button class="btn btn-success " wire:click="confirmPayment">
+                                                        Confirm Payment
+                                                    </button>
                                                     <div class="mb-2">
                                                         <span class="text-danger text-sm text-bold">Note:</span>
                                                         <span class="text-sm">
                                                         <b>Click only</b> when you have made a successful transfer and your bank has issued you receipt!
                                                     </span>
                                                     </div>
-
-                                                    <button class="btn btn-outline-info btn-sm text-dark" wire:click="confirmPayment">
-                                                        Confirm Payment
-                                                    </button>
                                                 </div>
                                             @endif
                                         @endif
