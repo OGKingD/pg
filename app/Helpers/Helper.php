@@ -41,10 +41,13 @@ function send_email($to, $name, $subject, $message, $extras = [], $type = null)
 function inspirationalText()
 {
     $text = Inspiring::quote();
-    $array = explode('-', $text);
-    $author = $array [count($array) - 1];
-    array_pop($array);
-    return ["quote" => implode(" ", $array), "author" => $author];
+    // Split the quote into content and author
+    $parts = explode('— ', $text, 2);
+
+    return [
+        'quote' => trim($parts[0]),
+        'author' => trim($parts[1])
+    ];
 
 }
 
