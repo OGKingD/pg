@@ -9,10 +9,7 @@ trait PaymentRequest
 {
     use AuthorizeApi;
 
-    public function authorize(): bool
-    {
-        return (bool)$this->user();
-    }
+
 
     public function isRequestIdValid($request_id): \Closure
     {
