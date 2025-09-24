@@ -38,6 +38,9 @@ class TransactionController extends Controller
             ->whereNotNull('invoice_no')
             ->where('user_id', $userId)
             ->whereBetween('updated_at', [$startDate, $endDate])
+            ->when($request->filled('service_type'), function ($query) use ($request) {
+                $query->where('type', $request->get('service_type'));
+            })
             ->orderBy('id')
             ->paginate($perPage);
 
