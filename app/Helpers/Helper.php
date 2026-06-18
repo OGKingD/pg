@@ -42,7 +42,7 @@ function inspirationalText()
 {
     $text = Inspiring::quote();
     // Split the quote into content and author
-    $parts = explode('— ', $text, 2);
+    $parts = explode('-', $text, 2);
 
     return [
         'quote' => trim($parts[0]),
