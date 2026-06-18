@@ -42,6 +42,25 @@
                                         @enderror
                                         <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
                                     </div>
+
+                                    {{-- Captcha --}}
+                                    <div class="form-group">
+
+                                        <label class="font-weight-bold">
+                                            Verification
+                                        </label>
+
+                                        <div class="captcha-wrapper">
+                                            {!! app('captcha')->display() !!}
+                                        </div>
+
+                                        @error('g-recaptcha-response')
+                                        <small class="text-danger d-block mt-2">
+                                            {{ $message }}
+                                        </small>
+                                        @enderror
+
+                                    </div>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
                                         <label class="form-check-label" for="rememberMe">Remember me</label>

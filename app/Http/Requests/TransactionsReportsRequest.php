@@ -13,6 +13,7 @@ class TransactionsReportsRequest extends FormRequest
         return [
             'start_date' => ['required', 'date_format:Y-m-d'],
             'end_date' => ['required', 'date_format:Y-m-d', 'after:start_date'],
+            'service_type' => ['nullable'],
         ];
     }
 

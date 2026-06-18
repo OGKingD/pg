@@ -39,6 +39,7 @@ class RegisteredUserController extends Controller
             'terms' => ['required', 'accepted'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'g-recaptcha-response' => ['required',],
         ]);
 
         try {
